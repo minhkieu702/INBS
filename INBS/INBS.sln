@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "INBS.Data", "INBS.Data\INBS.Data.csproj", "{F9333B50-961D-4061-BA37-D49E1B4CE50B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F9333B50-961D-4061-BA37-D49E1B4CE50B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9333B50-961D-4061-BA37-D49E1B4CE50B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9333B50-961D-4061-BA37-D49E1B4CE50B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9333B50-961D-4061-BA37-D49E1B4CE50B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BF2AFDB1-85B5-4EF9-BD43-EF2D8236EE3D}
+	EndGlobalSection
+EndGlobal
