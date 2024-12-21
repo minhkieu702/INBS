@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Configurations\" />
+    <Folder Include="DependencyInjection\" />
+    <Folder Include="Integrations\" />
+    <Folder Include="PayOS\" />
+    <Folder Include="SignalR\" />
+    <Folder Include="Payment\" />
+    <Folder Include="Quartz\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\INBS.Application\INBS.Application.csproj" />
+    <ProjectReference Include="..\INBS.Persistence\INBS.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>
