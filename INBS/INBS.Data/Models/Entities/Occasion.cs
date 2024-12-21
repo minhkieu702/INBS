@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Data.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSBS.Data.Models.Entities
+namespace INBS.Data.Models.Entities
 {
     public class Occasion
     {
@@ -15,6 +16,7 @@ namespace NSBS.Data.Models.Entities
             ID = Guid.NewGuid();
             Name = string.Empty;
             NailDesignOccasions = [];
+            OccasionPreferences = [];
         }
 
         [Key]
@@ -26,5 +28,8 @@ namespace NSBS.Data.Models.Entities
 
         [InverseProperty(nameof(NailDesignOccasion.Occasion))]
         public virtual ICollection<NailDesignOccasion> NailDesignOccasions { get; set; }
+
+        [InverseProperty(nameof(OccasionPreference.Occasion))]
+        public virtual ICollection<OccasionPreference> OccasionPreferences { get; set; }
     }
 }

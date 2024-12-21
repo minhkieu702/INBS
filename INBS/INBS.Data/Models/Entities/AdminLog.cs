@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Data.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSBS.Data.Models.Entities
+namespace INBS.Data.Models.Entities
 {
     public class AdminLog
     {
@@ -23,6 +24,6 @@ namespace NSBS.Data.Models.Entities
         public Guid AdminId { get; set; }
         [ForeignKey(nameof(AdminId))]
         [InverseProperty(nameof(Admin.AdminLogs))]
-        public virtual User? Admin { get; set; }
+        public virtual Admin? Admin { get; set; }
     }
 }

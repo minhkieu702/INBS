@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Data.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSBS.Data.Models.Entities
+namespace INBS.Data.Models.Entities
 {
     public class NailDesign
     {
@@ -17,6 +18,8 @@ namespace NSBS.Data.Models.Entities
             Images = [];
             Bookings = [];
             NailDesignOccasions = [];
+            FavoriteDesigns = [];
+            NailDesignSkinTones = [];
         }
 
         [Key]
@@ -37,6 +40,10 @@ namespace NSBS.Data.Models.Entities
         [InverseProperty(nameof(NailDesignOccasion.Design))]
         public virtual ICollection<NailDesignOccasion> NailDesignOccasions { get; set; }
 
+        [InverseProperty(nameof(FavoriteDesign.Design))]
+        public virtual ICollection<FavoriteDesign> FavoriteDesigns { get; set; }
 
+        [InverseProperty(nameof(NailDesignSkinTone.Design))]
+        public virtual ICollection<NailDesignSkinTone> NailDesignSkinTones { get; set; }
     }
 }

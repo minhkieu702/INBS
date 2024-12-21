@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Data.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSBS.Data.Models.Entities
+namespace INBS.Data.Models.Entities
 {
     public class User
     {
@@ -17,11 +18,6 @@ namespace NSBS.Data.Models.Entities
             Preferences = string.Empty;
             Email = string.Empty;
             CreateAt = DateTime.Now;
-            UserWaitLists = [];
-            ArtistAvailabilities = [];
-            AdminLogs = [];
-            UserBookings = [];
-            Recommendations = [];
         }
 
         [Key]
@@ -35,28 +31,19 @@ namespace NSBS.Data.Models.Entities
 
         public string? PhoneNumber { get; set; }
 
-        public int Role { get; set; } = 0;
+        public int Role { get; set; }
 
         public string? Preferences { get; set; }
 
         public DateTime CreateAt { get; set; }
 
-        [InverseProperty(nameof(UserWaitList.User))]
-        public virtual ICollection<UserWaitList> UserWaitLists { get; set; }
+        [InverseProperty(nameof(Customer.User))]
+        public virtual Customer? Customer { get; set; }
 
-        //[InverseProperty(nameof (CustomerPreference))]
-        //public virtual ICollection<CustomerPreference> CustomerPreferences { get; set; }
+        [InverseProperty(nameof(Admin.User))]
+        public virtual Admin? Admin { get; set; }
 
-        [InverseProperty(nameof(ArtistAvailability.Artist))]
-        public virtual ICollection<ArtistAvailability> ArtistAvailabilities { get; set; }
-
-        [InverseProperty(nameof(AdminLog.Admin))]
-        public virtual ICollection<AdminLog> AdminLogs { get; set; }
-
-        [InverseProperty(nameof(UserBooking.User))]
-        public virtual ICollection<UserBooking> UserBookings { get; set; }
-
-        [InverseProperty(nameof(Recommendation.Customer))]
-        public virtual ICollection<Recommendation> Recommendations { get; set; }
+        [InverseProperty(nameof(Artist.User))]
+        public virtual Artist? Artist { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Data.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSBS.Data.Models.Entities
+namespace INBS.Data.Models.Entities
 {
     public class WaitList
     {
@@ -14,7 +15,6 @@ namespace NSBS.Data.Models.Entities
         {
             ID = Guid.NewGuid();
             AddedAt = DateTime.Now;
-            UserWaitLists = [];
         }
 
         [Key]
@@ -28,7 +28,14 @@ namespace NSBS.Data.Models.Entities
 
         public DateTime AddedAt { get; set; }
 
-        [InverseProperty(nameof(UserWaitList.WaitList))]
-        public virtual ICollection<UserWaitList> UserWaitLists { get; set; }
+        public Guid ArtistId { get; set; }
+        [ForeignKey(nameof(ArtistId))]
+        [InverseProperty(nameof(Artist.WaitLists))]
+        public virtual Artist? Artist { get; set; }
+
+        public Guid CustomerId { get; set; }
+        [ForeignKey(nameof(CustomerId))]
+        [InverseProperty(nameof(Customer.WaitLists))]
+        public virtual Customer? Customer { get; set; }
     }
 }

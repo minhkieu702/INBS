@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Data.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,14 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSBS.Data.Models.Entities
+namespace INBS.Data.Models.Entities
 {
     public class Booking
     {
         public Booking()
         {
             ID = Guid.NewGuid();
-            UserBookings = [];
         }
 
         [Key]
@@ -38,9 +38,18 @@ namespace NSBS.Data.Models.Entities
         [InverseProperty(nameof(Design.Bookings))]
         public virtual NailDesign? Design { get; set; }
 
-        [InverseProperty(nameof(UserBooking.Booking))]
-        public virtual ICollection<UserBooking> UserBookings { get; set; }
+        public Guid ArtistId { get; set; }
+        [ForeignKey(nameof(ArtistId))]
+        [InverseProperty(nameof(Artist.Bookings))]
+        public virtual Artist? Artist { get; set; }
 
+        public Guid CustomerId { get; set; }
+        [ForeignKey(nameof(CustomerId))]
+        [InverseProperty(nameof(Customer.Bookings))]
+        public virtual Customer? Customer { get; set; }
+
+
+        [InverseProperty(nameof(Cancellation.Booking))]
         public virtual Cancellation? Cancellation { get; set; }
     }
 }

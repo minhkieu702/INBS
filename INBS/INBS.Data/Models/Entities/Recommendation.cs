@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NSBS.Data.Models.Entities
+namespace INBS.Data.Models.Entities
 {
     public class Recommendation
     {
@@ -29,6 +29,6 @@ namespace NSBS.Data.Models.Entities
         public Guid CustomerId { get; set; }
         [ForeignKey(nameof(CustomerId))]
         [InverseProperty(nameof(Customer.Recommendations))]
-        public virtual User? Customer { get; set; }
+        public virtual Customer? Customer { get; set; }
     }
 }
