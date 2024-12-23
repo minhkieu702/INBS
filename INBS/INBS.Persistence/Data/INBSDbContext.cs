@@ -40,6 +40,8 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<NailDesignSkinTone> NailDesignSkinTones { get; set; }
 
+        public virtual DbSet<Notification> Notifications { get; set; }
+
         public virtual DbSet<Occasion> Occasions { get; set; }
 
         public virtual DbSet<OccasionPreference> OccasionPreferences { get; set; }
@@ -49,8 +51,6 @@ namespace INBS.Persistence.Data
         public virtual DbSet<SkinTone> SkinTones { get; set; }
 
         public virtual DbSet<User> Users { get; set; }
-
-        public virtual DbSet<WaitList> WaitLists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -109,6 +109,7 @@ namespace INBS.Persistence.Data
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.EnableSensitiveDataLogging();
                 optionsBuilder.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
+                //optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBS; TrustServerCertificate=True");
             }
         }
 

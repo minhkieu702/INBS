@@ -45,5 +45,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(Artist.User))]
         public virtual Artist? Artist { get; set; }
+
+        [InverseProperty(nameof(Notification.User))]
+        public virtual Notification Notification { get; set; }
     }
 }
