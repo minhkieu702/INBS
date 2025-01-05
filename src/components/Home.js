@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Home.css';
 import '../data.json';
+import { PieChart, Pie, Cell, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 function Home() {
   const [bookings, setBookings] = useState([]);
@@ -10,7 +11,8 @@ function Home() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const [filters, setFilters] = useState({
     service: '',
-    store: ''
+    store: '',
+    price: ''
   });
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
@@ -92,6 +94,51 @@ function Home() {
     return [...new Set(bookings.map(booking => booking[key]))];
   };
 
+  // Get data for pie chart
+  const getPieChartData = () => {
+    const serviceCount = {};
+    bookings.forEach(booking => {
+      serviceCount[booking.service] = (serviceCount[booking.service] || 0) + 1;
+    });
+    
+    return Object.entries(serviceCount).map(([name, value]) => ({
+      name,
+      value
+    }));
+  };
+
+  // Get data for price bar chart
+  const getPriceChartData = () => {
+    const priceRanges = {
+      '200,000-250,000': 0,
+      '250,001-500,000': 0,
+      '500,001-1,000,000': 0,
+      '1,000,001-2,000,000': 0,
+      '2,000,000+': 0
+    };
+
+    bookings.forEach(booking => {
+      const price = Number(booking.price);
+      if (price <= 250000) {
+        priceRanges['200,000-250,000']++;
+      } else if (price <= 500000) {
+        priceRanges['250,001-500,000']++;
+      } else if (price <= 10000000) {
+        priceRanges['500,001-1,000,000']++;
+      } else if (price <= 20000000) {
+        priceRanges['1,000,001-2,000,000']++;
+      } else {
+        priceRanges['2,000,000+']++;
+      }
+    });
+
+    return Object.entries(priceRanges).map(([range, count]) => ({
+      range,
+      count
+    }));
+  };
+
+  const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
   
   const filteredAndSortedBookings = bookings
     .filter(booking => {
@@ -118,131 +165,33 @@ function Home() {
     });
 
   return (
-    <div style={{
-      display: 'flex',
-      minHeight: '100vh'
-    }}>
-      {/* Sidebar */}
+    <div className="layout">
       <div 
+        className={`sidebar ${showSidebar ? 'expanded' : ''}`}
         onMouseEnter={() => setShowSidebar(true)}
         onMouseLeave={() => setShowSidebar(false)}
-        style={{
-          width: showSidebar ? '280px' : '70px',
-          background: 'linear-gradient(180deg, #1a237e, #0d47a1)',
-          padding: '35px 0',
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'fixed',
-          height: '100vh',
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          overflow: 'hidden',
-          boxShadow: '4px 0 15px rgba(0,0,0,0.15)',
-          zIndex: 1000
-        }}>
-        <div style={{
-          padding: '0 25px',
-          marginBottom: '50px',
-          whiteSpace: 'nowrap'
-        }}>
-          <h1 style={{
-            color: 'white',
-            fontSize: showSidebar ? '38px' : '34px',
-            fontWeight: '900',
-            letterSpacing: '4px',
-            margin: 0,
-            textShadow: '2px 2px 8px rgba(0,0,0,0.3)',
-            fontFamily: "'Poppins', sans-serif",
-            background: 'linear-gradient(45deg, #fff, #64b5f6)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            transition: 'all 0.3s ease'
-          }}>{showSidebar ? 'INBS' : 'IB'}</h1>
+      >
+        <div className="sidebar-header">
+          <h1 className="sidebar-title">{showSidebar ? 'INBS' : 'IB'}</h1>
         </div>
 
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '15px',
-          padding: '0 25px'
-        }}>
-          <button
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'white',
-              padding: '18px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '15px',
-              transition: 'all 0.3s ease',
-              whiteSpace: 'nowrap',
-              backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-            }}
-            onClick={handleStore}
-          >
-            <span style={{ fontSize: '24px', filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.2))' }}>📊</span>
+        <div className="sidebar-buttons">
+          <button className="sidebar-button" onClick={handleStore}>
+            <span className="sidebar-button-icon">📊</span>
             {showSidebar && 'Store'}
           </button>
-          <button
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.1)', 
-              color: 'white',
-              padding: '18px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '15px',
-              transition: 'all 0.3s ease',
-              whiteSpace: 'nowrap',
-              backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-            }}
-            onClick={handleArtist}
-          >
-            <span style={{ fontSize: '24px', filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.2))' }}>🎨</span>
+          <button className="sidebar-button" onClick={handleArtist}>
+            <span className="sidebar-button-icon">🎨</span>
             {showSidebar && 'Artist'}
           </button>
-
-          <button
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: 'white',
-              padding: '18px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '600',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '15px',
-              transition: 'all 0.3s ease',
-              marginTop: 'auto',
-              whiteSpace: 'nowrap',
-              backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-            }}
-            onClick={handleLogout}
-          >
-            <span style={{ fontSize: '24px', filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.2))' }}>⬅️</span>
+          <button className="sidebar-button" onClick={handleLogout}>
+            <span className="sidebar-button-icon">⬅️</span>
             {showSidebar && 'Logout'}
           </button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div style={{
-        flex: 1,
-        marginLeft: showSidebar ? '280px' : '70px',
-        background: 'linear-gradient(135deg, #f6f9fc 0%, #e9f2f9 100%)',
-        transition: 'margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-      }}>
+      <div className={`main-content ${showSidebar ? 'sidebar-expanded' : ''}`}>
         <div className="home-container" style={{ padding: '40px' }}>
           <div style={{ 
             display: 'flex', 
@@ -262,6 +211,119 @@ function Home() {
               margin: 0,
               textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
             }}>Booking Management</h1>
+          </div>
+
+          {/* Analytics Section */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '20px',
+            marginBottom: '20px'
+          }}>
+            {/* Service Distribution Chart */}
+            <div style={{
+              background: 'rgba(255,255,255,0.95)',
+              padding: '30px',
+              borderRadius: '15px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+            }}>
+              <h2 style={{
+                color: '#1e3c72',
+                marginBottom: '20px',
+                fontSize: '24px',
+                fontWeight: '600'
+              }}>Service Distribution</h2>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '20px'
+              }}>
+                <PieChart width={500} height={400}>
+                  <Pie
+                    data={getPieChartData()}
+                    cx={250}
+                    cy={200}
+                    innerRadius={80}
+                    outerRadius={160}
+                    fill="#8884d8"
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({name, percent}) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    labelLine={{stroke: '#666', strokeWidth: 1}}
+                  >
+                    {getPieChartData().map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={COLORS[index % COLORS.length]}
+                        stroke="#fff"
+                        strokeWidth={2}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      padding: '10px 15px'
+                    }}
+                  />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={36}
+                    iconType="circle"
+                    iconSize={10}
+                    wrapperStyle={{
+                      padding: '20px 0',
+                      fontSize: '14px'
+                    }}
+                  />
+                </PieChart>
+              </div>
+            </div>
+
+            {/* Price Distribution Chart */}
+            <div style={{
+              background: 'rgba(255,255,255,0.95)',
+              padding: '30px',
+              borderRadius: '15px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+            }}>
+              <h2 style={{
+                color: '#1e3c72',
+                marginBottom: '20px',
+                fontSize: '24px',
+                fontWeight: '600'
+              }}>Price Distribution</h2>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '20px'
+              }}>
+                <BarChart width={500} height={400} data={getPriceChartData()}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="range" />
+                  <YAxis />
+                  <Tooltip 
+                    contentStyle={{
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      padding: '10px 15px'
+                    }}
+                  />
+                  <Bar dataKey="count" fill="#24BFDD">
+                    {getPriceChartData().map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </div>
+            </div>
           </div>
 
           {/* Search and Filter Controls */}

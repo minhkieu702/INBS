@@ -99,3 +99,87 @@
   .booking-list th:last-child {
     border-top-right-radius: 12px;
   }
+
+  .sidebar {
+    width: 70px;
+    background: linear-gradient(180deg, #1a237e, #0d47a1);
+    padding: 35px 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.15);
+    z-index: 1000;
+  }
+
+  .sidebar.expanded {
+    width: 280px;
+  }
+
+  .sidebar-header {
+    padding: 0 25px;
+    margin-bottom: 50px;
+    white-space: nowrap;
+  }
+
+  .sidebar-title {
+    color: white;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    margin: 0;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(45deg, #fff, #64b5f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar.expanded .sidebar-title {
+    font-size: 38px;
+  }
+
+  .sidebar-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 0 25px;
+  }
+
+  .sidebar-button {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+    padding: 18px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .sidebar-button-icon {
+    font-size: 24px;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+  }
+
+  .main-content {
+    flex: 1;
+    margin-left: 70px;
+    background: linear-gradient(135deg, #f6f9fc 0%, #e9f2f9 100%);
+    transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .main-content.sidebar-expanded {
+    margin-left: 280px;
+  }
+
+  /* Add more styles for other components... */
