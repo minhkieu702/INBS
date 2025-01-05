@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../css/Store.css';
 
 function Store() {
+  const [showSidebar, setShowSidebar] = useState(false);
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -10,6 +12,7 @@ function Store() {
     quantity: '',
     description: ''
   });
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -35,103 +38,137 @@ function Store() {
     setProducts(products.filter(product => product.id !== id));
   };
 
+  const handleLogout = () => navigate('/');
+  const handleHome = () => navigate('/home');
+  const handleArtist = () => navigate('/artist');
+
   return (
     <div className="store-container">
-      <h1>Quản lý Store</h1>
+      {/* Sidebar */}
+      <div 
+        className={`sidebar ${showSidebar ? 'expanded' : ''}`}
+        onMouseEnter={() => setShowSidebar(true)}
+        onMouseLeave={() => setShowSidebar(false)}
+      >
+        <div className="logo-container">
+          <h1 className="logo">{showSidebar ? 'INBS' : 'IB'}</h1>
+        </div>
 
-      <div className="product-form">
-        <h2>Thêm sản phẩm mới</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <input
-              type="text"
-              name="name"
-              placeholder="Tên sản phẩm"
-              value={newProduct.name}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="number"
-              name="price"
-              placeholder="Giá"
-              value={newProduct.price}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <select
-              name="category"
-              value={newProduct.category}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Chọn danh mục</option>
-              <option value="skincare">Skincare</option>
-              <option value="makeup">Makeup</option>
-              <option value="haircare">Haircare</option>
-              <option value="bodycare">Bodycare</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <input
-              type="number"
-              name="quantity"
-              placeholder="Số lượng"
-              value={newProduct.quantity}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <textarea
-              name="description"
-              placeholder="Mô tả sản phẩm"
-              value={newProduct.description}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <button type="submit">Thêm sản phẩm</button>
-        </form>
+        <div className="sidebar-buttons">
+          <button className="sidebar-button" onClick={handleHome}>
+            <span className="button-icon">🏠</span>
+            {showSidebar && 'Home'}
+          </button>
+
+          <button className="sidebar-button" onClick={handleArtist}>
+            <span className="button-icon">🎨</span>
+            {showSidebar && 'Artist'}
+          </button>
+
+          <button className="sidebar-button logout-button" onClick={handleLogout}>
+            <span className="button-icon">⬅️</span>
+            {showSidebar && 'Logout'}
+          </button>
+        </div>
       </div>
 
-      <div className="product-list">
-        <h2>Danh sách sản phẩm</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Tên sản phẩm</th>
-              <th>Giá</th>
-              <th>Danh mục</th>
-              <th>Số lượng</th>
-              <th>Mô tả</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td>{product.name}</td>
-                <td>{product.price}đ</td>
-                <td>{product.category}</td>
-                <td>{product.quantity}</td>
-                <td>{product.description}</td>
-                <td>
-                  <button 
-                    className="delete-btn"
-                    onClick={() => handleDelete(product.id)}
-                  >
-                    Xóa
-                  </button>
-                </td>
+      {/* Main Content */}
+      <div className={`main-content ${showSidebar ? 'sidebar-expanded' : ''}`}>
+        <div className="header">
+          <h1 className="page-title">Store Management</h1>
+        </div>
+
+        <div className="product-form">
+          <h2 className="section-title">Add New Product</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-grid">
+              <input
+                type="text"
+                name="name"
+                placeholder="Product Name"
+                value={newProduct.name}
+                onChange={handleInputChange}
+                required
+                className="form-input"
+              />
+              <input
+                type="number"
+                name="price"
+                placeholder="Price"
+                value={newProduct.price}
+                onChange={handleInputChange}
+                required
+                className="form-input"
+              />
+              <select
+                name="category"
+                value={newProduct.category}
+                onChange={handleInputChange}
+                required
+                className="form-input"
+              >
+                <option value="">Select Category</option>
+                <option value="skincare">Skincare</option>
+                <option value="makeup">Makeup</option>
+                <option value="haircare">Haircare</option>
+                <option value="bodycare">Bodycare</option>
+              </select>
+              <input
+                type="number"
+                name="quantity"
+                placeholder="Quantity"
+                value={newProduct.quantity}
+                onChange={handleInputChange}
+                required
+                className="form-input"
+              />
+              <textarea
+                name="description"
+                placeholder="Product Description"
+                value={newProduct.description}
+                onChange={handleInputChange}
+                required
+                className="form-input"
+              />
+            </div>
+            <button type="submit" className="submit-button">Add Product</button>
+          </form>
+        </div>
+
+        <div className="product-list">
+          <h2 className="section-title">Product List</h2>
+          <table className="product-table">
+            <thead>
+              <tr className="product-table-header">
+                <th className="product-table-header-cell">Product Name</th>
+                <th className="product-table-header-cell">Price</th>
+                <th className="product-table-header-cell">Category</th>
+                <th className="product-table-header-cell">Quantity</th>
+                <th className="product-table-header-cell">Description</th>
+                <th className="product-table-header-cell">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id} className="product-table-row">
+                  <td className="product-table-cell">{product.name}</td>
+                  <td className="product-table-cell">{product.price}</td>
+                  <td className="product-table-cell">{product.category}</td>
+                  <td className="product-table-cell">{product.quantity}</td>
+                  <td className="product-table-cell">{product.description}</td>
+                  <td className="product-table-cell">
+                    <button 
+                      onClick={() => handleDelete(product.id)}
+                      className="delete-button"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

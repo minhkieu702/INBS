@@ -7,6 +7,7 @@ function Artist() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [selectedStore, setSelectedStore] = useState('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,6 +38,10 @@ function Artist() {
     setSearchTerm(event.target.value);
   };
 
+  const handleStoreFilter = (event) => {
+    setSelectedStore(event.target.value);
+  };
+
   const requestSort = (key) => {
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -45,12 +50,20 @@ function Artist() {
     setSortConfig({ key, direction });
   };
 
+  const getUniqueStores = () => {
+    const stores = artists.map(artist => artist.storeAddress);
+    return [...new Set(stores)];
+  };
+
   const filteredAndSortedArtists = Array.isArray(artists) ? artists
     .filter(artist => 
       Object.values(artist)
         .join(' ')
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
+    )
+    .filter(artist => 
+      selectedStore === 'all' ? true : artist.storeAddress === selectedStore
     )
     .sort((a, b) => {
       if (!sortConfig.key) return 0;
@@ -107,6 +120,22 @@ function Artist() {
             value={searchTerm}
             onChange={handleSearch}
           />
+          <select 
+            value={selectedStore}
+            onChange={handleStoreFilter}
+            className="store-filter"
+            style={{
+              padding: '10px',
+              marginLeft: '10px',
+              borderRadius: '8px',
+              border: '1px solid #ddd'
+            }}
+          >
+            <option value="all">All Stores</option>
+            {getUniqueStores().map((store, index) => (
+              <option key={index} value={store}>{store}</option>
+            ))}
+          </select>
         </div>
 
         <div className="artists-list">
@@ -139,8 +168,8 @@ function Artist() {
               </tr>
             </thead>
             <tbody>
-              {filteredAndSortedArtists.map((artist, index) => (
-                <tr key={index} className="table-row">
+              {filteredAndSortedArtists.map((artist) => (
+                <tr key={artist.id} className="table-row">
                   <td className="table-cell name">{artist.name}</td>
                   <td className="table-cell">{artist.contact}</td>
                   <td className="table-cell">{artist.experience}</td>
