@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Home.css';
+import '../data.json';
 
 function Home() {
   const [bookings, setBookings] = useState([]);
@@ -34,6 +35,22 @@ function Home() {
       setBookings([]); // Set empty array on error
     }
   };
+  // const fetchBookings = async () => {
+  //   try {
+  //     const data = require('../data.json');
+  //     // Ensure data is an array before setting state
+  //     if (Array.isArray(data)) {
+  //       setBookings(data);
+  //     } else {
+  //       setBookings([]); // Set empty array if data is not an array
+  //       console.error('Fetched data is not an array:', data);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching bookings:', error);
+  //     setBookings([]); // Set empty array on error
+  //   }
+  // };
+  
 
   const handleLogout = () => {
     navigate('/');
@@ -70,12 +87,12 @@ function Home() {
     }));
   };
 
-  // Get unique values for filters
+  
   const getUniqueValues = (key) => {
     return [...new Set(bookings.map(booking => booking[key]))];
   };
 
-  // Apply all filters and sorting
+  
   const filteredAndSortedBookings = bookings
     .filter(booking => {
       const matchesSearch = Object.values(booking)
@@ -456,24 +473,28 @@ function Home() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.8)',
+            backgroundColor: 'rgba(0,0,0,0.85)', // Slightly darker overlay
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             zIndex: 1100,
-            padding: '20px'
+            padding: '20px',
+            backdropFilter: 'blur(8px)' // Add blur effect
           }}
           onClick={() => setSelectedImage(null)}
         >
           <div 
             style={{
-              background: 'white',
-              padding: '20px',
-              borderRadius: '15px',
+              background: 'linear-gradient(145deg, #ffffff, #f5f7fa)',
+              padding: '30px',
+              borderRadius: '20px',
               maxWidth: '90%',
               maxHeight: '90%',
               overflow: 'auto',
-              position: 'relative'
+              position: 'relative',
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              animation: 'modalFadeIn 0.3s ease-out'
             }}
             onClick={e => e.stopPropagation()}
           >
@@ -481,54 +502,89 @@ function Home() {
               src={selectedImage.serviceImage}
               alt={selectedImage.service}
               style={{
-                maxWidth: '100%',
+                width: '100%',
                 maxHeight: '70vh',
-                objectFit: 'contain',
-                borderRadius: '15px',
-                marginBottom: '25px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-                transition: 'transform 0.3s ease',
-                cursor: 'pointer'
+                objectFit: 'cover',
+                borderRadius: '18px',
+                marginBottom: '30px',
+                boxShadow: '0 15px 35px rgba(0,0,0,0.2)',
+                transition: 'all 0.4s ease',
+                cursor: 'zoom-in',
+                border: '3px solid rgba(255,255,255,0.2)'
               }}
               onMouseOver={(e) => {
-                e.target.style.transform = 'scale(1.02)';
+                e.target.style.transform = 'scale(1.03)';
+                e.target.style.boxShadow = '0 20px 40px rgba(0,0,0,0.25)';
               }}
               onMouseOut={(e) => {
                 e.target.style.transform = 'scale(1)';
+                e.target.style.boxShadow = '0 15px 35px rgba(0,0,0,0.2)';
               }}
             />
             <div style={{ 
               textAlign: 'center',
-              padding: '0 20px 20px',
-              background: 'linear-gradient(to bottom, #ffffff, #f8f9fa)',
-              borderRadius: '12px',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
+              padding: '25px 30px',
+              background: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+              borderRadius: '15px',
+              boxShadow: '0 8px 25px rgba(0,0,0,0.08)',
+              border: '1px solid rgba(255,255,255,0.4)'
             }}>
               <h3 style={{ 
-                color: '#1e3c72', 
-                marginBottom: '15px',
-                fontSize: '1.8rem',
-                fontWeight: '600',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.1)'
+                color: '#005FA3', 
+                marginBottom: '20px',
+                fontSize: '2rem',
+                fontWeight: '700',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
+                letterSpacing: '0.5px'
               }}>{selectedImage.service}</h3>
               <p style={{ 
                 color: '#4a4a4a', 
-                margin: '8px 0',
-                fontSize: '1.1rem',
-                fontWeight: '500'
-              }}>Price: <span style={{color: '#2ecc71'}}>${selectedImage.price}</span></p>
+                margin: '12px 0',
+                fontSize: '1.2rem',
+                fontWeight: '500',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '8px'
+              }}>Price: <span style={{
+                color: '#00A5F5',
+                background: 'rgba(0, 165, 245, 0.1)',
+                padding: '4px 12px',
+                borderRadius: '20px',
+                fontWeight: '600'
+              }}>${selectedImage.price}</span></p>
               <p style={{ 
                 color: '#4a4a4a', 
-                margin: '8px 0',
-                fontSize: '1.1rem',
-                fontWeight: '500'
-              }}>Duration: <span style={{color: '#3498db'}}>{selectedImage.time} hours</span></p>
+                margin: '12px 0',
+                fontSize: '1.2rem',
+                fontWeight: '500',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '8px'
+              }}>Duration: <span style={{
+                color: '#24BFDD',
+                background: 'rgba(36, 191, 221, 0.1)',
+                padding: '4px 12px',
+                borderRadius: '20px',
+                fontWeight: '600'
+              }}>{selectedImage.time} hours</span></p>
               <p style={{ 
                 color: '#4a4a4a', 
-                margin: '8px 0',
-                fontSize: '1.1rem',
-                fontWeight: '500'
-              }}>Store: <span style={{color: '#9b59b6'}}>{selectedImage.store}</span></p>
+                margin: '12px 0',
+                fontSize: '1.2rem',
+                fontWeight: '500',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '8px'
+              }}>Store: <span style={{
+                color: '#53CEF8',
+                background: 'rgba(83, 206, 248, 0.1)',
+                padding: '4px 12px',
+                borderRadius: '20px',
+                fontWeight: '600'
+              }}>{selectedImage.store}</span></p>
             </div>
           </div>
         </div>
