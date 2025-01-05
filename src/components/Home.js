@@ -11,6 +11,7 @@ function Home() {
     service: '',
     store: ''
   });
+  const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,9 +22,16 @@ function Home() {
     try {
       const response = await fetch('https://6772b9a7ee76b92dd49333cb.mockapi.io/Booking');
       const data = await response.json();
-      setBookings(data);
+      // Ensure data is an array before setting state
+      if (Array.isArray(data)) {
+        setBookings(data);
+      } else {
+        setBookings([]); // Set empty array if data is not an array
+        console.error('Fetched data is not an array:', data);
+      }
     } catch (error) {
       console.error('Error fetching bookings:', error);
+      setBookings([]); // Set empty array on error
     }
   };
 
@@ -155,11 +163,7 @@ function Home() {
               transition: 'all 0.3s ease',
               whiteSpace: 'nowrap',
               backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-              '&:hover': {
-                background: 'rgba(255,255,255,0.2)',
-                transform: 'translateY(-2px)'
-              }
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
             }}
             onClick={handleStore}
           >
@@ -181,11 +185,7 @@ function Home() {
               transition: 'all 0.3s ease',
               whiteSpace: 'nowrap',
               backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-              '&:hover': {
-                background: 'rgba(255,255,255,0.2)',
-                transform: 'translateY(-2px)'
-              }
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
             }}
             onClick={handleArtist}
           >
@@ -209,11 +209,7 @@ function Home() {
               marginTop: 'auto',
               whiteSpace: 'nowrap',
               backdropFilter: 'blur(10px)',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-              '&:hover': {
-                background: 'rgba(255,255,255,0.2)',
-                transform: 'translateY(-2px)'
-              }
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
             }}
             onClick={handleLogout}
           >
@@ -318,7 +314,7 @@ function Home() {
               }}
             >
               <option value="">All Prices</option>
-              {getUniqueValues('price').sort((a,b) => a-b).map(price => (
+              {getUniqueValues('price').sort((a,b) => Number(a)-Number(b)).map(price => (
                 <option key={price} value={price}>{price}</option>
               ))}
             </select>
@@ -416,39 +412,11 @@ function Home() {
                     <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef', fontWeight: '600', color: '#24BFDD' }}>{booking.store}</td>
                     <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef' }}>
                       {booking.serviceImage && (
-                        <>
+                        <div>
                           <img 
                             src={booking.serviceImage} 
                             alt={booking.service}
-                            onClick={() => {
-                              const popup = document.createElement('div');
-                              popup.style.cssText = `
-                                position: fixed;
-                                top: 0;
-                                left: 0;
-                                width: 100%;
-                                height: 100%;
-                                background: rgba(0,0,0,0.8);
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                z-index: 1000;
-                                cursor: pointer;
-                              `;
-                              
-                              const popupImg = document.createElement('img');
-                              popupImg.src = booking.serviceImage;
-                              popupImg.style.cssText = `
-                                max-width: 90%;
-                                max-height: 90%;
-                                border-radius: 20px;
-                                box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-                              `;
-                              
-                              popup.appendChild(popupImg);
-                              popup.onclick = () => document.body.removeChild(popup);
-                              document.body.appendChild(popup);
-                            }}
+                            onClick={() => setSelectedImage(booking)}
                             style={{
                               width: '120px', 
                               height: '120px', 
@@ -468,7 +436,7 @@ function Home() {
                               e.target.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)';
                             }}
                           />
-                        </>
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -478,6 +446,93 @@ function Home() {
           </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1100,
+            padding: '20px'
+          }}
+          onClick={() => setSelectedImage(null)}
+        >
+          <div 
+            style={{
+              background: 'white',
+              padding: '20px',
+              borderRadius: '15px',
+              maxWidth: '90%',
+              maxHeight: '90%',
+              overflow: 'auto',
+              position: 'relative'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <img 
+              src={selectedImage.serviceImage}
+              alt={selectedImage.service}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '70vh',
+                objectFit: 'contain',
+                borderRadius: '15px',
+                marginBottom: '25px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+                transition: 'transform 0.3s ease',
+                cursor: 'pointer'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.transform = 'scale(1.02)';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.transform = 'scale(1)';
+              }}
+            />
+            <div style={{ 
+              textAlign: 'center',
+              padding: '0 20px 20px',
+              background: 'linear-gradient(to bottom, #ffffff, #f8f9fa)',
+              borderRadius: '12px',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
+            }}>
+              <h3 style={{ 
+                color: '#1e3c72', 
+                marginBottom: '15px',
+                fontSize: '1.8rem',
+                fontWeight: '600',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.1)'
+              }}>{selectedImage.service}</h3>
+              <p style={{ 
+                color: '#4a4a4a', 
+                margin: '8px 0',
+                fontSize: '1.1rem',
+                fontWeight: '500'
+              }}>Price: <span style={{color: '#2ecc71'}}>${selectedImage.price}</span></p>
+              <p style={{ 
+                color: '#4a4a4a', 
+                margin: '8px 0',
+                fontSize: '1.1rem',
+                fontWeight: '500'
+              }}>Duration: <span style={{color: '#3498db'}}>{selectedImage.time} hours</span></p>
+              <p style={{ 
+                color: '#4a4a4a', 
+                margin: '8px 0',
+                fontSize: '1.1rem',
+                fontWeight: '500'
+              }}>Store: <span style={{color: '#9b59b6'}}>{selectedImage.store}</span></p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
