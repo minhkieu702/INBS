@@ -33,6 +33,7 @@ function Artist() {
   const handleLogout = () => navigate('/');
   const handleHome = () => navigate('/home'); 
   const handleStore = () => navigate('/store');
+  const handleWaitlist = () => navigate('/waitlist');
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -91,17 +92,22 @@ function Artist() {
 
         <div className="nav-buttons">
           <button onClick={handleHome} className="nav-button">
-            <span>🏠</span>
+            <span style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>🏠</span>
             {showSidebar && 'Home'}
           </button>
 
           <button onClick={handleStore} className="nav-button">
-            <span>📊</span>
+            <span style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>📊</span>
             {showSidebar && 'Store'}
           </button>
 
+          <button onClick={handleWaitlist} className="nav-button">
+            <span style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>⏳</span>
+            {showSidebar && 'Waitlist'}
+          </button>
+
           <button onClick={handleLogout} className="nav-button logout">
-            <span>⬅️</span>
+            <span style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>⬅️</span>
             {showSidebar && 'Logout'}
           </button>
         </div>

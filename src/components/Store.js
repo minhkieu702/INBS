@@ -41,6 +41,7 @@ function Store() {
   const handleLogout = () => navigate('/');
   const handleHome = () => navigate('/home');
   const handleArtist = () => navigate('/artist');
+  const handleWaitlist = () => navigate('/waitlist');
 
   return (
     <div className="store-container">
@@ -56,17 +57,22 @@ function Store() {
 
         <div className="sidebar-buttons">
           <button className="sidebar-button" onClick={handleHome}>
-            <span className="button-icon">🏠</span>
+            <span className="button-icon" style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>🏠</span>
             {showSidebar && 'Home'}
           </button>
 
           <button className="sidebar-button" onClick={handleArtist}>
-            <span className="button-icon">🎨</span>
+            <span className="button-icon" style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>🎨</span>
             {showSidebar && 'Artist'}
           </button>
 
-          <button className="sidebar-button logout-button" onClick={handleLogout}>
-            <span className="button-icon">⬅️</span>
+          <button className="sidebar-button" onClick={handleWaitlist}>
+            <span className="button-icon" style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>⏳</span>
+            {showSidebar && 'Waitlist'}
+          </button>
+
+          <button className="sidebar-button" onClick={handleLogout}>
+            <span className="button-icon" style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>⬅️</span>
             {showSidebar && 'Logout'}
           </button>
         </div>

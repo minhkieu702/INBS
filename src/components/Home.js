@@ -66,6 +66,8 @@ function Home() {
     navigate('/artist');
   };
 
+  const handleWaitlist = () => navigate('/waitlist');
+
   // Search function
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -138,6 +140,21 @@ function Home() {
     }));
   };
 
+  const getRevenueData = () => {
+    const storeRevenue = {};
+    bookings.forEach(booking => {
+      if (!storeRevenue[booking.store]) {
+        storeRevenue[booking.store] = 0;
+      }
+      storeRevenue[booking.store] += Number(booking.price);
+    });
+    
+    return Object.entries(storeRevenue).map(([name, value]) => ({
+      name,
+      value
+    }));
+  };
+
   const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD'];
   
   const filteredAndSortedBookings = bookings
@@ -155,6 +172,12 @@ function Home() {
     .sort((a, b) => {
       if (!sortConfig.key) return 0;
       
+      if (sortConfig.key === 'price') {
+        return sortConfig.direction === 'ascending' 
+          ? Number(a.price) - Number(b.price)
+          : Number(b.price) - Number(a.price);
+      }
+
       if (a[sortConfig.key] < b[sortConfig.key]) {
         return sortConfig.direction === 'ascending' ? -1 : 1;
       }
@@ -177,39 +200,45 @@ function Home() {
 
         <div className="sidebar-buttons">
           <button className="sidebar-button" onClick={handleStore}>
-            <span className="sidebar-button-icon">📊</span>
+            <span className="sidebar-button-icon" style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>📊</span>
             {showSidebar && 'Store'}
           </button>
           <button className="sidebar-button" onClick={handleArtist}>
-            <span className="sidebar-button-icon">🎨</span>
+            <span className="sidebar-button-icon" style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>🎨</span>
             {showSidebar && 'Artist'}
           </button>
+          <button className="sidebar-button" onClick={handleWaitlist}>
+            <span className="sidebar-button-icon" style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>⏳</span>
+            {showSidebar && 'Waitlist'}
+          </button>
           <button className="sidebar-button" onClick={handleLogout}>
-            <span className="sidebar-button-icon">⬅️</span>
+            <span className="sidebar-button-icon" style={{marginRight: "12px", marginLeft: "-12px", fontSize: "20px"}}>⬅️</span>
             {showSidebar && 'Logout'}
           </button>
         </div>
       </div>
 
       <div className={`main-content ${showSidebar ? 'sidebar-expanded' : ''}`}>
-        <div className="home-container" style={{ padding: '40px' }}>
+        <div className="home-container" style={{ padding: '20px 40px' }}>
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center', 
-            marginBottom: '35px',
-            background: 'rgba(255,255,255,0.95)',
-            padding: '30px 35px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)'
+            marginBottom: '25px',
+            background: 'rgba(255,255,255,0.98)',
+            padding: '25px 30px',
+            boxShadow: '0 12px 35px rgba(0,0,0,0.1)',
+            backdropFilter: 'blur(15px)',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '20px'
           }}>
             <h1 style={{
               color: '#1e3c72',
               fontSize: '36px',
               fontWeight: '800',
               margin: 0,
-              textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+              textShadow: '2px 2px 4px rgba(0,0,0,0.12)',
+              letterSpacing: '0.5px'
             }}>Booking Management</h1>
           </div>
 
@@ -222,62 +251,178 @@ function Home() {
           }}>
             {/* Service Distribution Chart */}
             <div style={{
-              background: 'rgba(255,255,255,0.95)',
-              padding: '30px',
-              borderRadius: '15px',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+              background: 'rgba(255,255,255,0.98)', 
+              padding: '25px',
+              borderRadius: '20px',
+              boxShadow: '0 15px 35px rgba(0,0,0,0.1)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+              height: '100%'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
             }}>
               <h2 style={{
                 color: '#1e3c72',
-                marginBottom: '20px',
-                fontSize: '24px',
-                fontWeight: '600'
+                marginBottom: '25px', 
+                fontSize: '26px',
+                fontWeight: '700',
+                letterSpacing: '0.5px',
+                borderBottom: '4px solid #24BFDD',
+                paddingBottom: '15px',
+                display: 'inline-block'
+              }}>Revenue by Store</h2>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '25px'
+              }}>
+                <BarChart width={500} height={400} data={getRevenueData()}
+                  margin={{top: 20, right: 30, left: 20, bottom: 5}}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
+                  <XAxis 
+                    dataKey="name"
+                    tick={{fill: '#1e3c72', fontSize: 12}}
+                    tickLine={{stroke: '#1e3c72'}}
+                  />
+                  <YAxis 
+                    tick={{fill: '#1e3c72', fontSize: 12}}
+                    tickLine={{stroke: '#1e3c72'}}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      background: 'rgba(255,255,255,0.95)',
+                      border: '1px solid #24BFDD',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    }}
+                  />
+                  <Bar 
+                    dataKey="value" 
+                    fill="#24BFDD"
+                    radius={[8, 8, 0, 0]}
+                    barSize={35}
+                  >
+                    {getRevenueData().map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`}
+                        fill={`rgba(36,191,221,${0.5 + (index * 0.1)})`}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </div>
+            </div>
+            <div style={{
+              background: 'rgba(255,255,255,0.98)',
+              padding: '25px',
+              borderRadius: '20px',
+              boxShadow: '0 15px 35px rgba(0,0,0,0.1)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
+            }}>
+              <h2 style={{
+                color: '#1e3c72',
+                marginBottom: '25px',
+                fontSize: '26px',
+                fontWeight: '700',
+                letterSpacing: '0.5px',
+                borderBottom: '4px solid #24BFDD',
+                paddingBottom: '15px',
+                display: 'inline-block'
               }}>Service Distribution</h2>
               <div style={{
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                padding: '20px'
+                padding: '25px',
+                position: 'relative'
               }}>
                 <PieChart width={500} height={400}>
                   <Pie
                     data={getPieChartData()}
                     cx={250}
-                    cy={200}
-                    innerRadius={80}
-                    outerRadius={160}
+                    cy={180}
+                    innerRadius={100}
+                    outerRadius={140}
                     fill="#8884d8"
-                    paddingAngle={5}
+                    paddingAngle={8}
                     dataKey="value"
-                    label={({name, percent}) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                    labelLine={{stroke: '#666', strokeWidth: 1}}
+                    label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
+                    labelStyle={{
+                      fill: '#fff',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
+                    }}
                   >
                     {getPieChartData().map((entry, index) => (
                       <Cell 
                         key={`cell-${index}`} 
-                        fill={COLORS[index % COLORS.length]}
+                        fill={`rgba(36, 191, 221, ${1 - (index * 0.15)})`}
                         stroke="#fff"
-                        strokeWidth={2}
+                        strokeWidth={4}
+                        style={{
+                          filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.2))',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease'
+                        }}
                       />
                     ))}
                   </Pie>
                   <Tooltip 
                     contentStyle={{
-                      background: 'rgba(255, 255, 255, 0.95)',
+                      background: 'rgba(255, 255, 255, 0.98)',
                       border: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                      padding: '10px 15px'
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+                      padding: '12px 18px'
+                    }}
+                    itemStyle={{
+                      color: '#1e3c72',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      textTransform: 'capitalize'
                     }}
                   />
                   <Legend 
-                    verticalAlign="bottom" 
-                    height={36}
+                    verticalAlign="bottom"
+                    height={50}
                     iconType="circle"
-                    iconSize={10}
+                    iconSize={12}
+                    layout="horizontal"
+                    formatter={(value, entry) => (
+                      <span style={{ 
+                        color: '#1e3c72', 
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        background: 'rgba(36, 191, 221, 0.1)',
+                        transition: 'all 0.3s ease',
+                        display: 'inline-block',
+                        margin: '0 4px'
+                      }}>
+                        {value}
+                      </span>
+                    )}
                     wrapperStyle={{
                       padding: '20px 0',
-                      fontSize: '14px'
                     }}
                   />
                 </PieChart>
@@ -286,41 +431,110 @@ function Home() {
 
             {/* Price Distribution Chart */}
             <div style={{
-              background: 'rgba(255,255,255,0.95)',
-              padding: '30px',
-              borderRadius: '15px',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+              background: 'rgba(255,255,255,0.98)',
+              padding: '25px',
+              borderRadius: '20px',
+              boxShadow: '0 15px 35px rgba(0,0,0,0.1)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-5px)';
+              e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.15)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 15px 35px rgba(0,0,0,0.1)';
             }}>
               <h2 style={{
                 color: '#1e3c72',
-                marginBottom: '20px',
-                fontSize: '24px',
-                fontWeight: '600'
+                marginBottom: '25px',
+                fontSize: '26px',
+                fontWeight: '700',
+                letterSpacing: '0.5px',
+                borderBottom: '4px solid #24BFDD',
+                paddingBottom: '15px',
+                display: 'inline-block'
               }}>Price Distribution</h2>
               <div style={{
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                padding: '20px'
+                padding: '25px'
               }}>
                 <BarChart width={500} height={400} data={getPriceChartData()}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="range" />
-                  <YAxis />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
+                  <XAxis 
+                    dataKey="range" 
+                    tick={{
+                      fill: '#1e3c72', 
+                      fontSize: 12,
+                      fontWeight: 600
+                    }}
+                    tickLine={{stroke: '#1e3c72'}}
+                  />
+                  <YAxis 
+                    tick={{
+                      fill: '#1e3c72', 
+                      fontSize: 12,
+                      fontWeight: 600
+                    }}
+                    tickLine={{stroke: '#1e3c72'}}
+                  />
                   <Tooltip 
                     contentStyle={{
-                      background: 'rgba(255, 255, 255, 0.95)',
+                      background: 'rgba(255,255,255,0.98)',
                       border: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                      padding: '10px 15px'
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+                      padding: '12px 18px'
                     }}
+                    itemStyle={{
+                      color: '#1e3c72',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      textTransform: 'capitalize'
+                    }}
+                    cursor={{fill: 'rgba(36, 191, 221, 0.1)'}}
                   />
-                  <Bar dataKey="count" fill="#24BFDD">
+                  <Bar 
+                    dataKey="count" 
+                    radius={[8, 8, 0, 0]}
+                    barSize={35}
+                  >
                     {getPriceChartData().map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell 
+                        key={`cell-${index}`}
+                        fill={`rgba(36, 191, 221, ${0.7 + (index * 0.1)})`}
+                        stroke="rgba(255,255,255,0.8)"
+                        strokeWidth={1}
+                        style={{
+                          filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.1))',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease'
+                        }}
+                      />
                     ))}
                   </Bar>
+                  <Legend
+                    verticalAlign="top"
+                    height={36}
+                    iconType="circle"
+                    iconSize={10}
+                    formatter={(value) => (
+                      <span style={{ 
+                        color: '#1e3c72', 
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        background: 'rgba(36, 191, 221, 0.1)',
+                        transition: 'all 0.3s ease'
+                      }}>
+                        Price Distribution
+                      </span>
+                    )}
+                  />
                 </BarChart>
               </div>
             </div>
@@ -328,14 +542,16 @@ function Home() {
 
           {/* Search and Filter Controls */}
           <div style={{
-            background: 'rgba(255,255,255,0.95)',
-            padding: '20px',
-            borderRadius: '15px',
-            marginBottom: '20px',
+            background: 'rgba(255,255,255,0.98)',
+            padding: '25px',
+            borderRadius: '20px',
+            marginBottom: '25px',
             display: 'flex',
-            gap: '20px',
+            gap: '25px',
             alignItems: 'center',
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
+            boxShadow: '0 12px 35px rgba(0,0,0,0.1)',
+            border: '1px solid rgba(255,255,255,0.3)'
           }}>
             <input
               type="text"
@@ -343,10 +559,21 @@ function Home() {
               value={searchTerm}
               onChange={handleSearch}
               style={{
-                padding: '10px 15px',
-                borderRadius: '8px',
-                border: '1px solid #ddd',
-                width: '250px'
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: '2px solid #eee',
+                width: '280px',
+                fontSize: '15px',
+                transition: 'all 0.3s ease',
+                outline: 'none'
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = '#24BFDD';
+                e.target.style.boxShadow = '0 0 0 3px rgba(36,191,221,0.2)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#eee';
+                e.target.style.boxShadow = 'none';
               }}
             />
             
@@ -355,9 +582,21 @@ function Home() {
               value={filters.service}
               onChange={handleFilterChange}
               style={{
-                padding: '10px 15px',
-                borderRadius: '8px',
-                border: '1px solid #ddd'
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: '2px solid #eee',
+                fontSize: '15px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                outline: 'none'
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = '#24BFDD';
+                e.target.style.boxShadow = '0 0 0 3px rgba(36,191,221,0.2)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#eee';
+                e.target.style.boxShadow = 'none';
               }}
             >
               <option value="">All Services</option>
@@ -371,9 +610,21 @@ function Home() {
               value={filters.store}
               onChange={handleFilterChange}
               style={{
-                padding: '10px 15px',
-                borderRadius: '8px',
-                border: '1px solid #ddd'
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: '2px solid #eee',
+                fontSize: '15px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                outline: 'none'
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = '#24BFDD';
+                e.target.style.boxShadow = '0 0 0 3px rgba(36,191,221,0.2)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#eee';
+                e.target.style.boxShadow = 'none';
               }}
             >
               <option value="">All Stores</option>
@@ -387,9 +638,21 @@ function Home() {
               value={filters.price}
               onChange={handleFilterChange}
               style={{
-                padding: '10px 15px',
-                borderRadius: '8px',
-                border: '1px solid #ddd'
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: '2px solid #eee',
+                fontSize: '15px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                outline: 'none'
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = '#24BFDD';
+                e.target.style.boxShadow = '0 0 0 3px rgba(36,191,221,0.2)';
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#eee';
+                e.target.style.boxShadow = 'none';
               }}
             >
               <option value="">All Prices</option>
@@ -400,69 +663,91 @@ function Home() {
           </div>
 
           <div className="booking-list" style={{
-            background: 'rgba(255,255,255,0.95)',
-            padding: '35px',
+            background: 'rgba(255,255,255,0.98)',
+            padding: '30px',
             borderRadius: '25px',
-            boxShadow: '0 15px 40px rgba(0,0,0,0.08)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.2)'
+            boxShadow: '0 18px 45px rgba(0,0,0,0.1)',
+            backdropFilter: 'blur(15px)',
+            border: '1px solid rgba(255,255,255,0.3)'
           }}>
             <h2 style={{
               color: '#1e3c72',
-              fontSize: '28px',
-              marginBottom: '30px',
+              fontSize: '32px',
+              marginBottom: '35px',
               borderBottom: '4px solid #24BFDD',
-              paddingBottom: '12px',
+              paddingBottom: '15px',
               display: 'inline-block',
-              fontWeight: '700'
+              fontWeight: '800',
+              letterSpacing: '0.5px'
             }}>Appointment List</h2>
-            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 12px' }}>
+            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 15px' }}>
               <thead>
-                <tr style={{ background: 'rgba(248,249,250,0.8)' }}>
+                <tr style={{ background: 'rgba(248,249,250,0.9)' }}>
                   <th 
                     onClick={() => requestSort('name')}
                     style={{ 
-                      padding: '18px', 
+                      padding: '20px', 
                       color: '#1e3c72', 
-                      fontWeight: '700', 
+                      fontWeight: '800', 
                       borderBottom: '2px solid #e9ecef', 
-                      fontSize: '15px',
-                      cursor: 'pointer'
+                      fontSize: '16px',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.color = '#24BFDD';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.color = '#1e3c72';
                     }}
                   >
                     Customer Name {sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                   </th>
-                  <th style={{ padding: '18px', color: '#1e3c72', fontWeight: '700', borderBottom: '2px solid #e9ecef', fontSize: '15px' }}>Phone Number</th>
+                  <th style={{ padding: '20px', color: '#1e3c72', fontWeight: '800', borderBottom: '2px solid #e9ecef', fontSize: '16px' }}>Phone Number</th>
                   <th 
                     onClick={() => requestSort('date')}
                     style={{ 
-                      padding: '18px', 
+                      padding: '20px', 
                       color: '#1e3c72', 
-                      fontWeight: '700', 
+                      fontWeight: '800', 
                       borderBottom: '2px solid #e9ecef', 
-                      fontSize: '15px',
-                      cursor: 'pointer'
+                      fontSize: '16px',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.color = '#24BFDD';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.color = '#1e3c72';
                     }}
                   >
                     Date {sortConfig.key === 'date' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                   </th>
-                  <th style={{ padding: '18px', color: '#1e3c72', fontWeight: '700', borderBottom: '2px solid #e9ecef', fontSize: '15px' }}>Time</th>
-                  <th style={{ padding: '18px', color: '#1e3c72', fontWeight: '700', borderBottom: '2px solid #e9ecef', fontSize: '15px' }}>Service</th>
+                  <th style={{ padding: '20px', color: '#1e3c72', fontWeight: '800', borderBottom: '2px solid #e9ecef', fontSize: '16px' }}>Time</th>
+                  <th style={{ padding: '20px', color: '#1e3c72', fontWeight: '800', borderBottom: '2px solid #e9ecef', fontSize: '16px' }}>Service</th>
                   <th 
                     onClick={() => requestSort('price')}
                     style={{ 
-                      padding: '18px', 
+                      padding: '20px', 
                       color: '#1e3c72', 
-                      fontWeight: '700', 
+                      fontWeight: '800', 
                       borderBottom: '2px solid #e9ecef', 
-                      fontSize: '15px',
-                      cursor: 'pointer'
+                      fontSize: '16px',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.color = '#24BFDD';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.color = '#1e3c72';
                     }}
                   >
                     Price {sortConfig.key === 'price' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
                   </th>
-                  <th style={{ padding: '18px', color: '#1e3c72', fontWeight: '700', borderBottom: '2px solid #e9ecef', fontSize: '15px' }}>Store Address</th>
-                  <th style={{ padding: '18px', color: '#1e3c72', fontWeight: '700', borderBottom: '2px solid #e9ecef', fontSize: '15px' }}>Service Image</th>
+                  <th style={{ padding: '20px', color: '#1e3c72', fontWeight: '800', borderBottom: '2px solid #e9ecef', fontSize: '16px' }}>Store Address</th>
+                  <th style={{ padding: '20px', color: '#1e3c72', fontWeight: '800', borderBottom: '2px solid #e9ecef', fontSize: '16px' }}>Service Image</th>
                 </tr>
               </thead>
               <tbody>
@@ -470,26 +755,26 @@ function Home() {
                   <tr key={index} style={{
                     background: 'white',
                     transition: 'all 0.4s ease',
-                    borderRadius: '15px',
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                    borderRadius: '18px',
+                    boxShadow: '0 5px 18px rgba(0,0,0,0.04)',
                     cursor: 'pointer'
                   }}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-3px)';
-                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)';
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.12)';
                   }}
                   onMouseOut={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.03)';
+                    e.currentTarget.style.boxShadow = '0 5px 18px rgba(0,0,0,0.04)';
                   }}>
-                    <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef', fontWeight: '500' }}>{booking.name}</td>
-                    <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef', color: '#666' }}>{booking.phone}</td>
-                    <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef', color: '#666' }}>{booking.date}</td>
-                    <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef', color: '#666' }}>{booking.time} hours</td>
-                    <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef', fontWeight: '500', color: '#1e3c72' }}>{booking.service}</td>
-                    <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef', fontWeight: '600', color: '#24BFDD' }}>${booking.price}</td>
-                    <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef', fontWeight: '600', color: '#24BFDD' }}>{booking.store}</td>
-                    <td style={{ padding: '22px', borderBottom: '1px solid #e9ecef' }}>
+                    <td style={{ padding: '25px', borderBottom: '1px solid #e9ecef', fontWeight: '600', color: '#1e3c72' }}>{booking.name}</td>
+                    <td style={{ padding: '25px', borderBottom: '1px solid #e9ecef', color: '#666', fontWeight: '500' }}>{booking.phone}</td>
+                    <td style={{ padding: '25px', borderBottom: '1px solid #e9ecef', color: '#666', fontWeight: '500' }}>{booking.date}</td>
+                    <td style={{ padding: '25px', borderBottom: '1px solid #e9ecef', color: '#666', fontWeight: '500' }}>{booking.time} hours</td>
+                    <td style={{ padding: '25px', borderBottom: '1px solid #e9ecef', fontWeight: '600', color: '#1e3c72' }}>{booking.service}</td>
+                    <td style={{ padding: '25px', borderBottom: '1px solid #e9ecef', fontWeight: '700', color: '#24BFDD' }}>${booking.price}</td>
+                    <td style={{ padding: '25px', borderBottom: '1px solid #e9ecef', fontWeight: '600', color: '#24BFDD' }}>{booking.store}</td>
+                    <td style={{ padding: '25px', borderBottom: '1px solid #e9ecef' }}>
                       {booking.serviceImage && (
                         <div>
                           <img 
@@ -497,22 +782,22 @@ function Home() {
                             alt={booking.service}
                             onClick={() => setSelectedImage(booking)}
                             style={{
-                              width: '120px', 
-                              height: '120px', 
+                              width: '130px', 
+                              height: '130px', 
                               objectFit: 'cover',
-                              borderRadius: '15px',
-                              boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
+                              borderRadius: '18px',
+                              boxShadow: '0 10px 25px rgba(0,0,0,0.12)',
                               transition: 'all 0.4s ease',
-                              border: '3px solid rgba(255,255,255,0.2)',
+                              border: '3px solid rgba(255,255,255,0.3)',
                               cursor: 'pointer'
                             }}
                             onMouseOver={(e) => {
-                              e.target.style.transform = 'scale(1.08)';
-                              e.target.style.boxShadow = '0 12px 30px rgba(0,0,0,0.15)';
+                              e.target.style.transform = 'scale(1.1)';
+                              e.target.style.boxShadow = '0 15px 35px rgba(0,0,0,0.18)';
                             }}
                             onMouseOut={(e) => {
                               e.target.style.transform = 'scale(1)';
-                              e.target.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)';
+                              e.target.style.boxShadow = '0 10px 25px rgba(0,0,0,0.12)';
                             }}
                           />
                         </div>
@@ -535,28 +820,28 @@ function Home() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.85)', // Slightly darker overlay
+            backgroundColor: 'rgba(0,0,0,0.9)',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             zIndex: 1100,
-            padding: '20px',
-            backdropFilter: 'blur(8px)' // Add blur effect
+            padding: '25px',
+            backdropFilter: 'blur(10px)'
           }}
           onClick={() => setSelectedImage(null)}
         >
           <div 
             style={{
-              background: 'linear-gradient(145deg, #ffffff, #f5f7fa)',
-              padding: '30px',
-              borderRadius: '20px',
+              background: 'linear-gradient(145deg, #ffffff, #f8f9fa)',
+              padding: '35px',
+              borderRadius: '25px',
               maxWidth: '90%',
               maxHeight: '90%',
               overflow: 'auto',
               position: 'relative',
-              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
-              border: '1px solid rgba(255,255,255,0.18)',
-              animation: 'modalFadeIn 0.3s ease-out'
+              boxShadow: '0 30px 60px -12px rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              animation: 'modalFadeIn 0.4s ease-out'
             }}
             onClick={e => e.stopPropagation()}
           >
@@ -565,39 +850,44 @@ function Home() {
               alt={selectedImage.service}
               style={{
                 width: '100%',
-                maxHeight: '70vh',
+                maxHeight: '75vh',
                 objectFit: 'cover',
-                borderRadius: '18px',
-                marginBottom: '30px',
-                boxShadow: '0 15px 35px rgba(0,0,0,0.2)',
+                borderRadius: '20px',
+                marginBottom: '35px',
+                boxShadow: '0 18px 40px rgba(0,0,0,0.25)',
                 transition: 'all 0.4s ease',
                 cursor: 'zoom-in',
-                border: '3px solid rgba(255,255,255,0.2)'
+                border: '3px solid rgba(255,255,255,0.3)'
               }}
               onMouseOver={(e) => {
-                e.target.style.transform = 'scale(1.03)';
-                e.target.style.boxShadow = '0 20px 40px rgba(0,0,0,0.25)';
+                e.target.style.transform = 'scale(1.04)';
+                e.target.style.boxShadow = '0 25px 50px rgba(0,0,0,0.3)';
               }}
               onMouseOut={(e) => {
                 e.target.style.transform = 'scale(1)';
-                e.target.style.boxShadow = '0 15px 35px rgba(0,0,0,0.2)';
+                e.target.style.boxShadow = '0 18px 40px rgba(0,0,0,0.25)';
               }}
             />
             <div style={{ 
               textAlign: 'center',
-              padding: '25px 30px',
+              padding: '30px 35px',
               background: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
-              borderRadius: '15px',
-              boxShadow: '0 8px 25px rgba(0,0,0,0.08)',
-              border: '1px solid rgba(255,255,255,0.4)'
+              borderRadius: '18px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+              border: '1px solid rgba(255,255,255,0.5)'
             }}>
               <h3 style={{ 
                 color: '#005FA3', 
+                marginBottom: '25px',
+                fontSize: '2.2rem',
+                fontWeight: '800',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.12)',
+                letterSpacing: '0.8px',
                 marginBottom: '20px',
                 fontSize: '2rem',
                 fontWeight: '700',
                 textShadow: '2px 2px 4px rgba(0,0,0,0.1)',
-                letterSpacing: '0.5px'
+                letterSpacing: '0.5px',
               }}>{selectedImage.service}</h3>
               <p style={{ 
                 color: '#4a4a4a', 

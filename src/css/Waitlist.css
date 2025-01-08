@@ -1,0 +1,203 @@
+.waitlist-container {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 80px;
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+}
+
+.main-content.sidebar-expanded {
+  margin-left: 250px;
+}
+
+.header {
+  background: white;
+  padding: 25px 35px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  margin-bottom: 25px;
+}
+
+.page-title {
+  color: #1e3c72;
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 25px;
+}
+
+.calendar-section {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.section-title {
+  color: #1e3c72;
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.custom-calendar {
+  width: 100%;
+  border: none !important;
+  background: transparent !important;
+  padding: 10px;
+}
+
+.react-calendar__tile {
+  padding: 16px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e3c72;
+}
+
+.react-calendar__tile--active {
+  background: #1e3c72 !important;
+  border-radius: 12px;
+  color: white !important;
+}
+
+.react-calendar__tile--now {
+  background: rgba(36, 191, 221, 0.1) !important;
+  border-radius: 12px;
+  color: #24BFDD !important;
+}
+
+.has-appointment {
+  background-color: rgba(36, 191, 221, 0.2) !important;
+  border-radius: 12px;
+  color: #1e3c72 !important;
+}
+
+.waitlist-table-container {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.waitlist-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+.waitlist-table th {
+  padding: 15px 20px;
+  text-align: left;
+  color: #1e3c72;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(36, 191, 221, 0.1);
+}
+
+.waitlist-table th:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.waitlist-table th:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.waitlist-table td {
+  padding: 20px;
+  background: white;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.waitlist-table tr {
+  transition: all 0.3s ease;
+}
+
+.waitlist-table tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.customer-name {
+  font-weight: 700;
+  color: #1e3c72;
+}
+
+.customer-phone {
+  color: #666;
+}
+
+.customer-service {
+  color: #24BFDD;
+  font-weight: 600;
+}
+
+.customer-time {
+  color: #666;
+  font-weight: 500;
+}
+
+.customer-store {
+  color: #1e3c72;
+  font-weight: 600;
+}
+
+.customer-price {
+  color: #24BFDD;
+  font-weight: 700;
+}
+
+.service-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.service-image:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Calendar navigation buttons */
+.react-calendar__navigation button {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e3c72;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.react-calendar__navigation button:hover {
+  background: rgba(36, 191, 221, 0.1) !important;
+}
+
+/* Calendar weekday headers */
+.react-calendar__month-view__weekdays__weekday {
+  font-weight: 600;
+  color: #1e3c72;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 8px 0;
+}
