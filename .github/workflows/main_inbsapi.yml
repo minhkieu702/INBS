@@ -18,11 +18,17 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
+    - name: List directory contents
+      run: dir
+
     - name: Restore dependencies
-      run: dotnet restore INBS.sln
+      working-directory: .
+      run: dotnet restore
 
     - name: Build
-      run: dotnet build INBS.sln --configuration Release --no-restore
+      working-directory: .
+      run: dotnet build --configuration Release --no-restore
 
     - name: Deploy
-      run: dotnet publish INBS.sln --configuration Release --output ./publish --no-build
+      working-directory: .
+      run: dotnet publish --configuration Release --output ./publish --no-build
