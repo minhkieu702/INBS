@@ -19,10 +19,10 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore INBS.sln
 
     - name: Build
-      run: dotnet build --configuration Release
+      run: dotnet build INBS.sln --configuration Release --no-restore
 
     - name: Deploy
-      run: dotnet publish --configuration Release --output ./publish
+      run: dotnet publish INBS.sln --configuration Release --output ./publish --no-build
