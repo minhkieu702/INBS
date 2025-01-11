@@ -25,19 +25,13 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Gets the weather forecast for the next 5 days.
+        /// Hello World
         /// </summary>
         /// <returns>An enumerable of weather forecast objects.</returns>
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public IActionResult Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return Ok("Hello World");
         }
     }
 }
