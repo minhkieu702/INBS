@@ -1,37 +1,63 @@
-name: Deploy
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy ASP.Net Core app to Azure Web App - inbsapi
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '8.0.x'
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.x'
+          include-prerelease: true
 
-    - name: List directory contents
-      run: |
-        dir
-        cd ..
-        dir
+      - name: Restore dependencies
+        run: dotnet restore INBS/INBS.sln
 
-    - name: Restore dependencies
-      working-directory: ..
-      run: dotnet restore
+      - name: Build with dotnet
+        run: dotnet build INBS/INBS.sln --configuration Release --no-restore
 
-    - name: Build
-      working-directory: ..
-      run: dotnet build --configuration Release --no-restore
+      - name: Run tests
+        run: dotnet test INBS/INBS.sln --configuration Release --no-build
 
-    - name: Deploy
-      working-directory: ..
-      run: dotnet publish --configuration Release --output ./publish --no-build
+      - name: dotnet publish
+        run: dotnet publish INBS/INBS.API/INBS.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: .net-app
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'inbsapi'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0640AB7FE27D4F61AB991BE0663B4ACD }}
+          package: .
