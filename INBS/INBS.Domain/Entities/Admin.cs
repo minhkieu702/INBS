@@ -14,7 +14,7 @@ namespace INBS.Domain.Entities
         public Admin()
         {
             ID = Guid.NewGuid();
-            AdminLogs = [];
+            Stores = [];
         }
 
         [Key]
@@ -25,8 +25,8 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(User.Admin))]
         public virtual User? User { get; set; }
 
-        [InverseProperty(nameof(AdminLog.Admin))]
-        public virtual ICollection<AdminLog> AdminLogs { get; set; }
+        [InverseProperty(nameof(Store.Admin))]
+        public virtual ICollection<Store> Stores { get; set; }
 
     }
 }

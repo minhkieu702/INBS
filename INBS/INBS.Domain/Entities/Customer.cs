@@ -14,11 +14,10 @@ namespace INBS.Domain.Entities
         public Customer()
         {
             ID = Guid.NewGuid();
-            FavoriteDesigns = [];
-            OccasionPreferences = [];
-            WaitLists = [];
-            Bookings = [];
             Recommendations = [];
+            CustomCombos = [];
+            CustomDesigns = [];
+            CustomerPreferences = [];
         }
 
         [Key]
@@ -29,22 +28,16 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(User.Customer))]
         public virtual User? User { get; set; }
 
-        [InverseProperty(nameof(WaitList.Customer))]
-        public virtual ICollection<WaitList> WaitLists { get; set; }
-
-        [InverseProperty(nameof(Booking.Customer))]
-        public virtual ICollection<Booking> Bookings { get; set; }
-
-        [InverseProperty(nameof(FavoriteDesign.Customer))]
-        public virtual ICollection<FavoriteDesign> FavoriteDesigns { get; set; }
-
-        [InverseProperty(nameof(SkinTone.Customer))]
-        public virtual SkinTone? SkinTone { get; set; }
-
-        [InverseProperty(nameof(OccasionPreference.Customer))]
-        public virtual ICollection<OccasionPreference> OccasionPreferences { get; set; }
-
         [InverseProperty(nameof(Recommendation.Customer))]
         public virtual ICollection<Recommendation> Recommendations { get; set; }
+
+        [InverseProperty(nameof(CustomCombo.Customer))]
+        public virtual ICollection<CustomCombo> CustomCombos { get; set; }
+
+        [InverseProperty(nameof(CustomDesign.Customer))]
+        public virtual ICollection<CustomDesign> CustomDesigns { get; set; }
+
+        [InverseProperty(nameof(CustomerPreference.Customer))]
+        public virtual ICollection<CustomerPreference> CustomerPreferences { get; set; }
     }
 }

@@ -14,8 +14,6 @@ namespace INBS.Domain.Entities
         public Artist()
         {
             ID = Guid.NewGuid();
-            WaitLists = [];
-            Bookings = [];
             ArtistAvailabilities = [];
         }
 
@@ -27,13 +25,11 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(User.Artist))]
         public virtual User? User { get; set; }
 
+        public Guid StoreID { get; set; }
+        [InverseProperty(nameof(Store.Artists))]
+        public virtual Store? Store { get; set; }
+
         [InverseProperty(nameof(ArtistAvailability.Artist))]
         public virtual ICollection<ArtistAvailability> ArtistAvailabilities { get; set; }
-
-        [InverseProperty(nameof(WaitList.Artist))]
-        public virtual ICollection<WaitList> WaitLists { get; set; }
-
-        [InverseProperty(nameof(Booking.Artist))]
-        public virtual ICollection<Booking> Bookings { get; set; }
     }
 }

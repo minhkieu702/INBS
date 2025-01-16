@@ -23,33 +23,35 @@ namespace INBS.Domain.Entities
 
         public long Duration { get; set; }
 
-        public int Status { get; set; }
+        public int Status { get; set; } //isWating (-1), isBooked (0), isCompleted (1), isCancelled (2)
 
         public long TotalAmount { get; set; }
 
-        public int PaymentMethod { get; set; }
+        public int PaymentMethod { get; set; } //Cash (0), Card (1)
 
         public string? Preferences { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
-        public Guid DesignId { get; set; }
-        [ForeignKey(nameof(DesignId))]
-        [InverseProperty(nameof(Design.Bookings))]
-        public virtual NailDesign? Design { get; set; }
+        public Guid CustomDesignId { get; set; }
+        [ForeignKey(nameof(CustomDesignId))]
+        [InverseProperty(nameof(CustomDesign.Bookings))]
+        public virtual CustomDesign? CustomDesign { get; set; }
 
-        public Guid ArtistId { get; set; }
-        [ForeignKey(nameof(ArtistId))]
-        [InverseProperty(nameof(Artist.Bookings))]
-        public virtual Artist? Artist { get; set; }
+        public Guid CustomComboId { get; set; }
+        [ForeignKey(nameof(CustomComboId))]
+        [InverseProperty(nameof(CustomCombo.Bookings))]
+        public virtual CustomCombo? CustomCombo { get; set; }
 
-        public Guid CustomerId { get; set; }
-        [ForeignKey(nameof(CustomerId))]
-        [InverseProperty(nameof(Customer.Bookings))]
-        public virtual Customer? Customer { get; set; }
-
+        public Guid ArtistAvailabilityId { get; set; }
+        [ForeignKey(nameof(ArtistAvailabilityId))]
+        [InverseProperty(nameof(ArtistAvailability.Bookings))]
+        public virtual ArtistAvailability? ArtistAvailability { get; set; }
 
         [InverseProperty(nameof(Cancellation.Booking))]
         public virtual Cancellation? Cancellation { get; set; }
+
+        [InverseProperty(nameof(Feedback.Booking))]
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }

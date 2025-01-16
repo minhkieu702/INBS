@@ -11,24 +11,11 @@ namespace INBS.Domain.Entities
 {
     public class SkinTone
     {
-        public SkinTone()
-        {
-            ID = Guid.NewGuid();
-            Customer = [];
-            NailDesignSkinTones = [];
-            RGPColor = string.Empty;
-        }
-        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid ID { get; set; }
 
-        public string? Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
-        public string RGPColor { get; set; }
-
-        [InverseProperty(nameof(Entities.Customer.SkinTone))]
-        public virtual ICollection<Customer> Customer { get; set; }
-
-        [InverseProperty(nameof(NailDesignSkinTone.SkinTone))]
-        public virtual ICollection<NailDesignSkinTone> NailDesignSkinTones { get; set; }
+        public string HexCode { get; set; } = string.Empty;
     }
 }

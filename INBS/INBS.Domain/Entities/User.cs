@@ -18,6 +18,7 @@ namespace INBS.Domain.Entities
             Preferences = string.Empty;
             Email = string.Empty;
             CreateAt = DateTime.Now;
+            Notifications = [];
         }
 
         [Key]
@@ -31,7 +32,7 @@ namespace INBS.Domain.Entities
 
         public string? PhoneNumber { get; set; }
 
-        public int Role { get; set; }
+        public int Role { get; set; } //Customer, Artist, Admin
 
         public string? Preferences { get; set; }
 
@@ -47,6 +48,6 @@ namespace INBS.Domain.Entities
         public virtual Artist? Artist { get; set; }
 
         [InverseProperty(nameof(Notification.User))]
-        public virtual Notification Notification { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
     }
 }

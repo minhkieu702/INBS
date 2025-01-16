@@ -8,25 +8,23 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Image
+    public class TemplateCombo
     {
-        public Image()
+        public TemplateCombo()
         {
             ID = Guid.NewGuid();
-            ImageUrl = string.Empty;
+            ServiceTemplateCombos = [];
+            Name = string.Empty;
         }
+
         [Key]
         public Guid ID { get; set; }
-
-        public int NumerialOrder { get; set; }
-
-        public string ImageUrl { get; set; }
+        
+        public string Name { get; set; }
 
         public string? Description { get; set; }
 
-        public Guid DesignId { get; set; }
-        [ForeignKey(nameof(DesignId))]
-        [InverseProperty(nameof(Design.Images))]
-        public virtual Design? Design { get; set; }
+        [InverseProperty(nameof(ServiceTemplateCombo.TemplateCombo))]
+        public virtual ICollection<ServiceTemplateCombo> ServiceTemplateCombos { get; set; }
     }
 }

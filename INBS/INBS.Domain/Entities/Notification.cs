@@ -26,7 +26,7 @@ namespace INBS.Domain.Entities
 
         public Guid UserId { get; set; }
         [ForeignKey(nameof(UserId))]
-        [InverseProperty(nameof(User.Notification))]
+        [InverseProperty(nameof(User.Notifications))]
         public virtual User? User { get; set; }
     }
 }

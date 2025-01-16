@@ -8,25 +8,23 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Image
+    public class Accessory
     {
-        public Image()
+        public Accessory()
         {
+            AccessoryCustomDesigns = [];
             ID = Guid.NewGuid();
+            Name = string.Empty;
             ImageUrl = string.Empty;
         }
+
         [Key]
         public Guid ID { get; set; }
-
-        public int NumerialOrder { get; set; }
-
+        public string Name { get; set; }
+        public double Price { get; set; }
         public string ImageUrl { get; set; }
 
-        public string? Description { get; set; }
-
-        public Guid DesignId { get; set; }
-        [ForeignKey(nameof(DesignId))]
-        [InverseProperty(nameof(Design.Images))]
-        public virtual Design? Design { get; set; }
+        [InverseProperty(nameof(AccessoryCustomDesign.Accessory))]
+        public virtual ICollection<AccessoryCustomDesign> AccessoryCustomDesigns { get; set; }
     }
 }

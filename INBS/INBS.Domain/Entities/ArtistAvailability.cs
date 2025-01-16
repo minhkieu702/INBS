@@ -14,6 +14,7 @@ namespace INBS.Domain.Entities
         public ArtistAvailability()
         {
             ID = Guid.NewGuid();
+            Bookings = [];
         }
 
         [Key]
@@ -29,5 +30,8 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(ArtistId))]
         [InverseProperty(nameof(Artist.ArtistAvailabilities))]
         public virtual Artist? Artist { get; set; }
+
+        [InverseProperty(nameof(Booking.ArtistAvailability))]
+        public virtual ICollection<Booking> Bookings { get; set; }
     }
 }
