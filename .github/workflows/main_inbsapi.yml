@@ -60,4 +60,3 @@ jobs:
           app-name: 'inbsapi'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0640AB7FE27D4F61AB991BE0663B4ACD }}
-          package: .
