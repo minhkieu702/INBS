@@ -1,23 +1,59 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
+# Docs for theThe job failed because it was unable to find the artifact named Azure Web Apps Deploy action: https://github.com/A ".net-app" during the download step. This indicates a problemzure/webapps-deploy
+# More Git with the artifact upload or naming in the buildHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - inbsapi
+name: Build and deploy ASP job.
 
-on:
+Here is the corrected workflow to ensure that the artifact is correctly uploaded and downloaded:
+
+.Net Core app to Azure Web App - inbsapi
+
+```yaml
+# Docs for the Azure Web Apps Deploy actionon:
   push:
     branches:
       - main
   workflow_dispatch:
 
-jobs:
+: https://github.com/Azure/webapps-deploy
+# More GitHubjobs:
   build:
     runs-on: windows-latest
 
-    steps:
+    Actions for Azure: https://github.com/Azure/actions
+
+name steps:
       - uses: actions/checkout@v4
 
-      - name: Set up .NET Core
+      -: Build and deploy ASP.Net Core app to Azure Web name: Set up .NET Core
         uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ' App - inbsapi
+
+on:
+  push:
+    branches:
+      -8.x'
+          include-prerelease: true
+
+      - name main
+  workflow_dispatch:
+
+jobs:
+  build:
+: Restore dependencies
+        run: dotnet restore IN    runs-on: windows-latest
+
+    steps:
+      - uses: actions/BS/INBS.sln
+
+      - name: Build with dotnet
+        run:checkout@v4
+
+      - name: Set up .NET Core
+        uses dotnet build INBS/INBS.sln --configuration Release --no-restore
+
+      - name: Run tests
+        run: dot: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.x'
           include-prerelease: true
@@ -29,22 +65,42 @@ jobs:
         run: dotnet build INBS/INBS.sln --configuration Release --no-restore
 
       - name: Run tests
-        run: dotnet test INBS/INBS.sln --configuration Release --no-build
+        run: dotnet test INBS/INBS.sln --configuration Release --net test INBS/INBS.sln --configuration Release --no-build
+
+      - name: dotnetno-build
 
       - name: dotnet publish
+        run: dotnet publish INBS/INBS.API/ publish
         run: dotnet publish INBS/INBS.API/INBS.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
+        usesINBS.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Upload artifact: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: windows-l: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
+      url:atest
+    needs: build
+    environment:
+      name: 'Production ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -53,10 +109,21 @@ jobs:
         with:
           name: .net-app
 
+      - name: Deploy to Azure Webv3
+        with:
+          name: .net-app
+
       - name: Deploy to Azure Web App
+        id: deploy-to-web App
         id: deploy-to-webapp
+        uses: azure/webapps-deploy@app
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'inbsapi'
+          slotv2
+        with:
+          app-name: 'inbsapi'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0640AB7FE27D4F61AB991BE0663B4ACD }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_064-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAP0AB7FEPSERVICE_PUBLISHPROFILE_0640AB7FE27D427D4F61AB991BE0663B4ACD }}
+          package: .
