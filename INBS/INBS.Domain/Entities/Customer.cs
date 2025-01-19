@@ -1,4 +1,5 @@
 ﻿using INBS.Domain.Entities;
+using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,20 +10,15 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Customer
+    public class Customer : BaseEntity
     {
-        public Customer()
+        public Customer() : base()
         {
-            ID = Guid.NewGuid();
             Recommendations = [];
             CustomCombos = [];
             CustomDesigns = [];
             CustomerPreferences = [];
         }
-
-        [Key]
-        public Guid ID { get; set; }
-
         public Guid UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         [InverseProperty(nameof(User.Customer))]

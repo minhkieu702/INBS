@@ -1,4 +1,5 @@
 ﻿using INBS.Domain.Entities;
+using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,20 +10,15 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class User
+    public class User : BaseEntity
     {
-        public User()
+        public User() : base()
         {
-            ID = Guid.NewGuid();
             PasswordHash = string.Empty;
             Preferences = string.Empty;
             Email = string.Empty;
-            CreateAt = DateTime.Now;
             Notifications = [];
         }
-
-        [Key]
-        public Guid ID { get; set; }
 
         public string? FullName { get; set; }
 
@@ -35,8 +31,6 @@ namespace INBS.Domain.Entities
         public int Role { get; set; } //Customer, Artist, Admin
 
         public string? Preferences { get; set; }
-
-        public DateTime CreateAt { get; set; }
 
         [InverseProperty(nameof(Customer.User))]
         public virtual Customer? Customer { get; set; }

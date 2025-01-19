@@ -6,19 +6,16 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using INBS.Domain.Entities.Common;
 
 namespace INBS.Domain.Entities
 {
-    public class Artist
+    public class Artist : BaseEntity
     {
-        public Artist()
+        public Artist() : base()
         {
-            ID = Guid.NewGuid();
             ArtistAvailabilities = [];
         }
-
-        [Key]
-        public Guid ID { get; set; }
 
         public Guid UserId { get; set; }
         [ForeignKey(nameof(UserId))]

@@ -5,21 +5,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using INBS.Domain.Entities.Common;
 
 namespace INBS.Domain.Entities
 {
-    public class Accessory
+    public class Accessory : BaseEntity
     {
-        public Accessory()
+        public Accessory() : base()
         {
             AccessoryCustomDesigns = [];
-            ID = Guid.NewGuid();
             Name = string.Empty;
             ImageUrl = string.Empty;
         }
 
-        [Key]
-        public Guid ID { get; set; }
         public string Name { get; set; }
         public double Price { get; set; }
         public string ImageUrl { get; set; }

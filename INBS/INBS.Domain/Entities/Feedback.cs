@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Domain.Entities.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,16 +9,13 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Feedback
+    public class Feedback : BaseEntity
     {
-        public Feedback()
+        public Feedback() : base()
         {
-            ID = Guid.NewGuid();
             Rating = 5;
             Content = string.Empty;
         }
-        [Key]
-        public Guid ID { get; set; }
         public int Rating { get; set; }
         public string Content { get; set; }
         public Guid BookingId { get; set; }

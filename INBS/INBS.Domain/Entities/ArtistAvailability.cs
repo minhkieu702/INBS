@@ -1,4 +1,4 @@
-﻿using INBS.Domain.Entities;
+﻿using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,17 +9,13 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class ArtistAvailability
+    public class ArtistAvailability : BaseEntity
     {
-        public ArtistAvailability()
+        public ArtistAvailability() : base()
         {
-            ID = Guid.NewGuid();
             Bookings = [];
         }
 
-        [Key]
-        public Guid ID { get; set; }
-        
         public DateOnly AvailableDate { get; set; }
 
         public TimeOnly StartTime { get; set; }

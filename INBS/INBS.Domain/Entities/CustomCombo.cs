@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Domain.Entities.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,19 +9,14 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class CustomCombo
+    public class CustomCombo : BaseEntity
     {
-        public CustomCombo()
+        public CustomCombo() : base()
         {
-            ID = Guid.NewGuid();
             IsFavorite = false;
             Bookings = [];
             ServiceCustomCombos = [];
         }
-
-        [Key]
-        public Guid ID { get; set; }
-
         public bool IsFavorite { get; set; }
 
         public Guid CustomerID { get; set; }

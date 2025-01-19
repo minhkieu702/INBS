@@ -1,4 +1,5 @@
 ﻿using INBS.Domain.Entities;
+using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,16 +10,13 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Booking
+    public class Booking : BaseEntity
     {
-        public Booking()
+        public Booking() : base()
         {
-            ID = Guid.NewGuid();
+            ServiceDate = DateTime.Now;
+            Feedbacks = [];
         }
-
-        [Key]
-        public Guid ID { get; set; }
-
         public DateTime ServiceDate { get; set; }
 
         public long Duration { get; set; }
@@ -30,8 +28,6 @@ namespace INBS.Domain.Entities
         public int PaymentMethod { get; set; } //Cash (0), Card (1)
 
         public string? Preferences { get; set; }
-
-        public DateTime CreatedAt { get; set; }
 
         public Guid CustomDesignId { get; set; }
         [ForeignKey(nameof(CustomDesignId))]

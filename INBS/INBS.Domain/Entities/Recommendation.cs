@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Domain.Entities.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,15 +9,11 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Recommendation
+    public class Recommendation : BaseEntity
     {
-        public Recommendation()
+        public Recommendation() : base()
         {
-            ID = Guid.NewGuid();
         }
-
-        [Key]
-        public Guid ID { get; set; }
 
         public string? RecommendedDesigns { get; set; }
 

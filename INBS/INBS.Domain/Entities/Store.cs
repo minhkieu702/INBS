@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Domain.Entities.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,20 +9,16 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Store
+    public class Store : BaseEntity
     {
-        public Store()
+        public Store() : base()
         {
-            ID = Guid.NewGuid();
             Artists = [];
             StoreDesigns = [];
             StoreServices = [];
             Address = string.Empty;
             ImageUrl = string.Empty;
         }
-
-        [Key]
-        public Guid ID { get; set; }
 
         public string Address { get; set; }
 

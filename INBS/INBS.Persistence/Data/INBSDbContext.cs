@@ -1,4 +1,5 @@
 ﻿using INBS.Domain.Entities;
+using INBS.Domain.Entities.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -29,6 +30,10 @@ namespace INBS.Persistence.Data
         public virtual DbSet<Booking> Bookings { get; set; }
 
         public virtual DbSet<Cancellation> Cancellations { get; set; }
+
+        public virtual DbSet<Category> Categories { get; set; }
+
+        public virtual DbSet<CategoryService> CategoryServices { get; set; }
 
         public virtual DbSet<Color> Colors { get; set; }
 
@@ -84,157 +89,51 @@ namespace INBS.Persistence.Data
             modelBuilder.Entity<CustomerPreference>().HasKey(c => new { c.CustomerId, c.PreferenceId, c.PreferenceType });
             modelBuilder.Entity<StoreService>().HasKey(c => new { c.StoreId, c.ServiceId });
             modelBuilder.Entity<StoreDesign>().HasKey(c => new { c.StoreId, c.DesignId });
+            modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
 
-            // Fix the Artist-Store relationship
-            modelBuilder.Entity<Artist>()
-                .HasOne(a => a.Store)
-                .WithMany(s => s.Artists)
-                .HasForeignKey(a => a.StoreID)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToOne<Admin, User>(a => a.User, u => u.Admin, a => a.UserId);
 
-            // Fix User-related cascades
-            modelBuilder.Entity<Admin>()
-                .HasOne(a => a.User)
-                .WithOne(u => u.Admin)
-                .HasForeignKey<Admin>(a => a.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToOne<Artist, User>(a => a.User, u => u.Artist, a => a.UserId);
 
-            modelBuilder.Entity<Artist>()
-                .HasOne(a => a.User)
-                .WithOne(u => u.Artist)
-                .HasForeignKey<Artist>(a => a.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.ConfigureRestrictOneToOne<Customer, User>(a => a.User, u => u.Customer, a => a.UserId);
 
-            modelBuilder.Entity<Customer>()
-                .HasOne(c => c.User)
-                .WithOne(u => u.Customer)
-                .HasForeignKey<Customer>(c => c.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.ConfigureRestrictOneToMany<Store, Admin>(s => s.Admin, a => a.Stores, s => s.AdminId);
 
-            //add prevent cascade delete
-            modelBuilder.Entity<AccessoryCustomDesign>()
-                .HasOne(acd => acd.Accessory)
-                .WithMany(a => a.AccessoryCustomDesigns)
-                .HasForeignKey(acd => acd.AccessoryId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<Artist, Store>(a => a.Store, s => s.Artists, a => a.StoreID);
 
-            modelBuilder.Entity<AccessoryCustomDesign>()
-                .HasOne(acd => acd.CustomDesign)
-                .WithMany(cd => cd.AccessoryCustomDesigns)
-                .HasForeignKey(acd => acd.CustomDesignId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<ArtistAvailability, Artist>(aa => aa.Artist, a => a.ArtistAvailabilities, a => a.ArtistId);
 
-            modelBuilder.Entity<ServiceCustomCombo>()
-                .HasOne(scc => scc.Service)
-                .WithMany(s => s.ServiceCustomCombos)
-                .HasForeignKey(scc => scc.ServiceId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<AccessoryCustomDesign, Accessory>(acd => acd.Accessory, a => a.AccessoryCustomDesigns, acd => acd.AccessoryId);
 
-            modelBuilder.Entity<ServiceCustomCombo>()
-                .HasOne(scc => scc.CustomCombo)
-                .WithMany(cc => cc.ServiceCustomCombos)
-                .HasForeignKey(scc => scc.CustomComboId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<AccessoryCustomDesign, CustomDesign>(acd => acd.CustomDesign, cd => cd.AccessoryCustomDesigns, acd => acd.CustomDesignId);
 
-            modelBuilder.Entity<ServiceTemplateCombo>()
-                .HasOne(stc => stc.Service)
-                .WithMany(s => s.ServiceTemplateCombos)
-                .HasForeignKey(stc => stc.ServiceId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<ServiceCustomCombo, Service>(scc => scc.Service, s => s.ServiceCustomCombos, scc => scc.ServiceId);
 
-            modelBuilder.Entity<ServiceTemplateCombo>()
-                .HasOne(stc => stc.TemplateCombo)
-                .WithMany(tc => tc.ServiceTemplateCombos)
-                .HasForeignKey(stc => stc.TemplateComboId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<ServiceCustomCombo, CustomCombo>(scc => scc.CustomCombo, cc => cc.ServiceCustomCombos, scc => scc.CustomComboId);
 
-            modelBuilder.Entity<StoreService>()
-                .HasOne(ss => ss.Store)
-                .WithMany(s => s.StoreServices)
-                .HasForeignKey(ss => ss.StoreId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<ServiceTemplateCombo, Service>(stc => stc.Service, s => s.ServiceTemplateCombos, stc => stc.ServiceId);
 
-            modelBuilder.Entity<StoreService>()
-                .HasOne(ss => ss.Service)
-                .WithMany(s => s.StoreServices)
-                .HasForeignKey(ss => ss.ServiceId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<ServiceTemplateCombo, TemplateCombo>(stc => stc.TemplateCombo, tc => tc.ServiceTemplateCombos, stc => stc.TemplateComboId);
 
-            modelBuilder.Entity<StoreDesign>()
-                .HasOne(sd => sd.Store)
-                .WithMany(s => s.StoreDesigns)
-                .HasForeignKey(sd => sd.StoreId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<StoreService, Service>(ss => ss.Service, st => st.StoreServices, ss => ss.ServiceId);
 
-            modelBuilder.Entity<StoreDesign>()
-                .HasOne(sd => sd.Design)
-                .WithMany(d => d.StoreDesigns)
-                .HasForeignKey(sd => sd.DesignId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<StoreService, Store>(ss => ss.Store, st => st.StoreServices, ss => ss.StoreId);
 
-            // Prevent cascade delete cycles for Booking relationships
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.CustomDesign)
-                .WithMany(cd => cd.Bookings)
-                .HasForeignKey(b => b.CustomDesignId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<StoreDesign, Store>(sd => sd.Store, s => s.StoreDesigns, sd => sd.StoreId);
 
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.CustomCombo)
-                .WithMany(cc => cc.Bookings)
-                .HasForeignKey(b => b.CustomComboId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<StoreDesign, Design>(sd => sd.Design, d => d.StoreDesigns, sd => sd.DesignId);
 
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.ArtistAvailability)
-                .WithMany(aa => aa.Bookings)
-                .HasForeignKey(b => b.ArtistAvailabilityId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<CategoryService, Category>(cs => cs.Category, c => c.CategoryServices, cs => cs.CategoryId);
 
-            // Prevent cascade delete for Design relationships
-            modelBuilder.Entity<Image>()
-                .HasOne(i => i.Design)
-                .WithMany(d => d.Images)
-                .HasForeignKey(i => i.DesignId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<Booking, CustomDesign>(b => b.CustomDesign, cd => cd.Bookings, b => b.CustomDesignId);
 
-            modelBuilder.Entity<CustomDesign>()
-                .HasOne(cd => cd.Design)
-                .WithMany(d => d.CustomDesigns)
-                .HasForeignKey(cd => cd.DesignID)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<Booking, CustomCombo>(b => b.CustomCombo, cc => cc.Bookings, b => b.CustomComboId);
 
-            // Prevent cascade delete for Customer relationships
-            modelBuilder.Entity<CustomDesign>()
-                .HasOne(cd => cd.Customer)
-                .WithMany(c => c.CustomDesigns)
-                .HasForeignKey(cd => cd.CustomerID)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<Booking, ArtistAvailability>(b => b.ArtistAvailability, aa => aa.Bookings, b => b.ArtistAvailabilityId);
 
-            modelBuilder.Entity<CustomCombo>()
-                .HasOne(cc => cc.Customer)
-                .WithMany(c => c.CustomCombos)
-                .HasForeignKey(cc => cc.CustomerID)
-                .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.ConfigureRestrictOneToMany<CustomDesign, Design>(cd => cd.Design, d => d.CustomDesigns, cd => cd.DesignID);
 
-            modelBuilder.Entity<Recommendation>()
-                .HasOne(r => r.Customer)
-                .WithMany(c => c.Recommendations)
-                .HasForeignKey(r => r.CustomerId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Prevent cascade delete for Store relationships
-            modelBuilder.Entity<StoreService>()
-                .HasOne(ss => ss.Store)
-                .WithMany(s => s.StoreServices)
-                .HasForeignKey(ss => ss.StoreId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Store>()
-                .HasOne(s => s.Admin)
-                .WithMany(a => a.Stores)
-                .HasForeignKey(s => s.AdminId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.ConfigureRestrictOneToMany<CustomDesign, Customer>(cd => cd.Customer, c => c.CustomDesigns, cd => cd.CustomerID);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Domain.Entities.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,20 +9,17 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Service
+    public class Service : BaseEntity
     {
-        public Service()
+        public Service() : base()
         {
-            ID = Guid.NewGuid();
             Name = string.Empty;
             ImageUrl = string.Empty;
             StoreServices = [];
             ServiceCustomCombos = [];
             ServiceTemplateCombos = [];
+            CategoryServices = [];
         }
-
-        [Key]
-        public Guid ID { get; set; }
 
         public string Name { get; set; }
 
@@ -39,5 +37,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(ServiceCustomCombo.Service))]
         public virtual ICollection<ServiceCustomCombo> ServiceCustomCombos { get; set; }
+
+        [InverseProperty(nameof(CategoryService.Service))]
+        public virtual ICollection<CategoryService> CategoryServices { get; set; }
     }
 }

@@ -5,23 +5,19 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using INBS.Domain.Entities.Common;
 
 namespace INBS.Domain.Entities
 {
-    public class CustomDesign
+    public class CustomDesign : BaseEntity
     {
-        public CustomDesign()
+        public CustomDesign() : base()
         {
-            ID = Guid.NewGuid();
             IsSave = false;
             ImageUrl = string.Empty;
             Bookings = [];
             AccessoryCustomDesigns = [];
         }
-
-        [Key]
-        public Guid ID { get; set; }
-
         public bool IsSave { get; set; }
 
         public string ImageUrl { get; set; }

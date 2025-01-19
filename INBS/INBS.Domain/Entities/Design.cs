@@ -1,4 +1,5 @@
 ﻿using INBS.Domain.Entities;
+using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,27 +10,22 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Design
+    public class Design : BaseEntity
     {
-        public Design()
+        public Design() : base()
         {
-            ID = Guid.NewGuid();
             Name = string.Empty;
             Images = [];
             CustomDesigns = [];
             StoreDesigns = [];
+            DesignPreferences = [];
         }
-
-        [Key]
-        public Guid ID { get; set; }
 
         public string Name { get; set; }
 
         public float TrendScore { get; set; }
 
         public string? Description { get; set; }
-
-        public DateTime CreatedAt { get; set; }
 
         public int Price { get; set; }
 
