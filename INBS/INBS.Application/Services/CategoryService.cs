@@ -102,7 +102,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<IEnumerable<CategoryResponse>> GetAll()
+        public async Task<IEnumerable<CategoryResponse>> Get()
         {
             try
             {

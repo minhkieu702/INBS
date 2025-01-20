@@ -10,7 +10,7 @@ namespace INBS.Application.IService
 {
     public interface ICategoryService
     {
-        Task<IEnumerable<CategoryResponse>> GetAll();
+        Task<IEnumerable<CategoryResponse>> Get();
         Task<CategoryResponse> GetById(int id);
         Task Create(CategoryRequest category);
         Task Update(Guid id, CategoryRequest category);

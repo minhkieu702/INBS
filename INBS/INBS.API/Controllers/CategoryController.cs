@@ -25,7 +25,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                var categories = await _categoryService.GetAll();
+                var categories = await _categoryService.Get();
                 return Ok(categories.AsQueryable());
             }
             catch (Exception ex)
