@@ -13,7 +13,7 @@ namespace INBS.Domain.Entities
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid ID { get; set; }
+        public int ID { get; set; }
 
         public string Name { get; set; } = string.Empty;
 

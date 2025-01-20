@@ -18,6 +18,8 @@ namespace INBS.Domain.Entities
             Preferences = string.Empty;
             Email = string.Empty;
             Notifications = [];
+            ImageUrl = string.Empty;
+            DeviceTokens = [];
         }
 
         public string? FullName { get; set; }
@@ -29,6 +31,8 @@ namespace INBS.Domain.Entities
         public string? PhoneNumber { get; set; }
 
         public int Role { get; set; } //Customer, Artist, Admin
+
+        public string ImageUrl { get; set; }
 
         public string? Preferences { get; set; }
 
@@ -43,5 +47,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(Notification.User))]
         public virtual ICollection<Notification> Notifications { get; set; }
+
+        [InverseProperty(nameof(DeviceToken.User))]
+        public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
     }
 }

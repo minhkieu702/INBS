@@ -49,6 +49,8 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<DesignPreference> DesignPreferences { get; set; }
 
+        public virtual DbSet<DeviceToken> DeviceTokens { get; set; }
+
         public virtual DbSet<Feedback> Feedbacks { get; set; }
 
         public virtual DbSet<Image> Images { get; set; }

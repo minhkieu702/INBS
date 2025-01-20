@@ -19,7 +19,7 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(Design.DesignPreferences))]
         public virtual Design? Design { get; set; }
 
-        public Guid PreferenceId { get; set; }
+        public int PreferenceId { get; set; }
 
         public string PreferenceType { get; set; }
     }
