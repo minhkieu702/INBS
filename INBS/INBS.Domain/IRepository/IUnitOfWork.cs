@@ -11,10 +11,11 @@ namespace INBS.Domain.IRepository
     {
         public IGenericRepository<Category> CategoryRepository { get; }
 
+        public IGenericRepository<CategoryService> CategoryServiceRepository { get; }
+
         int Save();
         Task<int> SaveAsync();
         void Dispose();
-        Task DisposeAsync();
         void BeginTransaction();
         void CommitTransaction();
         void RollBack();

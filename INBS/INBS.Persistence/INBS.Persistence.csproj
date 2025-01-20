@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DependencyInjection\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\INBS.Domain\INBS.Domain.csproj" />
   </ItemGroup>
 
