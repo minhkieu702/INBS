@@ -19,7 +19,6 @@ namespace INBS.Domain.Entities
             Email = string.Empty;
             Notifications = [];
             ImageUrl = string.Empty;
-            DeviceTokens = [];
         }
 
         public string? FullName { get; set; }
@@ -47,8 +46,5 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(Notification.User))]
         public virtual ICollection<Notification> Notifications { get; set; }
-
-        [InverseProperty(nameof(DeviceToken.User))]
-        public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
     }
 }

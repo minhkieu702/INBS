@@ -18,6 +18,7 @@ namespace INBS.Domain.Entities
             CustomCombos = [];
             CustomDesigns = [];
             CustomerPreferences = [];
+            DeviceTokens = [];
         }
         public Guid UserId { get; set; }
         [ForeignKey(nameof(UserId))]
@@ -35,5 +36,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(CustomerPreference.Customer))]
         public virtual ICollection<CustomerPreference> CustomerPreferences { get; set; }
+            
+        [InverseProperty(nameof(DeviceToken.Customer))]
+        public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
     }
 }

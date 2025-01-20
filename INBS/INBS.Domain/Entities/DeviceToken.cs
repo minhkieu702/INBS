@@ -19,9 +19,9 @@ namespace INBS.Domain.Entities
 
         public DateTime CreatedAt { get; set; }
 
-        public Guid UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
-        [InverseProperty(nameof(User.DeviceTokens))]
-        public virtual User? User { get; set; }
+        public Guid CustomerId { get; set; }
+        [ForeignKey(nameof(CustomerId))]
+        [InverseProperty(nameof(Customer.DeviceTokens))]
+        public virtual Customer? Customer { get; set; }
     }
 }
