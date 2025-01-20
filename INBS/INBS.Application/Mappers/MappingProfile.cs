@@ -12,6 +12,15 @@ namespace INBS.Application.Mappers
             CreateMap<CategoryRequest, Category>();
             CreateMap<Category, CategoryResponse>();
             #endregion
+
+            #region CategoryService
+            //CreateMap<CategoryServiceRequest, CategoryService>();
+            CreateMap<CategoryService, CategoryServiceResponse>();
+            #endregion
+
+            #region Service
+            CreateMap<Service, ServiceResponse>();
+            #endregion
         }
     }
 }

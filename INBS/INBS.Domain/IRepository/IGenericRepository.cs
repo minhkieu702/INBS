@@ -15,10 +15,7 @@ namespace INBS.Domain.IRepository
         //non async
         IEnumerable<TEntity> Get(
             Expression<Func<TEntity, bool>>? filter = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-            string includeProperties = "",
-            int? pageIndex = null,
-            int? pageSize = null);
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
 
         IEnumerable<TEntity> GetAll();
 
@@ -44,11 +41,8 @@ namespace INBS.Domain.IRepository
         Task DeleteAsync(object id);
         Task SaveAsync();
         Task<IEnumerable<TEntity>> GetAsync(
-        Expression<Func<TEntity, bool>>? filter = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        string includeProperties = "",
-        int? pageIndex = null,
-        int? pageSize = null);
+            Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
 
         Task<int> CountAsync();
     }

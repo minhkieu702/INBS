@@ -17,7 +17,8 @@ builder.Services.AddControllers().AddOData(opt =>
 {
     ODataConventionModelBuilder odataBuilder = new();
     odataBuilder.EntitySet<CategoryResponse>("Category");
-
+    odataBuilder.EntitySet<CategoryServiceResponse>("CategoryService");
+    odataBuilder.EntitySet<ServiceResponse>("Service");
     opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())
     .Select().Filter().Expand().OrderBy().Count().SetMaxTop(100);
 });

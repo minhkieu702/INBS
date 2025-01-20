@@ -3,6 +3,7 @@ using INBS.Application.DTOs.Service;
 using INBS.Application.IService;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,9 +107,11 @@ namespace INBS.Application.Services
         {
             try
             {
-                var categories = await _unitOfWork.CategoryRepository.GetAllAsync();
+                var categories = await _unitOfWork.CategoryRepository.GetAsync(
+                    include: query => query.Include(c => c.CategoryServices)
+                                            .ThenInclude(cs => cs.Service));
 
-                if (categories == null || categories.Count <= 0)
+                if (categories == null || categories.Count() <= 0)
                     throw new Exception("No data");
 
                 return _mapper.Map<IEnumerable<CategoryResponse>>(categories);
