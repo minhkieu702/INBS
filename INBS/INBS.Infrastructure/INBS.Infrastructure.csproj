@@ -8,14 +8,14 @@
 
   <ItemGroup>
     <Folder Include="Configurations\" />
-    <Folder Include="DependencyInjection\" />
     <Folder Include="Integrations\" />
-    <Folder Include="PayOS\" />
+    <Folder Include="Payment\PayOS\" />
     <Folder Include="Payment\" />
     <Folder Include="Quartz\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http.Connections" Version="1.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
   </ItemGroup>
 

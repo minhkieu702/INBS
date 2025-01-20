@@ -4,6 +4,7 @@ using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Domain
 {
     [DbContext(typeof(INBSDbContext))]
-    partial class INBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250120045334_AddDeviceToken")]
+    partial class AddDeviceToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -392,22 +395,6 @@ namespace INBS.Domain
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.CustomerPreference", b =>
-                {
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("PreferenceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PreferenceType")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("CustomerId", "PreferenceId", "PreferenceType");
-
-                    b.ToTable("CustomerPreferences");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Design", b =>
                 {
                     b.Property<Guid>("ID")
@@ -439,22 +426,6 @@ namespace INBS.Domain
                     b.HasKey("ID");
 
                     b.ToTable("Designs");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.DesignPreference", b =>
-                {
-                    b.Property<Guid>("DesignId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("PreferenceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PreferenceType")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("DesignId", "PreferenceId", "PreferenceType");
-
-                    b.ToTable("DesignPreferences");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.DeviceToken", b =>
@@ -583,26 +554,6 @@ namespace INBS.Domain
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.Occasion", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Occasions");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.PaintType", b =>
                 {
                     b.Property<int>("ID")
@@ -722,27 +673,6 @@ namespace INBS.Domain
                     b.HasIndex("TemplateComboId");
 
                     b.ToTable("ServiceTemplateCombos");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.SkinTone", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("HexCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("SkinTones");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Store", b =>
@@ -1043,28 +973,6 @@ namespace INBS.Domain
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.CustomerPreference", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
-                        .WithMany("CustomerPreferences")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.DesignPreference", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Design", "Design")
-                        .WithMany("DesignPreferences")
-                        .HasForeignKey("DesignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Design");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.DeviceToken", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.User", "User")
@@ -1259,16 +1167,12 @@ namespace INBS.Domain
 
                     b.Navigation("CustomDesigns");
 
-                    b.Navigation("CustomerPreferences");
-
                     b.Navigation("Recommendations");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Design", b =>
                 {
                     b.Navigation("CustomDesigns");
-
-                    b.Navigation("DesignPreferences");
 
                     b.Navigation("Images");
 

@@ -9,7 +9,6 @@
     <Folder Include="Constants\" />
     <Folder Include="CustomException\" />
     <Folder Include="Enums\" />
-    <Folder Include="IRepository\" />
     <Folder Include="Utils\" />
   </ItemGroup>
   <ItemGroup>

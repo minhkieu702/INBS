@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using INBS.Application.DTOs.Booking;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,9 @@ namespace INBS.Infrastructure.SignalR
 {
     public class BookingHub : Hub
     {
-        //public async
+        public async Task Appointment(BookingHubResponse response)
+        {
+            await Clients.All.SendAsync("HoldTable", response);
+        }
     }
 }
