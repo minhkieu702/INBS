@@ -9,7 +9,7 @@ namespace INBS.Application.Interfaces
 {
     public interface IFirebaseService
     {
-        Task<string> UploadImageAsync(IFormFile file);
+        Task<string> UploadFileAsync(IFormFile file);
 
         Task DeleteImageAsync(string imageUrl);
     }

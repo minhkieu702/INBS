@@ -12,24 +12,15 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class CategoryService : ICategoryService
+    public class CategoryService(IMapper _mapper, IUnitOfWork _unitOfWork) : ICategoryService
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CategoryService(IMapper mapper, IUnitOfWork unitOfWork)
-        {
-            _mapper = mapper;
-            _unitOfWork = unitOfWork;
-        }
-
         public async Task Create(CategoryRequest category)
         {
             try
             {
                 var isExist = await _unitOfWork.CategoryRepository.GetAsync(c => c.Name.Equals(category.Name));
                 
-                if (isExist.Count() > 0)
+                if (isExist.Any())
                     throw new Exception("Category is already exist");
 
                 var categoryEntity = _mapper.Map<Category>(category);
@@ -45,21 +36,28 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task<int> RemoveCategoryService(Guid cateId)
+        private async Task DeleteCategoryService(IEnumerable<Domain.Entities.CategoryService> categoryServices)
         {
             try
             {
-                int count = 0;
-                var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.CategoryId.Equals(cateId));
-                if (categoryServices.Count() > 0)
+                var deleteTasks = categoryServices.Select(async cs =>
                 {
-                    foreach (var categoryService in categoryServices)
+                    try
                     {
-                        await _unitOfWork.CategoryServiceRepository.DeleteAsync(categoryService);
-                        count++;
+                        await _unitOfWork.CategoryServiceRepository.DeleteAsync([cs.CategoryId, cs.ServiceId]);
                     }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to delete CategoryService with ID: category-{cs.CategoryId}, service-{cs.ServiceId}. Error: {ex.Message}");
+                    }
+                });
+
+                await Task.WhenAll(deleteTasks);
+
+                if (deleteTasks.Any(t => t.IsFaulted))
+                {
+                    throw new Exception("Some category services could not be deleted successfully.");
                 }
-                return count;
             }
             catch (Exception)
             {
@@ -73,18 +71,15 @@ namespace INBS.Application.Services
             {
                 _unitOfWork.BeginTransaction();
 
-                var isExist = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
-                
-                if (isExist == null)
-                    throw new Exception("Category not found");
+                var isExist = await _unitOfWork.CategoryRepository.GetByIdAsync(id) ?? throw new Exception("Category not found");
 
-                var count = await RemoveCategoryService(id);
+                var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(id));
+
+                await DeleteCategoryService(categoryServices);
 
                 await _unitOfWork.CategoryRepository.DeleteAsync(isExist);
-                
-                count++;
-                
-                if (await _unitOfWork.SaveAsync() < count)
+                                
+                if (await _unitOfWork.SaveAsync() < 0)
                 {
                     _unitOfWork.RollBack();
                     throw new Exception("Delete category failed");
@@ -109,27 +104,8 @@ namespace INBS.Application.Services
             {
                 var categories = await _unitOfWork.CategoryRepository.GetAsync(
                     include: query => query.Include(c => c.CategoryServices)
-                                            .ThenInclude(cs => cs.Service));
-
-                if (categories == null || categories.Count() <= 0)
-                    throw new Exception("No data");
-
+                                            .ThenInclude(cs => cs.Service)) ?? throw new Exception("Something was wrong!");
                 return _mapper.Map<IEnumerable<CategoryResponse>>(categories);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<CategoryResponse> GetById(int id)
-        {
-            try
-            {
-                var category = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
-                if (category == null)
-                    throw new Exception("Category not found");
-                return _mapper.Map<CategoryResponse>(category);
             }
             catch (Exception)
             {
@@ -141,10 +117,7 @@ namespace INBS.Application.Services
         {
             try
             {
-                var existedEntity = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
-
-                if (existedEntity == null)
-                    throw new Exception("Category not found");
+                var existedEntity = await _unitOfWork.CategoryRepository.GetByIdAsync(id) ?? throw new Exception("Category not found");
 
                 _unitOfWork.CategoryRepository.Update(_mapper.Map(category, existedEntity));
 

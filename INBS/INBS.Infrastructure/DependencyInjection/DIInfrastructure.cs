@@ -7,6 +7,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using INBS.Persistence.Repository;
 using INBS.Domain.IRepository;
 using INBS.Application.Mappers;
+using Firebase.Auth;
+using FirebaseAdmin.Messaging;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using INBS.Application.Interfaces;
+using INBS.Infrastructure.Integrations;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -35,6 +41,42 @@ namespace Infrastructure.DependencyInjection
             services.AddSingleton<IConnectionMapping, ConnectionMapping>();
 
             services.AddAutoMapper(typeof(MappingProfile));
+
+            //Firebase
+            //services.Configure<FirebaseConfig>(
+            //    options => options.ApiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey"));
+
+            //// Initialize Firebase if not initialized
+            //if (FirebaseApp.DefaultInstance == null)
+            //{
+            //    try
+            //    {
+            //        var credentialPath = Path.Combine(
+            //            AppDomain.CurrentDomain.BaseDirectory,
+            //            Environment.GetEnvironmentVariable("FirebaseSettings:credentialFile"));
+
+            //        if (!File.Exists(credentialPath))
+            //        {
+            //            throw new FileNotFoundException(
+            //                $"Firebase credential file not found at {credentialPath}");
+            //        }
+
+            //        FirebaseApp.Create(new AppOptions()
+            //        {
+            //            Credential = GoogleCredential.FromFile(credentialPath)
+            //        });
+
+            //        services.AddSingleton(FirebaseMessaging.DefaultInstance);
+
+            //        Console.WriteLine("Firebase initialized successfully!");
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine($"Error initializing Firebase: {ex.Message}");
+            //        throw;
+            //    }
+            //}
+
             //Quartz
             //services.AddQuartz();
 
@@ -45,7 +87,10 @@ namespace Infrastructure.DependencyInjection
 
 
 
-        public static void AddServices(this IServiceCollection services) { }
+        public static void AddServices(this IServiceCollection services)
+        {
+            services.AddScoped<IFirebaseService, FirebaseService>();
+        }
 
         public static void AddRepositories(this IServiceCollection services)
         {

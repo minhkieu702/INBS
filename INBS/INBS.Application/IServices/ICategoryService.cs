@@ -11,7 +11,6 @@ namespace INBS.Application.IService
     public interface ICategoryService
     {
         Task<IEnumerable<CategoryResponse>> Get();
-        Task<CategoryResponse> GetById(int id);
         Task Create(CategoryRequest category);
         Task Update(Guid id, CategoryRequest category);
         Task DeleteById(Guid id);

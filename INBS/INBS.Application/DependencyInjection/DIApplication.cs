@@ -1,4 +1,5 @@
 ﻿using INBS.Application.IService;
+using INBS.Application.IServices;
 using INBS.Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,7 @@ namespace INBS.Application.DependencyInjection
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IServiceService, ServiceService>();
         }
     }
 }

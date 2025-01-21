@@ -114,6 +114,14 @@ namespace INBS.Persistence.Repository
             TEntity entity = await dbSet.FindAsync(id) ?? throw new Exception();
             dbSet.Remove(entity);
         }
+        public async Task DeleteAsync(object[] keyValues)
+        {
+            if (keyValues.Length != 2)
+                throw new ArgumentException("Composite key requires two values.");
+
+            TEntity entity = await dbSet.FindAsync(keyValues) ?? throw new Exception();
+            dbSet.Remove(entity);
+        }
         public async Task<IEnumerable<TEntity>> GetAsync(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)

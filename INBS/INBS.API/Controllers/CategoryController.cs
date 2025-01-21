@@ -1,8 +1,10 @@
 ﻿using INBS.Application.DTOs.Service;
+using INBS.Application.Interfaces;
 using INBS.Application.IService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using System.Net.Http;
 
 namespace INBS.API.Controllers
 {
@@ -11,7 +13,7 @@ namespace INBS.API.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class CategoryController(ICategoryService categoryService) : ODataController
+    public class CategoryController(ICategoryService categoryService) : ControllerBase
     {
         private readonly ICategoryService _categoryService = categoryService;
 
@@ -40,7 +42,7 @@ namespace INBS.API.Controllers
         /// <param name="category"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CategoryRequest category)
+        public async Task<IActionResult> Create([FromForm] CategoryRequest category)
         {
             try
             {
@@ -60,7 +62,7 @@ namespace INBS.API.Controllers
         /// <param name="category">uses to update new information</param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] CategoryRequest category)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromForm] CategoryRequest category)
         {
             try
             {
@@ -92,11 +94,5 @@ namespace INBS.API.Controllers
             }
         }
 
-        [HttpGet("Test")]
-        public IActionResult Test()
-        {
-            var some = Environment.GetEnvironmentVariable("connectionString");
-            return Ok(some);
-        }
     }
 }

@@ -45,6 +45,7 @@ namespace INBS.Domain.IRepository
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
 
         Task<int> CountAsync();
+        Task DeleteAsync(object[] keyValues);
     }
 
 }
