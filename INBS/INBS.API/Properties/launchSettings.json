@@ -26,8 +26,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7012;http://localhost:5230",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "connectionString": "Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBS; TrustServerCertificate=True"
+      },
     },
     "IIS Express": {
       "commandName": "IISExpress",

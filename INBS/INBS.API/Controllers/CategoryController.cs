@@ -95,7 +95,7 @@ namespace INBS.API.Controllers
         [HttpGet("Test")]
         public IActionResult Test()
         {
-            var some = Environment.GetEnvironmentVariable("FirebaseSettings:appId");
+            var some = Environment.GetEnvironmentVariable("connectionString");
             return Ok(some);
         }
     }

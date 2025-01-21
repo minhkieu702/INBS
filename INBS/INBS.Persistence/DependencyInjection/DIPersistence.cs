@@ -17,7 +17,7 @@ namespace INBS.Persistence.DependencyInjection
         {
             services.AddDbContext<INBSDbContext>(options =>
             {
-                options.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBS; TrustServerCertificate=True", options => options.MigrationsAssembly("INBS.Persistence"));
+                options.UseSqlServer(Environment.GetEnvironmentVariable("connectionString"));
             });
             return services;
         }
