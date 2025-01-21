@@ -13,6 +13,8 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<CategoryService> CategoryServiceRepository { get; }
 
+        public IGenericRepository<Service> ServiceRepository { get; }
+
         int Save();
         Task<int> SaveAsync();
         void Dispose();

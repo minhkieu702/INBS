@@ -91,5 +91,12 @@ namespace INBS.API.Controllers
                 return BadRequest(ex);
             }
         }
+
+        [HttpGet("Test")]
+        public IActionResult Test()
+        {
+            var some = Environment.GetEnvironmentVariable("FirebaseSettings:appId");
+            return Ok(some);
+        }
     }
 }

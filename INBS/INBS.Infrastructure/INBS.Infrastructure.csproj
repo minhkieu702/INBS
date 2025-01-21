@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Configurations\" />
-    <Folder Include="Integrations\" />
     <Folder Include="Payment\PayOS\" />
     <Folder Include="Payment\" />
     <Folder Include="Quartz\" />

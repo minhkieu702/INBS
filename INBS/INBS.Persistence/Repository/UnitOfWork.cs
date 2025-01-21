@@ -45,6 +45,18 @@ namespace INBS.Persistence.Repository
 
         #endregion
 
+        #region Service
+        private IGenericRepository<Service>? _serviceRepository;
+        public IGenericRepository<Service> ServiceRepository
+        {
+            get
+            {
+                _serviceRepository ??= new GenericRepository<Service>(_context);
+                return _serviceRepository;
+            }
+        }
+        #endregion
+
         public void BeginTransaction()
         {
             _context.Database.BeginTransaction();

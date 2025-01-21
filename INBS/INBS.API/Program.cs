@@ -11,17 +11,6 @@ using INBS.Application.DTOs.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers().AddOData(opt =>
-{
-    ODataConventionModelBuilder odataBuilder = new();
-    odataBuilder.EntitySet<CategoryResponse>("Category");
-    odataBuilder.EntitySet<CategoryServiceResponse>("CategoryService");
-    odataBuilder.EntitySet<ServiceResponse>("Service");
-    opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())
-    .Select().Filter().Expand().OrderBy().Count().SetMaxTop(100);
-});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
