@@ -11,7 +11,5 @@ namespace INBS.Application.DTOs.Service
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        [JsonIgnore]
-        public DateTime LastModifiedAt { get; set; } = DateTime.Now;
     }
 }

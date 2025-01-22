@@ -77,7 +77,7 @@ namespace INBS.Application.Services
 
                 await DeleteCategoryService(categoryServices);
 
-                await _unitOfWork.CategoryRepository.DeleteAsync(isExist);
+                await _unitOfWork.CategoryRepository.DeleteAsync(id);
                                 
                 if (await _unitOfWork.SaveAsync() < 0)
                 {
