@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.IServices
 {
-    public interface IServiceTemplateComboService
+    public interface ITemplateComboService
     {
         Task<IEnumerable<TemplateComboResponse>> Get();
         Task Create(TemplateComboRequest request);

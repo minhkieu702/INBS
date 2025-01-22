@@ -11,40 +11,39 @@ namespace INBS.Application.Services
 {
     public class ServiceService(IMapper _mapper, IUnitOfWork _unitOfWork, IFirebaseService _firebaseService) : IServiceService
     {
-        private async Task InsertCategoryService(Guid serviceId, IList<Guid> categoryIds, IEnumerable<Domain.Entities.CategoryService> existedCategoryServices)
+        private async Task InsertCategoryService(
+            Guid serviceId, 
+            IList<Guid> categoryIds, 
+            IEnumerable<Domain.Entities.CategoryService> existedCategoryServices)
         {
-            // Lọc ra các CategoryId cần thêm mới
-            var existingCategoryIds = existedCategoryServices.Select(cs => cs.CategoryId).ToHashSet(); // Dùng HashSet để tăng hiệu suất lookup
-            var insertTasks = categoryIds
-                .Distinct() // Loại bỏ ID trùng lặp
-                .Where(id => !existingCategoryIds.Contains(id))
-                .Select(async id =>
-                {
-                    try
-                    {
-                        var category = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
-                        if (category != null)
-                        {
-                            var categoryService = new Domain.Entities.CategoryService
-                            {
-                                CategoryId = id,
-                                ServiceId = serviceId
-                            };
-                            await _unitOfWork.CategoryServiceRepository.InsertAsync(categoryService);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to delete CategoryService with ID: category-{id}, service-{serviceId}. Error: {ex.Message}");
-                    }
-                });
+            var existingCategoryIds = existedCategoryServices.Select(cs => cs.CategoryId).ToHashSet();
 
-            await Task.WhenAll(insertTasks);
+            var list = new List<Domain.Entities.CategoryService>();
 
-            if (insertTasks.Any(t => t.IsFaulted))
+            foreach (var categoryId in categoryIds.Distinct())
             {
-                throw new Exception("Some category services could not be inserted successfully.");
+                if (existingCategoryIds.Contains(categoryId)) continue;
+
+                try
+                {
+                    var category = await _unitOfWork.CategoryRepository.GetByIdAsync(categoryId);
+                    if (category != null)
+                    {
+                        var categoryService = new Domain.Entities.CategoryService
+                        {
+                            CategoryId = categoryId,
+                            ServiceId = serviceId
+                        };
+                        list.Add(categoryService);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to process CategoryService with CategoryId: {categoryId}, Error: {ex.Message}");
+                }
             }
+
+            await _unitOfWork.CategoryServiceRepository.InsertRangeAsync(list);
         }
 
         public async Task Create(ServiceCreatingRequest modelRequest)
@@ -66,12 +65,10 @@ namespace INBS.Application.Services
 
                 newService.CreatedAt = DateTime.Now;
 
-                //Insert service
                 await _unitOfWork.ServiceRepository.InsertAsync(newService);
 
                 var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(newService.ID));
 
-                //Insert categoryServices
                 await InsertCategoryService(newService.ID, modelRequest.CategoryIds, categoryServices);
 
                 if (await _unitOfWork.SaveAsync() == 0)
@@ -86,33 +83,9 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task DeleteCategoryService(IEnumerable<Domain.Entities.CategoryService> categoryServices)
+        private void DeleteCategoryService(IEnumerable<Domain.Entities.CategoryService> categoryServices)
         {
-            try
-            {
-                var deleteTasks = categoryServices.Select(async cs =>
-                {
-                    try
-                    {
-                        await _unitOfWork.CategoryServiceRepository.DeleteAsync([cs.CategoryId, cs.ServiceId]);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to delete CategoryService with ID: category-{cs.CategoryId}, service-{cs.ServiceId}. Error: {ex.Message}");
-                    }
-                });
-
-                await Task.WhenAll(deleteTasks);
-
-                if (deleteTasks.Any(t => t.IsFaulted))
-                {
-                    throw new Exception("Some category services could not be deleted successfully.");
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            _unitOfWork.CategoryServiceRepository.DeleteRange(categoryServices);
         }
 
         public async Task DeleteById(Guid id)
@@ -123,9 +96,7 @@ namespace INBS.Application.Services
 
                 var isExist = await _unitOfWork.ServiceRepository.GetByIdAsync(id) ?? throw new Exception("Service not found");
 
-                var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(id));
-
-                await DeleteCategoryService(categoryServices);
+                DeleteCategoryService(await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(id)));
 
                 await _unitOfWork.ServiceRepository.DeleteAsync(id);
 
@@ -149,7 +120,7 @@ namespace INBS.Application.Services
                 var services = await _unitOfWork.ServiceRepository.GetAsync(include: 
                     s => s.Include(c => c.CategoryServices).ThenInclude(cs => cs.Category)
                     //.Include(s => s.ServiceCustomCombos).ThenInclude(scc => scc.CustomCombo)
-                    //.Include(s => s.ServiceTemplateCombos).ThenInclude(stc => stc.TemplateCombo)
+                    .Include(s => s.ServiceTemplateCombos).ThenInclude(stc => stc.TemplateCombo)
                     //.Include(s => s.StoreServices).ThenInclude(ss => ss.Store)
                     ) ?? throw new Exception("Something was wrong!");
 
@@ -166,7 +137,7 @@ namespace INBS.Application.Services
             var existedCategoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(serviceId));
 
             // Lọc ra các CategoryService cần xóa
-            await DeleteCategoryService(existedCategoryServices.Where(cs => !categoryIds.Contains(cs.CategoryId)));
+            DeleteCategoryService(existedCategoryServices.Where(cs => !categoryIds.Contains(cs.CategoryId)));
 
             await InsertCategoryService(serviceId, categoryIds, existedCategoryServices);
         }
@@ -178,7 +149,7 @@ namespace INBS.Application.Services
             {
                 var existedEntity = await _unitOfWork.ServiceRepository.GetByIdAsync(id) ?? throw new Exception("Service not found");
 
-                var existedEntityName = await _unitOfWork.ServiceRepository.GetAsync(x => x.Name == updatingRequest.Name);
+                var existedEntityName = await _unitOfWork.ServiceRepository.GetAsync(filter: x => x.Name.Equals(updatingRequest.Name));
 
                 if (existedEntityName != null && existedEntityName.Any() && existedEntityName.First().ID != id)
                     throw new Exception("Service already exists");

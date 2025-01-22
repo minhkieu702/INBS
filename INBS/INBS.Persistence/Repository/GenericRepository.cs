@@ -114,6 +114,12 @@ namespace INBS.Persistence.Repository
             TEntity entity = await dbSet.FindAsync(id) ?? throw new Exception();
             dbSet.Remove(entity);
         }
+
+        public void DeleteRange(IEnumerable<TEntity> obj)
+        {
+            dbSet.RemoveRange(obj);
+        }
+
         public async Task DeleteAsync(object[] keyValues)
         {
             if (keyValues.Length != 2)

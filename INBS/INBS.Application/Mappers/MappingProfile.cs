@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using INBS.Application.DTOs.Service.Category;
 using INBS.Application.DTOs.Service.Service;
+using INBS.Application.DTOs.Service.ServiceTemplateCombo;
+using INBS.Application.DTOs.Service.TemplateCombo;
 using INBS.Domain.Entities;
 
 namespace INBS.Application.Mappers
@@ -23,6 +25,12 @@ namespace INBS.Application.Mappers
             CreateMap<ServiceCreatingRequest, Service>();
             CreateMap<ServiceUpdatingRequest, Service>();
             CreateMap<Service, ServiceResponse>();
+            #endregion
+
+            #region TemplateCombo
+            CreateMap<TemplateComboRequest, TemplateCombo>();
+            CreateMap<TemplateCombo, TemplateComboResponse>();
+            CreateMap<ServiceTemplateCombo, ServiceTemplateComboResponse>();
             #endregion
         }
     }

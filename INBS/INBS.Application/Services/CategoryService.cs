@@ -38,33 +38,9 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task DeleteCategoryService(IEnumerable<Domain.Entities.CategoryService> categoryServices)
+        private void DeleteCategoryService(IEnumerable<Domain.Entities.CategoryService> categoryServices)
         {
-            try
-            {
-                var deleteTasks = categoryServices.Select(async cs =>
-                {
-                    try
-                    {
-                        await _unitOfWork.CategoryServiceRepository.DeleteAsync([cs.CategoryId, cs.ServiceId]);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to delete CategoryService with ID: category-{cs.CategoryId}, service-{cs.ServiceId}. Error: {ex.Message}");
-                    }
-                });
-
-                await Task.WhenAll(deleteTasks);
-
-                if (deleteTasks.Any(t => t.IsFaulted))
-                {
-                    throw new Exception("Some category services could not be deleted successfully.");
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            _unitOfWork.CategoryServiceRepository.DeleteRange(categoryServices);
         }
 
         public async Task DeleteById(Guid id)
@@ -77,7 +53,7 @@ namespace INBS.Application.Services
 
                 var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(id));
 
-                await DeleteCategoryService(categoryServices);
+                DeleteCategoryService(categoryServices);
 
                 await _unitOfWork.CategoryRepository.DeleteAsync(id);
                                 
