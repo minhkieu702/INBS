@@ -10,8 +10,8 @@ namespace INBS.Application.IServices
     public interface IServiceService
     {
         Task<IEnumerable<ServiceResponse>> Get();
-        Task Create(ServiceCreatingRequest category);
-        Task Update(Guid id, ServiceUpdatingRequest category);
+        Task Create(ServiceRequest category);
+        Task Update(Guid id, ServiceRequest category);
         Task DeleteById(Guid id);
     }
 }

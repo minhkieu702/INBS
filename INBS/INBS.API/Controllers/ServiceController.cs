@@ -40,12 +40,12 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Creates a new service.
+        /// Creates a new service, bắt buộc để imageUrl là null, còn nếu để Image là null thì sẽ tự động lấy ảnh mặc định có sẵn
         /// </summary>
         /// <param name="service">The service creation request.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] ServiceCreatingRequest service)
+        public async Task<IActionResult> Create([FromForm] ServiceRequest service)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace INBS.API.Controllers
         /// <param name="service">The service update request.</param>
         /// <returns>An action result.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] ServiceUpdatingRequest service)
+        public async Task<IActionResult> Update(Guid id, [FromForm] ServiceRequest service)
         {
             try
             {

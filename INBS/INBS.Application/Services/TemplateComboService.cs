@@ -44,15 +44,13 @@ namespace INBS.Application.Services
                 try
                 {
                     var service = await _unitOfWork.ServiceRepository.GetByIdAsync(serviceId);
-                    if (service != null)
+                    if (service != null) continue;
+
+                    list.Add(new ServiceTemplateCombo
                     {
-                        var serviceTemplateCombo = new ServiceTemplateCombo
-                        {
-                            ServiceId = serviceId,
-                            TemplateComboId = templateComboId
-                        };
-                        list.Add(serviceTemplateCombo);
-                    }
+                        ServiceId = serviceId,
+                        TemplateComboId = templateComboId
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -61,9 +59,7 @@ namespace INBS.Application.Services
             }
 
             if (list.Any())
-            {
                 await _unitOfWork.ServiceTemplateComboRepository.InsertRangeAsync(list);
-            }
         }
 
 

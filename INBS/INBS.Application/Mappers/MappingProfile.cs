@@ -22,8 +22,7 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region Service
-            CreateMap<ServiceCreatingRequest, Service>();
-            CreateMap<ServiceUpdatingRequest, Service>();
+            CreateMap<ServiceRequest, Service>();
             CreateMap<Service, ServiceResponse>();
             #endregion
 

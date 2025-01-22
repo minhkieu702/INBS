@@ -81,7 +81,7 @@ namespace INBS.Application.Services
             try
             {
                 var categories = await _unitOfWork.CategoryRepository.GetAsync(
-                    include: query => query.Include(c => c.CategoryServices)
+                    include: query => query.Include(c => c.CategoryServices.Where(c => c.Service != null && !c.Service.IsDeleted))
                                             .ThenInclude(cs => cs.Service)) ?? throw new Exception("Something was wrong!");
                 return _mapper.Map<IEnumerable<CategoryResponse>>(categories);
             }

@@ -5,20 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Service.Service
+namespace INBS.Application.DTOs.Service.Store
 {
-    public class ServiceUpdatingRequest
+    public class StoreRequest
     {
-        public string Name { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
 
         public string? Description { get; set; }
-
-        public double Price { get; set; }
 
         public string? ImageUrl { get; set; }
 
         public IFormFile? NewImage { get; set; }
 
-        public IList<Guid> CategoryIds { get; set; } = [];
+        public int Status { get; set; }
+
+        public IList<Guid> DesignIds { get; set; } = [];
+
+        public IList<Guid> ServiceIds { get; set; } = [];
     }
 }

@@ -26,7 +26,7 @@ namespace INBS.Domain.Entities
         
         public string ImageUrl { get; set; }
 
-        public int Status { get; set; }
+        public int Status { get; set; } // 0: inactive, 1: active
 
         [InverseProperty(nameof(Artist.Store))]
         public virtual ICollection<Artist> Artists { get; set; }

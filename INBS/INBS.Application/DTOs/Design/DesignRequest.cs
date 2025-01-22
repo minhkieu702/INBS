@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.Common
+namespace INBS.Application.DTOs.Design
 {
-    internal class Utils
+    public class DesignRequest
     {
     }
 }

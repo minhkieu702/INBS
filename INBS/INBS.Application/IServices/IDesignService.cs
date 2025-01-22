@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Service;
+using INBS.Application.DTOs.Service.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace INBS.Application.IService
 {
     public interface IDesignService
     {
-        
+        //Task<StoreDesignResponse>
     }
 }
