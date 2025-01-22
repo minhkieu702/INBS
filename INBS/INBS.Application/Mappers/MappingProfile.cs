@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using INBS.Application.DTOs.Service;
+using INBS.Application.DTOs.Service.Category;
+using INBS.Application.DTOs.Service.Service;
 using INBS.Domain.Entities;
 
 namespace INBS.Application.Mappers

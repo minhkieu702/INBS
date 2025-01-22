@@ -1,4 +1,4 @@
-﻿using INBS.Application.DTOs.Service;
+﻿using INBS.Application.DTOs.Service.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;

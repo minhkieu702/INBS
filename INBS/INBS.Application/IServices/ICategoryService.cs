@@ -1,4 +1,4 @@
-﻿using INBS.Application.DTOs.Service;
+﻿using INBS.Application.DTOs.Service.Category;
 using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;

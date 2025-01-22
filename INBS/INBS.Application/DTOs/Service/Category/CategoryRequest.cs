@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Service
+namespace INBS.Application.DTOs.Service.Category
 {
     public class CategoryRequest
     {

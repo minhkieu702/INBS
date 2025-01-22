@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Service
+namespace INBS.Application.DTOs.Service.Service
 {
-    public class ServiceCreatingRequest
+    public class ServiceUpdatingRequest
     {
         public string Name { get; set; } = string.Empty;
 
@@ -16,7 +15,9 @@ namespace INBS.Application.DTOs.Service
 
         public double Price { get; set; }
 
-        public IFormFile? Image { get; set; }
+        public string? ImageUrl { get; set; }
+
+        public IFormFile? NewImage { get; set; }
 
         public IList<Guid> CategoryIds { get; set; } = [];
     }

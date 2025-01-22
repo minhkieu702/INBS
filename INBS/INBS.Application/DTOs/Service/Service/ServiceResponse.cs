@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Service
+namespace INBS.Application.DTOs.Service.Service
 {
     public class ServiceResponse : BaseEntity
     {

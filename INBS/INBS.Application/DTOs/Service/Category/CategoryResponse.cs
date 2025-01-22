@@ -1,4 +1,5 @@
-﻿using INBS.Domain.Entities;
+﻿using INBS.Application.DTOs.Service.Service;
+using INBS.Domain.Entities;
 using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Service
+namespace INBS.Application.DTOs.Service.Category
 {
     public class CategoryResponse : BaseEntity
     {

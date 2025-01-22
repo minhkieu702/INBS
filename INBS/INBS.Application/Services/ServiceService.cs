@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using INBS.Application.DTOs.Service;
+using INBS.Application.DTOs.Service.Service;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;

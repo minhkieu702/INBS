@@ -1,4 +1,5 @@
-﻿using INBS.Application.Services;
+﻿using INBS.Application.DTOs.Service.Category;
+using INBS.Application.Services;
 using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Service
+namespace INBS.Application.DTOs.Service.Service
 {
-    public class CategoryServiceResponse 
+    public class CategoryServiceResponse
     {
         [Key]
         public Guid CategoryId { get; set; } = Guid.Empty;
