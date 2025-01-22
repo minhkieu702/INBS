@@ -8,7 +8,7 @@ namespace INBS.Domain.Entities.Common
         {
             ID = Guid.NewGuid();
             IsDeleted = false;
-            CreatedAt = LastModifiedAt = DateTime.Now;
+            LastModifiedAt = DateTime.Now;
         }
 
         [Key]

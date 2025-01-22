@@ -60,15 +60,14 @@ namespace INBS.Application.Services
 
                 var newService = _mapper.Map<Service>(modelRequest);
 
-                    newService.ImageUrl = modelRequest.Image != null ? 
+                 newService.ImageUrl = modelRequest.Image != null ? 
                     await _firebaseService.UploadFileAsync(modelRequest.Image) :
                     "https://firebasestorage.googleapis.com/v0/b/fir-realtime-database-49344.appspot.com/o/images%2Fnoimage.jpg?alt=media&token=8ffe560a-6aeb-4a34-8ebc-16693bb10a56";
 
+                newService.CreatedAt = DateTime.Now;
+
                 //Insert service
                 await _unitOfWork.ServiceRepository.InsertAsync(newService);
-
-                //if (await _unitOfWork.SaveAsync() == 0)
-                //    throw new Exception("Create service failed");
 
                 var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(newService.ID));
 

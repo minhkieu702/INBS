@@ -25,6 +25,8 @@ namespace INBS.Application.Services
 
                 var categoryEntity = _mapper.Map<Category>(category);
 
+                categoryEntity.CreatedAt = DateTime.Now;
+
                 await _unitOfWork.CategoryRepository.InsertAsync(categoryEntity);
 
                 if (await _unitOfWork.SaveAsync() < 0)
