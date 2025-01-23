@@ -1,9 +1,13 @@
 ﻿using INBS.Application.DependencyInjection;
+using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Design.Image;
+using INBS.Application.DTOs.Design.Preference;
 using INBS.Application.DTOs.Service;
 using INBS.Application.DTOs.Service.Category;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
 using INBS.Application.DTOs.Service.TemplateCombo;
+using INBS.Application.DTOs.Store;
 using INBS.Application.IService;
 using INBS.Application.Services;
 using INBS.Domain.IRepository;
@@ -46,6 +50,12 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<ServiceResponse>("Service");
                     odataBuilder.EntitySet<TemplateComboResponse>("TemplateCombo");
                     odataBuilder.EntitySet<ServiceTemplateComboResponse>("ServiceTemplateCombo");
+                    odataBuilder.EntitySet<DesignResponse>("Design");
+                    odataBuilder.EntitySet<ImageResponse>("Image");
+                    odataBuilder.EntitySet<DesignPreferenceResponse>("DesignPreference");
+                    odataBuilder.EntitySet<StoreServiceResponse>("StoreService");
+                    odataBuilder.EntitySet<ServiceResponse>("Service");
+                    
                     // Add OData route components
                     opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())
                        .Select()

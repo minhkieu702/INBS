@@ -1,0 +1,77 @@
+[
+  {
+    "ID": 1,
+    "Name": "Wedding",
+    "Description": "A celebration of marriage."
+  },
+  {
+    "ID": 2,
+    "Name": "Birthday",
+    "Description": "A celebration of someone's birth."
+  },
+  {
+    "ID": 3,
+    "Name": "Christmas",
+    "Description": "A holiday celebrated on December 25th."
+  },
+  {
+    "ID": 4,
+    "Name": "New Year",
+    "Description": "Celebration of the beginning of a new year."
+  },
+  {
+    "ID": 5,
+    "Name": "Valentine's Day",
+    "Description": "A day to celebrate love and romance."
+  },
+  {
+    "ID": 6,
+    "Name": "Halloween",
+    "Description": "A spooky celebration on October 31st."
+  },
+  {
+    "ID": 7,
+    "Name": "Easter",
+    "Description": "A Christian holiday celebrating resurrection."
+  },
+  {
+    "ID": 8,
+    "Name": "Graduation",
+    "Description": "A ceremony for completing a course of study."
+  },
+  {
+    "ID": 9,
+    "Name": "Anniversary",
+    "Description": "A celebration of a special date."
+  },
+  {
+    "ID": 10,
+    "Name": "Mother's Day",
+    "Description": "Celebrating mothers and motherhood."
+  },
+  {
+    "ID": 11,
+    "Name": "Father's Day",
+    "Description": "Honoring fathers and fatherhood."
+  },
+  {
+    "ID": 12,
+    "Name": "Baby Shower",
+    "Description": "Celebrating an upcoming birth."
+  },
+  {
+    "ID": 13,
+    "Name": "Corporate Event",
+    "Description": "Professional gatherings or meetings."
+  },
+  {
+    "ID": 14,
+    "Name": "Prom Night",
+    "Description": "A high school formal dance."
+  },
+  {
+    "ID": 15,
+    "Name": "Festival",
+    "Description": "A community celebration or event."
+  }
+]

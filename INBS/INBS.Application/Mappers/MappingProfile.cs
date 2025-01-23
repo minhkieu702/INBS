@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
+using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Design.Image;
+using INBS.Application.DTOs.Design.Preference;
 using INBS.Application.DTOs.Service.Category;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
 using INBS.Application.DTOs.Service.TemplateCombo;
+using INBS.Application.DTOs.Store;
 using INBS.Domain.Entities;
 
 namespace INBS.Application.Mappers
@@ -30,6 +34,21 @@ namespace INBS.Application.Mappers
             CreateMap<TemplateComboRequest, TemplateCombo>();
             CreateMap<TemplateCombo, TemplateComboResponse>();
             CreateMap<ServiceTemplateCombo, ServiceTemplateComboResponse>();
+            #endregion
+
+            #region Store
+            CreateMap<StoreRequest, Store>();
+            CreateMap<Store, StoreResponse>();
+            CreateMap<StoreDesign, StoreDesignResponse>();
+            CreateMap<StoreService, StoreServiceResponse>();
+            #endregion
+
+            #region Design
+            CreateMap<DesignRequest, Design>();
+            CreateMap<Design, DesignResponse>();
+            CreateMap<ImageRequest, Image>();
+            CreateMap<Image, ImageResponse>();
+            CreateMap<DesignPreference, DesignPreferenceResponse>();
             #endregion
         }
     }

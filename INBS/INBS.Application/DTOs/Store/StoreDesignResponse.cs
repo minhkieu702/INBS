@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Design
+namespace INBS.Application.DTOs.Store
 {
-    public class DesignRequest
+    internal class StoreDesignResponse
     {
     }
 }

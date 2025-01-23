@@ -1,0 +1,77 @@
+[
+    {
+        "ID": 1,
+        "ColorName": "Red",
+        "HexCode": "#FF0000"
+    },
+    {
+        "ID": 2,
+        "ColorName": "Blue",
+        "HexCode": "#0000FF"
+    },
+    {
+        "ID": 3,
+        "ColorName": "Green",
+        "HexCode": "#008000"
+    },
+    {
+        "ID": 4,
+        "ColorName": "Yellow",
+        "HexCode": "#FFFF00"
+    },
+    {
+        "ID": 5,
+        "ColorName": "Purple",
+        "HexCode": "#800080"
+    },
+    {
+        "ID": 6,
+        "ColorName": "Pink",
+        "HexCode": "#FFC0CB"
+    },
+    {
+        "ID": 7,
+        "ColorName": "Orange",
+        "HexCode": "#FFA500"
+    },
+    {
+        "ID": 8,
+        "ColorName": "Black",
+        "HexCode": "#000000"
+    },
+    {
+        "ID": 9,
+        "ColorName": "White",
+        "HexCode": "#FFFFFF"
+    },
+    {
+        "ID": 10,
+        "ColorName": "Grey",
+        "HexCode": "#808080"
+    },
+    {
+        "ID": 11,
+        "ColorName": "Brown",
+        "HexCode": "#A52A2A"
+    },
+    {
+        "ID": 12,
+        "ColorName": "Teal",
+        "HexCode": "#008080"
+    },
+    {
+        "ID": 13,
+        "ColorName": "Turquoise",
+        "HexCode": "#40E0D0"
+    },
+    {
+        "ID": 14,
+        "ColorName": "Gold",
+        "HexCode": "#FFD700"
+    },
+    {
+        "ID": 15,
+        "ColorName": "Silver",
+        "HexCode": "#C0C0C0"
+    }
+]

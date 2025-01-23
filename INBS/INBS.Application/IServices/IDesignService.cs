@@ -1,5 +1,5 @@
-﻿using INBS.Application.DTOs.Service;
-using INBS.Application.DTOs.Service.Store;
+﻿using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +10,12 @@ namespace INBS.Application.IService
 {
     public interface IDesignService
     {
-        //Task<StoreDesignResponse>
+        Task<IEnumerable<DesignResponse>> Get();
+
+        Task Create(DesignRequest modelRequest);
+
+        Task Delete(Guid designId);
+
+        Task Update(Guid designId, DesignRequest modelRequest);
     }
 }

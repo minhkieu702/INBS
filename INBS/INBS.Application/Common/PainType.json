@@ -1,0 +1,52 @@
+[
+  {
+    "ID": 1,
+    "Name": "Glossy",
+    "Description": "A shiny and smooth finish."
+  },
+  {
+    "ID": 2,
+    "Name": "Matte",
+    "Description": "A non-shiny, flat finish."
+  },
+  {
+    "ID": 3,
+    "Name": "Metallic",
+    "Description": "A finish that reflects light like metal."
+  },
+  {
+    "ID": 4,
+    "Name": "Pearlescent",
+    "Description": "A shiny finish with subtle color shifts."
+  },
+  {
+    "ID": 5,
+    "Name": "Neon",
+    "Description": "Bright and fluorescent colors."
+  },
+  {
+    "ID": 6,
+    "Name": "Holographic",
+    "Description": "Iridescent and color-shifting finish."
+  },
+  {
+    "ID": 7,
+    "Name": "Textured",
+    "Description": "A rough or raised surface."
+  },
+  {
+    "ID": 8,
+    "Name": "Transparent",
+    "Description": "See-through, sheer finish."
+  },
+  {
+    "ID": 9,
+    "Name": "Satin",
+    "Description": "A soft, velvety finish."
+  },
+  {
+    "ID": 10,
+    "Name": "Chrome",
+    "Description": "Highly reflective mirror-like finish."
+  }
+]

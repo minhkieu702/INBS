@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Service.Store
+namespace INBS.Application.DTOs.Store
 {
     public class StoreServiceResponse
     {

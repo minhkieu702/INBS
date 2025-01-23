@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using INBS.Application.DTOs.Service.Store;
+using INBS.Application.DTOs.Store;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Common;
@@ -37,7 +37,11 @@ namespace INBS.Application.Services
 
                 var storeServices = await _unitOfWork.StoreServiceRepository.GetAsync(cs => cs.ServiceId.Equals(newEntity.ID));
 
-                await InsertStoreService(newEntity.ID, modelRequest.ServiceIds, storeServices);
+                var storeDesigns = await _unitOfWork.StoreDesignRepository.GetAsync(cd => cd.DesignId.Equals(newEntity.ID));
+
+                await Task.WhenAll(
+                    InsertStoreService(newEntity.ID, modelRequest.ServiceIds, storeServices),
+                    InsertStoreDesign(newEntity.ID, modelRequest.DesignIds, storeDesigns));
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("Create service failed");
@@ -53,6 +57,7 @@ namespace INBS.Application.Services
 
         private async Task InsertStoreService(Guid iD, IList<Guid> serviceIds, IEnumerable<Domain.Entities.StoreService> existedStoreServices)
         {
+            if (serviceIds ==null || !serviceIds.Any()) return;
             var existingServiceIds = existedStoreServices.Select(ss => ss.ServiceId).ToHashSet();
 
             var list = new List<Domain.Entities.StoreService>();
@@ -183,6 +188,8 @@ namespace INBS.Application.Services
 
         private async Task InsertStoreDesign(Guid storeId, IList<Guid> designIds, IEnumerable<StoreDesign> existedStoreDesigns)
         {
+            if(designIds == null || !designIds.Any()) return ;
+
             var existingDesignIds = existedStoreDesigns.Select(c => c.DesignId).ToHashSet();
 
             var list = new List<StoreDesign>();

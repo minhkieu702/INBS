@@ -1,0 +1,52 @@
+[
+  {
+    "ID": 1,
+    "Name": "Fair",
+    "HexCode": "#FFDFC4"
+  },
+  {
+    "ID": 2,
+    "Name": "Light",
+    "HexCode": "#F0D5BE"
+  },
+  {
+    "ID": 3,
+    "Name": "Medium",
+    "HexCode": "#E5B887"
+  },
+  {
+    "ID": 4,
+    "Name": "Olive",
+    "HexCode": "#C68358"
+  },
+  {
+    "ID": 5,
+    "Name": "Tan",
+    "HexCode": "#9C5E3F"
+  },
+  {
+    "ID": 6,
+    "Name": "Deep",
+    "HexCode": "#855D38"
+  },
+  {
+    "ID": 7,
+    "Name": "Dark",
+    "HexCode": "#613D2B"
+  },
+  {
+    "ID": 8,
+    "Name": "Ebony",
+    "HexCode": "#3B241B"
+  },
+  {
+    "ID": 9,
+    "Name": "Bronze",
+    "HexCode": "#B08D57"
+  },
+  {
+    "ID": 10,
+    "Name": "Golden",
+    "HexCode": "#FFCC99"
+  }
+]
