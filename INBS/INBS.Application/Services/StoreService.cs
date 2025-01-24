@@ -31,7 +31,7 @@ namespace INBS.Application.Services
                 var newEntity = _mapper.Map<Store>(modelRequest);
 
                 newEntity.AdminId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                    "a5e6a416-772b-430b-b4e6-c50a16cae715");
+                    "7d9e01f9-d23a-403c-b496-097af797de02");
 
                 newEntity.ImageUrl = modelRequest.NewImage != null ? await _firebaseService.UploadFileAsync(modelRequest.NewImage) : Constants.DEFAULT_IMAGE_URL;
 
@@ -39,13 +39,8 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.StoreRepository.InsertAsync(newEntity);
 
-                var storeServices = await _unitOfWork.StoreServiceRepository.GetAsync(cs => cs.ServiceId.Equals(newEntity.ID));
-
-                var storeDesigns = await _unitOfWork.StoreDesignRepository.GetAsync(cd => cd.DesignId.Equals(newEntity.ID));
-
-                await Task.WhenAll(
-                    InsertStoreService(newEntity.ID, modelRequest.ServiceIds, storeServices),
-                    InsertStoreDesign(newEntity.ID, modelRequest.DesignIds, storeDesigns));
+                await InsertStoreService(newEntity.ID, modelRequest.ServiceIds, []);
+                    await InsertStoreDesign(newEntity.ID, modelRequest.DesignIds, []);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("Create service failed");
@@ -74,19 +69,18 @@ namespace INBS.Application.Services
                 {
                     if (await _unitOfWork.ServiceRepository.GetByIdAsync(serviceId) == null) continue;
 
-                    var storeService = new Domain.Entities.StoreService
+                    list.Add(new Domain.Entities.StoreService
                     {
                         ServiceId = serviceId,
                         StoreId = iD
-                    };
+                    });
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Failed to process StoreService with serviceId: {serviceId}, Error: {ex.Message}");
                 }
-
-                await _unitOfWork.StoreServiceRepository.InsertRangeAsync(list);
             }
+            await _unitOfWork.StoreServiceRepository.InsertRangeAsync(list);
         }
 
         public async Task Delete(Guid id)
@@ -120,7 +114,7 @@ namespace INBS.Application.Services
                 var result = await _unitOfWork.StoreRepository.GetAsync(include:
                     query => query.Where(s => !s.IsDeleted)
                     .Include(s => s.StoreServices.Where(ss => ss.Service != null && !ss.Service.IsDeleted)).ThenInclude(ss => ss.Service)
-                    //.Include(s => s.StoreDesigns.Where(sd => sd.Design != null && !sd.Design.IsDeleted)).ThenInclude(sd => sd.Design)
+                    .Include(s => s.StoreDesigns.Where(sd => sd.Design != null && !sd.Design.IsDeleted)).ThenInclude(sd => sd.Design)
                     //.Include(s => s.Artists.Where(a => !a.IsDeleted))
                     //.Include(s => s.Admin)
                     );
@@ -151,10 +145,8 @@ namespace INBS.Application.Services
                 
                 await _unitOfWork.StoreRepository.UpdateAsync(existingEntity);
 
-                await Task.WhenAll(
-                    HandleStoreDesignUpdating(id, request.DesignIds),
-                    HandleStoreServiceUpdating(id, request.ServiceIds)
-                    );
+                await HandleStoreDesignUpdating(id, request.DesignIds);
+                await HandleStoreServiceUpdating(id, request.ServiceIds);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("Update store failed");

@@ -22,6 +22,7 @@ namespace INBS.Application.DTOs.Store
 
         public ICollection<StoreServiceResponse> StoreServices { get; set; } = [];
 
+        public ICollection<StoreDesignResponse> StoreDesigns { get; set; }
 
     }
 }

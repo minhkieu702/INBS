@@ -47,6 +47,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<ImageResponse>("Image");
                     odataBuilder.EntitySet<DesignPreferenceResponse>("DesignPreference");
                     odataBuilder.EntitySet<StoreServiceResponse>("StoreService");
+                    odataBuilder.EntitySet<StoreDesignResponse>("StoreDesign");
                     odataBuilder.EntitySet<StoreResponse>("Store");
                     odataBuilder.EntitySet<ServiceResponse>("Service");
                     odataBuilder.EntitySet<Color>("Color");

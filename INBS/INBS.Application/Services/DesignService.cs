@@ -34,8 +34,8 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.DesignRepository.InsertAsync(newEntity);
 
-                await Task.WhenAll(HandleInsertImage(modelRequest.Images, newEntity.ID), 
-                    HandleInsertPreference(modelRequest, newEntity.ID));
+                await HandleInsertImage(modelRequest.Images, newEntity.ID);
+                await HandleInsertPreference(modelRequest, newEntity.ID);
 
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
@@ -215,11 +215,10 @@ namespace INBS.Application.Services
                 
                 _mapper.Map(modelRequest, existedEntity);
 
-                await Task.WhenAll(
-                    HandleDeleteImage(modelRequest, designId), 
-                    HandleInsertImage(modelRequest.Images, designId), 
-                    HandleInsertPreference(modelRequest, designId),
-                    _unitOfWork.DesignRepository.UpdateAsync(existedEntity));
+                await HandleDeleteImage(modelRequest, designId);
+                await HandleInsertImage(modelRequest.Images, designId);
+                await HandleInsertPreference(modelRequest, designId);
+                await _unitOfWork.DesignRepository.UpdateAsync(existedEntity);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("This action failed");
