@@ -138,6 +138,9 @@ namespace INBS.Application.Services
 
                 _mapper.Map(request, existingEntity);
 
+                //existingEntity.AdminId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                    //"7d9e01f9-d23a-403c-b496-097af797de02");
+
                 if (request.NewImage != null)
                 {
                     existingEntity.ImageUrl = await _firebaseService.UploadFileAsync(request.NewImage);

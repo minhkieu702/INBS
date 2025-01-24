@@ -32,7 +32,17 @@ namespace INBS.Application.Mappers
 
             #region Store
             CreateMap<StoreRequest, Store>();
-            CreateMap<Store, StoreResponse>();
+            CreateMap<Store, StoreResponse>()
+                .AfterMap((src, dest) =>
+                {
+                    dest.Status = src.Status switch
+                    {
+                        0 => "Active",
+                        1 => "Inactive",
+                        _ => "No Info"
+                    };
+                });
+                ;
             CreateMap<StoreDesign, StoreDesignResponse>();
             CreateMap<StoreService, StoreServiceResponse>();
             #endregion

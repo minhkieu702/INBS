@@ -1,4 +1,5 @@
-﻿using INBS.Domain.Entities;
+﻿using INBS.Application.DTOs.Store;
+using INBS.Domain.Entities;
 using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
@@ -20,5 +21,7 @@ namespace INBS.Application.DTOs.Service.Service
         public double Price { get; set; }
 
         public ICollection<CategoryServiceResponse> CategoryServices { get; set; } = [];
+
+        public ICollection<StoreServiceResponse> StoreServices { get; set; } = [];
     }
 }

@@ -16,7 +16,7 @@ namespace INBS.Application.DTOs.Store
 
         public string ImageUrl { get; set; }
 
-        public int Status { get; set; } // 0: inactive, 1: active
+        public string Status { get; set; } // 0: inactive, 1: active
 
 #warning Add ArtistResponse, AdminResponse, DesignResponse
 
