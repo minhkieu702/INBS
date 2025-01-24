@@ -17,33 +17,59 @@ namespace INBS.Application.Common
             List<PaintType> tempPaintTypes = [];
             List<SkinTone> tempSkinTones = [];
 
-            var colorTask = Task.Run(() =>
+            var colorTask = Task.Run(async () =>
             {
-                var colorJson = File.ReadAllText("./Color.json");
-                tempColors = JsonSerializer.Deserialize<List<Color>>(colorJson) ?? [];
+                tempColors = await GetColors();
             });
 
-            var occasionTask = Task.Run(() =>
+            var occasionTask = Task.Run(async () =>
             {
-                var occasionJson = File.ReadAllText("./Occasion.json");
-                tempOccasions = JsonSerializer.Deserialize<List<Occasion>>(occasionJson) ?? [];
+                tempOccasions = await GetOccasions();
             });
 
-            var paintTypeTask = Task.Run(() =>
+            var paintTypeTask = Task.Run(async () =>
             {
-                var paintTypeJson = File.ReadAllText("./PaintType.json");
-                tempPaintTypes = JsonSerializer.Deserialize<List<PaintType>>(paintTypeJson) ?? [];
+                tempPaintTypes = await GetPaintTypes();
             });
 
-            var skintoneTask = Task.Run(() =>
+            var skintoneTask = Task.Run(async () =>
             {
-                var skintoneJson = File.ReadAllText("./SkinTone.json");
-                tempSkinTones = JsonSerializer.Deserialize<List<SkinTone>>(skintoneJson) ?? [];
+                tempSkinTones = await GetSkinTones();
             });
 
             await Task.WhenAll(colorTask, occasionTask, paintTypeTask, skintoneTask);
 
             return (tempColors, tempOccasions, tempPaintTypes, tempSkinTones);
+        }
+
+        public static Task<List<SkinTone>> GetSkinTones()
+        {
+            var skintoneJson = File.ReadAllText("./File/Skintone.json");
+            return Task.FromResult(JsonSerializer.Deserialize<List<SkinTone>>(skintoneJson) ?? []);
+        }
+
+        public static Task<List<PaintType>> GetPaintTypes()
+        {
+            var paintTypeJson = File.ReadAllText("./File/PaintType.json");
+            return Task.FromResult(JsonSerializer.Deserialize<List<PaintType>>(paintTypeJson) ?? []);
+        }
+
+        public static Task<List<Occasion>> GetOccasions()
+        {
+            var occasionJson = File.ReadAllText("./File/Occasion.json");
+            return Task.FromResult(JsonSerializer.Deserialize<List<Occasion>>(occasionJson) ?? []);
+        }
+
+        public static Task<List<Color>> GetColors()
+        {
+            var colorJson = File.ReadAllText("./File/Color.json");
+            return Task.FromResult(JsonSerializer.Deserialize<List<Color>>(colorJson) ?? []);
+        }
+
+        public static Task<List<Category>> GetCategories()
+        {
+            var categoryJson = File.ReadAllText("./File/ServiceCategory.json");
+            return Task.FromResult(JsonSerializer.Deserialize<List<Category>>(categoryJson) ?? []);            
         }
     }
 }

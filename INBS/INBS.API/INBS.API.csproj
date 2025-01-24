@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="File\Color.json" />
+    <Content Remove="File\Occasion.json" />
+    <Content Remove="File\PaintType.json" />
+    <Content Remove="File\ServiceCategory.json" />
+    <Content Remove="File\Skintone.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="properties\launchSettings.json" />
   </ItemGroup>
 
@@ -21,6 +29,14 @@
   <ItemGroup>
     <ProjectReference Include="..\INBS.Application\INBS.Application.csproj" />
     <ProjectReference Include="..\INBS.Infrastructure\INBS.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="File\Color.json" />
+    <None Include="File\Occasion.json" />
+    <None Include="File\PaintType.json" />
+    <None Include="File\ServiceCategory.json" />
+    <None Include="File\Skintone.json" />
   </ItemGroup>
 
 </Project>

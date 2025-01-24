@@ -19,6 +19,6 @@ namespace INBS.Application.DTOs.Service.Service
 
         public IFormFile? NewImage { get; set; }
 
-        public IList<Guid> CategoryIds { get; set; } = [];
+        public IList<int> CategoryIds { get; set; } = [];
     }
 }

@@ -38,6 +38,8 @@ namespace INBS.Application.Services
                     HandleInsertPreference(modelRequest, newEntity.ID));
 
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
+
+                _unitOfWork.CommitTransaction();
             }
             catch (Exception)
             {
@@ -182,17 +184,16 @@ namespace INBS.Application.Services
                     switch (preference.PreferenceType)
                     {
                         case "Color": 
-                            preference.Data = colors.Select(c => c.ID).Contains(preference.PreferenceId); 
+                            preference.Data = colors.FirstOrDefault(c => c.ID == preference.PreferenceId); 
                             break;
 
-                        case "Occasion": preference.Data = occasions.Select(c => c.ID).Contains(preference.PreferenceId); 
+                        case "Occasion": preference.Data = occasions.FirstOrDefault(c => c.ID == preference.PreferenceId);
                             break;
 
-                        case "Skintone": preference.Data = skintones.Select(c => c.ID).Contains(preference.PreferenceId);
+                        case "Skintone": preference.Data = skintones.FirstOrDefault(c => c.ID == preference.PreferenceId);
                             break;
 
-                        case "PaintTypes": preference.Data = paintTypes.Select(c => c.ID).Contains
-                                (preference.PreferenceId);
+                        case "PaintType": preference.Data = paintTypes.FirstOrDefault(c => c.ID == preference.PreferenceId);
                             break;
 
                         default:

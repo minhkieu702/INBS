@@ -21,7 +21,7 @@ namespace INBS.Application.DependencyInjection
 
         public static void AddServices(this IServiceCollection services)
         {
-            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IAdjectiveService, AdjectiveService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<ITemplateComboService, TemplateComboService>();
             services.AddScoped<IStoreService, StoreService>();

@@ -31,11 +31,11 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Cancellation> Cancellations { get; set; }
 
-        public virtual DbSet<Category> Categories { get; set; }
+        //public virtual DbSet<Category> Categories { get; set; }
 
         public virtual DbSet<CategoryService> CategoryServices { get; set; }
 
-        public virtual DbSet<Color> Colors { get; set; }
+        //public virtual DbSet<Color> Colors { get; set; }
 
         public virtual DbSet<CustomCombo> CustomCombos { get; set; }
 
@@ -57,9 +57,9 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Notification> Notifications { get; set; }
 
-        public virtual DbSet<PaintType> PaintTypes { get; set; }
+        //public virtual DbSet<PaintType> PaintTypes { get; set; }
 
-        public virtual DbSet<Occasion> Occasions { get; set; }
+        //public virtual DbSet<Occasion> Occasions { get; set; }
 
         public virtual DbSet<Recommendation> Recommendations { get; set; }
 
@@ -69,7 +69,7 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<ServiceTemplateCombo> ServiceTemplateCombos { get; set; }
 
-        public virtual DbSet<SkinTone> SkinTones { get; set; }
+        //public virtual DbSet<SkinTone> SkinTones { get; set; }
 
         public virtual DbSet<Store> Stores { get; set; }
 
@@ -140,19 +140,11 @@ namespace INBS.Persistence.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    if (!optionsBuilder.IsConfigured)
-        //    {
-        //        var builder = new ConfigurationBuilder()
-        //                            .SetBasePath(Directory.GetCurrentDirectory())
-        //                            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
-        //        IConfigurationRoot configuration = builder.Build();
-        //        optionsBuilder.EnableSensitiveDataLogging();
-        //        //optionsBuilder.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
-        //        optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBS; TrustServerCertificate=True");
-        //    }
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
+            //optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBSDatabase; TrustServerCertificate=True");
+        }
 
     }
 }

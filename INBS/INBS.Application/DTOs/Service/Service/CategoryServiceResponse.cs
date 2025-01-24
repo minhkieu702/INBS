@@ -1,5 +1,4 @@
-﻿using INBS.Application.DTOs.Service.Category;
-using INBS.Application.Services;
+﻿using INBS.Application.Services;
 using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,10 +13,10 @@ namespace INBS.Application.DTOs.Service.Service
     public class CategoryServiceResponse
     {
         [Key]
-        public Guid CategoryId { get; set; } = Guid.Empty;
-        public virtual CategoryResponse? Category { get; set; }
+        public int CategoryId { get; set; }
+        public Category? Category { get; set; }
         [Key]
         public Guid ServiceId { get; set; } = Guid.Empty;
-        public virtual ServiceResponse? Service { get; set; }
+        //public virtual ServiceResponse? Service { get; set; }
     }
 }

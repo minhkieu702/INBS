@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using INBS.Application.Common;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
@@ -15,12 +16,14 @@ namespace INBS.Application.Services
     {
         private async Task InsertCategoryService(
             Guid serviceId, 
-            IList<Guid> categoryIds, 
+            IList<int> categoryIds, 
             IEnumerable<Domain.Entities.CategoryService> existedCategoryServices)
         {
             var existingCategoryIds = existedCategoryServices.Select(cs => cs.CategoryId).ToHashSet();
 
             var list = new List<Domain.Entities.CategoryService>();
+
+            var categories = await Utils.GetCategories();
 
             foreach (var categoryId in categoryIds.Distinct())
             {
@@ -28,7 +31,7 @@ namespace INBS.Application.Services
 
                 try
                 {
-                    var category = await _unitOfWork.CategoryRepository.GetByIdAsync(categoryId);
+                    var category = categories.FirstOrDefault(c => c.ID == categoryId);
                     if (category != null)
                     {
                         var categoryService = new Domain.Entities.CategoryService
@@ -118,13 +121,28 @@ namespace INBS.Application.Services
             {
                 var services = await _unitOfWork.ServiceRepository.GetAsync(
                     include: 
-                    s => s.Where(s => !s.IsDeleted).Include(c => c.CategoryServices).ThenInclude(cs => cs.Category)
+                    s => s.Where(s => !s.IsDeleted)
+                    .Include(c => c.CategoryServices)
                     //.Include(s => s.ServiceCustomCombos).ThenInclude(scc => scc.CustomCombo)
                     .Include(s => s.ServiceTemplateCombos).ThenInclude(stc => stc.TemplateCombo)
                     //.Include(s => s.StoreServices).ThenInclude(ss => ss.Store)
                     ) ?? throw new Exception("Something was wrong!");
 
-                return _mapper.Map<IEnumerable<ServiceResponse>>(services);
+                var responses = _mapper.Map<IEnumerable<ServiceResponse>>(services);
+
+                if (responses.Any())
+                {
+                    var categories = await Utils.GetCategories();
+                    foreach (var service in responses)
+                    {
+                        foreach (var cateService in service.CategoryServices)
+                        {
+                            cateService.Category = categories.FirstOrDefault(c => c.ID == cateService.CategoryId);
+                        }
+                    }
+                }
+
+                return responses;
             }
             catch (Exception)
             {
@@ -132,7 +150,7 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task HandleCategoryServiceUpdating(Guid serviceId, IList<Guid> categoryIds)
+        private async Task HandleCategoryServiceUpdating(Guid serviceId, IList<int> categoryIds)
         {
             var existedCategoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(serviceId));
 

@@ -2,7 +2,6 @@
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.Preference;
-using INBS.Application.DTOs.Service.Category;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
 using INBS.Application.DTOs.Service.TemplateCombo;
@@ -15,11 +14,6 @@ namespace INBS.Application.Mappers
     {
         public MappingProfile()
         {
-            #region Category
-            CreateMap<CategoryRequest, Category>();
-            CreateMap<Category, CategoryResponse>();
-            #endregion
-
             #region CategoryService
             //CreateMap<CategoryServiceRequest, CategoryService>();
             CreateMap<CategoryService, CategoryServiceResponse>();

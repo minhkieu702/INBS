@@ -2,18 +2,12 @@
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.Preference;
-using INBS.Application.DTOs.Service;
-using INBS.Application.DTOs.Service.Category;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
 using INBS.Application.DTOs.Service.TemplateCombo;
 using INBS.Application.DTOs.Store;
-using INBS.Application.IService;
-using INBS.Application.Services;
-using INBS.Domain.IRepository;
-using INBS.Infrastructure.SignalR;
+using INBS.Domain.Entities;
 using INBS.Persistence.DependencyInjection;
-using INBS.Persistence.Repository;
 using Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
@@ -45,7 +39,6 @@ namespace INBS.API.AppStart
                 {
                     // Define OData Entity Sets
                     var odataBuilder = new ODataConventionModelBuilder();
-                    odataBuilder.EntitySet<CategoryResponse>("Category");
                     odataBuilder.EntitySet<CategoryServiceResponse>("CategoryService");
                     odataBuilder.EntitySet<ServiceResponse>("Service");
                     odataBuilder.EntitySet<TemplateComboResponse>("TemplateCombo");
@@ -55,7 +48,8 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<DesignPreferenceResponse>("DesignPreference");
                     odataBuilder.EntitySet<StoreServiceResponse>("StoreService");
                     odataBuilder.EntitySet<ServiceResponse>("Service");
-                    
+                    odataBuilder.EntitySet<Color>("Color");
+                    odataBuilder.EntitySet<Category>("Category");
                     // Add OData route components
                     opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())
                        .Select()

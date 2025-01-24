@@ -19,6 +19,6 @@ namespace INBS.Application.DTOs.Service.Service
 
         public double Price { get; set; }
 
-        public ICollection<CategoryServiceResponse> CategoryServices { get; set; }
+        public ICollection<CategoryServiceResponse> CategoryServices { get; set; } = [];
     }
 }

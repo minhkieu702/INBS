@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace INBS.Domain
+namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
     partial class INBSDbContextModelSnapshot : ModelSnapshot
@@ -237,38 +237,10 @@ namespace INBS.Domain
                     b.ToTable("Cancellations");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.Category", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Categories");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.CategoryService", b =>
                 {
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ServiceId")
                         .HasColumnType("uniqueidentifier");
@@ -278,27 +250,6 @@ namespace INBS.Domain
                     b.HasIndex("ServiceId");
 
                     b.ToTable("CategoryServices");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.Color", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("ColorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HexCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Colors");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.CustomCombo", b =>
@@ -583,46 +534,6 @@ namespace INBS.Domain
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.Occasion", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Occasions");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.PaintType", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("PaintTypes");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Recommendation", b =>
                 {
                     b.Property<Guid>("ID")
@@ -673,7 +584,6 @@ namespace INBS.Domain
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -722,27 +632,6 @@ namespace INBS.Domain
                     b.HasIndex("TemplateComboId");
 
                     b.ToTable("ServiceTemplateCombos");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.SkinTone", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("HexCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("SkinTones");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Store", b =>
@@ -985,19 +874,11 @@ namespace INBS.Domain
 
             modelBuilder.Entity("INBS.Domain.Entities.CategoryService", b =>
                 {
-                    b.HasOne("INBS.Domain.Entities.Category", "Category")
-                        .WithMany("CategoryServices")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("INBS.Domain.Entities.Service", "Service")
                         .WithMany("CategoryServices")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Category");
 
                     b.Navigation("Service");
                 });
@@ -1232,11 +1113,6 @@ namespace INBS.Domain
                     b.Navigation("Cancellation");
 
                     b.Navigation("Feedbacks");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.Category", b =>
-                {
-                    b.Navigation("CategoryServices");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.CustomCombo", b =>

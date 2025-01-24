@@ -1,0 +1,47 @@
+[
+  {
+    "ID": 1,
+    "Name": "Nail Services",
+    "Description": "Includes manicure, pedicure, and nail enhancements."
+  },
+  {
+    "ID": 2,
+    "Name": "Spa Services",
+    "Description": "Services to relax and rejuvenate your hands and feet."
+  },
+  {
+    "ID": 3,
+    "Name": "Skin Care",
+    "Description": "Treatments to nourish and care for your skin."
+  },
+  {
+    "ID": 4,
+    "Name": "Specialty Services",
+    "Description": "Custom and themed services for special occasions."
+  },
+  {
+    "ID": 5,
+    "Name": "Add-On Services",
+    "Description": "Additional enhancements to complement your service."
+  },
+  {
+    "ID": 6,
+    "Name": "Wellness Services",
+    "Description": "Therapeutic treatments for relaxation and health."
+  },
+  {
+    "ID": 7,
+    "Name": "Bridal Packages",
+    "Description": "Exclusive services for brides-to-be."
+  },
+  {
+    "ID": 8,
+    "Name": "Kid’s Nail Services",
+    "Description": "Fun and safe nail services for children."
+  },
+  {
+    "ID": 9,
+    "Name": "Seasonal Themes",
+    "Description": "Special designs and services for holidays and events."
+  }
+]

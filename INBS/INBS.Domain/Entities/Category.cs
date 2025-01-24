@@ -1,6 +1,7 @@
 ﻿using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -8,18 +9,11 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Category : BaseEntity
+    public class Category
     {
-        public Category() : base()
-        {
-            Name = string.Empty;
-            Description = string.Empty;
-            CategoryServices = [];
-        }
-        public string Name { get; set; }
-        public string Description { get; set; }
-
-        [InverseProperty(nameof(CategoryService.Category))]
-        public virtual ICollection<CategoryService> CategoryServices { get; set; }
+        [Key]
+        public int ID { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
     }
 }

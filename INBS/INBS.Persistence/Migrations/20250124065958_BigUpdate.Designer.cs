@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace INBS.Domain
+namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    [Migration("20250120045334_AddDeviceToken")]
-    partial class AddDeviceToken
+    [Migration("20250124065958_BigUpdate")]
+    partial class BigUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -240,38 +240,10 @@ namespace INBS.Domain
                     b.ToTable("Cancellations");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.Category", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Categories");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.CategoryService", b =>
                 {
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ServiceId")
                         .HasColumnType("uniqueidentifier");
@@ -281,27 +253,6 @@ namespace INBS.Domain
                     b.HasIndex("ServiceId");
 
                     b.ToTable("CategoryServices");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.Color", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("ColorName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HexCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Colors");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.CustomCombo", b =>
@@ -395,6 +346,22 @@ namespace INBS.Domain
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.CustomerPreference", b =>
+                {
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("PreferenceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PreferenceType")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CustomerId", "PreferenceId", "PreferenceType");
+
+                    b.ToTable("CustomerPreferences");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.Design", b =>
                 {
                     b.Property<Guid>("ID")
@@ -428,6 +395,22 @@ namespace INBS.Domain
                     b.ToTable("Designs");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.DesignPreference", b =>
+                {
+                    b.Property<Guid>("DesignId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("PreferenceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PreferenceType")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("DesignId", "PreferenceId", "PreferenceType");
+
+                    b.ToTable("DesignPreferences");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.DeviceToken", b =>
                 {
                     b.Property<int>("ID")
@@ -439,16 +422,16 @@ namespace INBS.Domain
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("ID");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("CustomerId");
 
                     b.ToTable("DeviceTokens");
                 });
@@ -554,26 +537,6 @@ namespace INBS.Domain
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.PaintType", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("PaintTypes");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Recommendation", b =>
                 {
                     b.Property<Guid>("ID")
@@ -624,7 +587,6 @@ namespace INBS.Domain
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -915,19 +877,11 @@ namespace INBS.Domain
 
             modelBuilder.Entity("INBS.Domain.Entities.CategoryService", b =>
                 {
-                    b.HasOne("INBS.Domain.Entities.Category", "Category")
-                        .WithMany("CategoryServices")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("INBS.Domain.Entities.Service", "Service")
                         .WithMany("CategoryServices")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Category");
 
                     b.Navigation("Service");
                 });
@@ -973,15 +927,37 @@ namespace INBS.Domain
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.DeviceToken", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.CustomerPreference", b =>
                 {
-                    b.HasOne("INBS.Domain.Entities.User", "User")
-                        .WithMany("DeviceTokens")
-                        .HasForeignKey("UserId")
+                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
+                        .WithMany("CustomerPreferences")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.DesignPreference", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.Design", "Design")
+                        .WithMany("DesignPreferences")
+                        .HasForeignKey("DesignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Design");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.DeviceToken", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
+                        .WithMany("DeviceTokens")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Feedback", b =>
@@ -1142,11 +1118,6 @@ namespace INBS.Domain
                     b.Navigation("Feedbacks");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.Category", b =>
-                {
-                    b.Navigation("CategoryServices");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.CustomCombo", b =>
                 {
                     b.Navigation("Bookings");
@@ -1167,12 +1138,18 @@ namespace INBS.Domain
 
                     b.Navigation("CustomDesigns");
 
+                    b.Navigation("CustomerPreferences");
+
+                    b.Navigation("DeviceTokens");
+
                     b.Navigation("Recommendations");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Design", b =>
                 {
                     b.Navigation("CustomDesigns");
+
+                    b.Navigation("DesignPreferences");
 
                     b.Navigation("Images");
 
@@ -1211,8 +1188,6 @@ namespace INBS.Domain
                     b.Navigation("Artist");
 
                     b.Navigation("Customer");
-
-                    b.Navigation("DeviceTokens");
 
                     b.Navigation("Notifications");
                 });
