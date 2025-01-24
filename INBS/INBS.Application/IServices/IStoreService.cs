@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace INBS.Application.IServices
     {
         Task<IEnumerable<StoreResponse>> Get();
 
-        Task Create(StoreRequest request);
+        Task Create(StoreRequest request, ClaimsPrincipal user);
 
         Task Delete(Guid id);
 

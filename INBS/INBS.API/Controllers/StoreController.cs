@@ -12,17 +12,17 @@ namespace INBS.API.Controllers
     public class StoreController(IStoreService _service) : ControllerBase
     {
         /// <summary>
-        /// Gets the list of designs.
+        /// Gets the list of stores.
         /// </summary>
-        /// <returns>A list of designs.</returns>
+        /// <returns>A list of stores.</returns>
         [HttpGet]
         [EnableQuery]
         public async Task<IActionResult> Get()
         {
             try
             {
-                var designs = await _service.Get();
-                return Ok(designs.AsQueryable());
+                var stores = await _service.Get();
+                return Ok(stores.AsQueryable());
             }
             catch (Exception ex)
             {
@@ -31,16 +31,16 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Creates a new design
+        /// Creates a new store
         /// </summary>
-        /// <param name="design">The design creation request.</param>
+        /// <param name="store">The store creation request.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] StoreRequest design)
+        public async Task<IActionResult> Create([FromForm] StoreRequest store)
         {
             try
             {
-                await _service.Create(design);
+                await _service.Create(store, User);
                 return Ok();
             }
             catch (Exception ex)
@@ -50,17 +50,17 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Updates an existing design.
+        /// Updates an existing store.
         /// </summary>
-        /// <param name="id">The design ID.</param>
-        /// <param name="design">The design update request.</param>
+        /// <param name="id">The store ID.</param>
+        /// <param name="store">The store update request.</param>
         /// <returns>An action result.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] StoreRequest design)
+        public async Task<IActionResult> Update(Guid id, [FromForm] StoreRequest store)
         {
             try
             {
-                await _service.Update(id, design);
+                await _service.Update(id, store);
                 return Ok();
             }
             catch (Exception ex)
@@ -70,9 +70,9 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Deletes a design by ID.
+        /// Deletes a store by ID.
         /// </summary>
-        /// <param name="id">The design ID.</param>
+        /// <param name="id">The store ID.</param>
         /// <returns>An action result.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)

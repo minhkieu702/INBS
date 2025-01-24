@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +18,7 @@ namespace INBS.Application.Services
 {
     public class StoreService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService) : IStoreService
     {
-        public async Task Create(StoreRequest modelRequest)
+        public async Task Create(StoreRequest modelRequest, ClaimsPrincipal user)
         {
             try
             {
@@ -28,6 +29,9 @@ namespace INBS.Application.Services
                 if (existedEntity != null && existedEntity.Any())
                     throw new Exception("This address was already used");
                 var newEntity = _mapper.Map<Store>(modelRequest);
+
+                newEntity.AdminId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                    "a5e6a416-772b-430b-b4e6-c50a16cae715");
 
                 newEntity.ImageUrl = modelRequest.NewImage != null ? await _firebaseService.UploadFileAsync(modelRequest.NewImage) : Constants.DEFAULT_IMAGE_URL;
 
