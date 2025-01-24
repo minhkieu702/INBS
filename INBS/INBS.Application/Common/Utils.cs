@@ -44,31 +44,31 @@ namespace INBS.Application.Common
 
         public static Task<List<SkinTone>> GetSkinTones()
         {
-            var skintoneJson = File.ReadAllText("./File/Skintone.json");
+            var skintoneJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Skintone.json"));
             return Task.FromResult(JsonSerializer.Deserialize<List<SkinTone>>(skintoneJson) ?? []);
         }
 
         public static Task<List<PaintType>> GetPaintTypes()
         {
-            var paintTypeJson = File.ReadAllText("./File/PaintType.json");
+            var paintTypeJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "PaintType.json"));
             return Task.FromResult(JsonSerializer.Deserialize<List<PaintType>>(paintTypeJson) ?? []);
         }
 
         public static Task<List<Occasion>> GetOccasions()
         {
-            var occasionJson = File.ReadAllText("./File/Occasion.json");
+            var occasionJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Occasion.json"));
             return Task.FromResult(JsonSerializer.Deserialize<List<Occasion>>(occasionJson) ?? []);
         }
 
         public static Task<List<Color>> GetColors()
         {
-            var colorJson = File.ReadAllText("./File/Color.json");
+            var colorJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Color.json"));
             return Task.FromResult(JsonSerializer.Deserialize<List<Color>>(colorJson) ?? []);
         }
 
         public static Task<List<Category>> GetCategories()
         {
-            var categoryJson = File.ReadAllText("./File/ServiceCategory.json");
+            var categoryJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "ServiceCategory.json"));
             return Task.FromResult(JsonSerializer.Deserialize<List<Category>>(categoryJson) ?? []);            
         }
     }

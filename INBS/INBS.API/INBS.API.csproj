@@ -32,11 +32,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="File\Color.json" />
-    <None Include="File\Occasion.json" />
-    <None Include="File\PaintType.json" />
-    <None Include="File\ServiceCategory.json" />
-    <None Include="File\Skintone.json" />
+    <None Include="File\Color.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="File\Occasion.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="File\PaintType.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="File\ServiceCategory.json" >
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="File\Skintone.json" >
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Controllers\StoreController.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
 </Project>
