@@ -7,9 +7,16 @@ using Microsoft.AspNetCore.OData.Query;
 
 namespace INBS.API.Controllers
 {
+    /// <summary>
+    /// Controller for managing store operations.
+    /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="StoreController"/> class.
+    /// </remarks>
+    /// <param name="service">The store service.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class StoreController(IStoreService _service) : ControllerBase
+    public class StoreController(IStoreService service) : ControllerBase
     {
         /// <summary>
         /// Gets the list of stores.
@@ -21,7 +28,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                var stores = await _service.Get();
+                var stores = await service.Get();
                 return Ok(stores.AsQueryable());
             }
             catch (Exception ex)
@@ -31,7 +38,7 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Creates a new store
+        /// Creates a new store.
         /// </summary>
         /// <param name="store">The store creation request.</param>
         /// <returns>An action result.</returns>
@@ -40,7 +47,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await _service.Create(store, User);
+                await service.Create(store, User);
                 return Ok();
             }
             catch (Exception ex)
@@ -60,7 +67,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await _service.Update(id, store);
+                await service.Update(id, store);
                 return Ok();
             }
             catch (Exception ex)
@@ -79,7 +86,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await _service.Delete(id);
+                await service.Delete(id);
                 return Ok();
             }
             catch (Exception ex)

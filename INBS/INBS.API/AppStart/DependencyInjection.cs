@@ -47,9 +47,11 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<ImageResponse>("Image");
                     odataBuilder.EntitySet<DesignPreferenceResponse>("DesignPreference");
                     odataBuilder.EntitySet<StoreServiceResponse>("StoreService");
+                    odataBuilder.EntitySet<StoreResponse>("Store");
                     odataBuilder.EntitySet<ServiceResponse>("Service");
                     odataBuilder.EntitySet<Color>("Color");
                     odataBuilder.EntitySet<Category>("Category");
+                    
                     // Add OData route components
                     opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())
                        .Select()
