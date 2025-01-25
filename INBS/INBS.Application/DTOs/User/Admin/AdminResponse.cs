@@ -1,6 +1,6 @@
-﻿using INBS.Application.DTOs.Store;
+﻿using INBS.Application.DTOs.Common;
+using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.User;
-using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

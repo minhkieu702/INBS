@@ -1,8 +1,8 @@
-﻿using INBS.Application.DTOs.User.Admin;
+﻿using INBS.Application.DTOs.Common;
+using INBS.Application.DTOs.User.Admin;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Customer;
 using INBS.Application.DTOs.User.Notification;
-using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

@@ -42,7 +42,7 @@ namespace INBS.Application.Mappers
                         _ => "No Info"
                     };
                 });
-                ;
+
             CreateMap<StoreDesign, StoreDesignResponse>();
             CreateMap<StoreService, StoreServiceResponse>();
             #endregion
@@ -50,7 +50,10 @@ namespace INBS.Application.Mappers
             #region Design
             CreateMap<DesignRequest, Design>();
             CreateMap<Design, DesignResponse>();
-            CreateMap<ImageRequest, Image>();
+            CreateMap<ImageRequest, Image>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.LastModifiedAt, opt => opt.Ignore());
+            CreateMap<NewImageRequest, Image>();
             CreateMap<Image, ImageResponse>();
             CreateMap<DesignPreference, DesignPreferenceResponse>();
             #endregion

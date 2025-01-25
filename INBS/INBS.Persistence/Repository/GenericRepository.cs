@@ -104,10 +104,9 @@ namespace INBS.Persistence.Repository
         {
             return Task.FromResult(dbSet.Update(obj));
         }
-        public async Task UpdateRangeAsync(TEntity obj)
+        public void UpdateRangeAsync(IList<TEntity> obj)
         {
             dbSet.UpdateRange(obj);
-            await context.SaveChangesAsync();
         }
         public async Task DeleteAsync(object id)
         {

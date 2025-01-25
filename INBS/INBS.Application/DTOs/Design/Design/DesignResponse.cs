@@ -1,7 +1,7 @@
-﻿using INBS.Application.DTOs.Design.Image;
+﻿using INBS.Application.DTOs.Common;
+using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.Preference;
 using INBS.Domain.Entities;
-using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

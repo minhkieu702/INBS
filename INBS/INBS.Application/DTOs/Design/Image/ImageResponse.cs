@@ -1,4 +1,4 @@
-﻿using INBS.Domain.Entities.Common;
+﻿using INBS.Application.DTOs.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

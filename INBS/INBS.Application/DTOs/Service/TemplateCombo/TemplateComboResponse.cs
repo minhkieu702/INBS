@@ -1,5 +1,5 @@
-﻿using INBS.Application.DTOs.Service.TemplateCombo;
-using INBS.Domain.Entities.Common;
+﻿using INBS.Application.DTOs.Common;
+using INBS.Application.DTOs.Service.TemplateCombo;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

@@ -26,12 +26,17 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("AllowAnyOrigins");
-
 app.UseHttpsRedirection();
+
+app.UseRouting(); 
+
+app.UseCors("AllowAnyOrigins");
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();

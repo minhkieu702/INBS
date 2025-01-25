@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.IService;
 using INBS.Domain.Entities;
@@ -36,11 +37,11 @@ namespace INBS.API.Controllers
         /// <param name="design">The design creation request.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] DesignRequest design)
+        public async Task<IActionResult> Create([FromForm] DesignRequest design, [FromForm] IList<NewImageRequest> newImages)
         {
             try
             {
-                await _service.Create(design);
+                await _service.Create(design, newImages);
                 return Ok();
             }
             catch (Exception ex)
@@ -55,12 +56,12 @@ namespace INBS.API.Controllers
         /// <param name="id">The design ID.</param>
         /// <param name="design">The design update request.</param>
         /// <returns>An action result.</returns>
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] DesignRequest design)
+        [HttpPut]
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] DesignRequest design, [FromForm] IList<NewImageRequest> newImages, [FromForm] IList<ImageRequest> currentImages)
         {
             try
             {
-                await _service.Update(id, design);
+                await _service.Update(id, design, newImages, currentImages);
                 return Ok();
             }
             catch (Exception ex)
@@ -74,8 +75,8 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="id">The design ID.</param>
         /// <returns>An action result.</returns>
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
             try
             {

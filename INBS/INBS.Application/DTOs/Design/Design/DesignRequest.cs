@@ -19,9 +19,9 @@ namespace INBS.Application.DTOs.Design.Design
 
         public int Price { get; set; }
 
-        public IList<ImageRequest> Images { get; set; } = [];
+        //public IList<NewImageRequest> NewImagesList { get; set; } = [];
 
-        public IList<string> ImageUrls { get; set; } = [];
+        //public IList<ImageRequest> CurrentImagesList { get; set; } = [];
 
         public IList<int> ColorIds { get; set; } = [];
 
