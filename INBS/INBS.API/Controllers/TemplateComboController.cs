@@ -8,20 +8,14 @@ namespace INBS.API.Controllers
     /// <summary>
     /// Controller for managing template combos.
     /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="TemplateComboController"/> class.
+    /// </remarks>
+    /// <param name="service">The template combo service.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class TemplateComboController : ControllerBase
+    public class TemplateComboController(ITemplateComboService service) : ControllerBase
     {
-        private readonly ITemplateComboService _service;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TemplateComboController"/> class.
-        /// </summary>
-        /// <param name="service">The template combo service.</param>
-        public TemplateComboController(ITemplateComboService service)
-        {
-            _service = service;
-        }
 
         /// <summary>
         /// Gets the list of template combos.
@@ -33,7 +27,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                var templateCombos = await _service.Get();
+                var templateCombos = await service.Get();
                 return Ok(templateCombos.AsQueryable());
             }
             catch (Exception ex)
@@ -52,7 +46,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await _service.Create(templateCombo);
+                await service.Create(templateCombo);
                 return Ok();
             }
             catch (Exception ex)
@@ -67,12 +61,12 @@ namespace INBS.API.Controllers
         /// <param name="id">The template combo ID.</param>
         /// <param name="templateCombo">The template combo request.</param>
         /// <returns>An action result.</returns>
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] TemplateComboRequest templateCombo)
+        [HttpPut]
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] TemplateComboRequest templateCombo)
         {
             try
             {
-                await _service.Update(id, templateCombo);
+                await service.Update(id, templateCombo);
                 return Ok();
             }
             catch (Exception ex)
@@ -86,12 +80,12 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="id">The template combo ID.</param>
         /// <returns>An action result.</returns>
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
             try
             {
-                await _service.Delete(id);
+                await service.Delete(id);
                 return Ok();
             }
             catch (Exception ex)

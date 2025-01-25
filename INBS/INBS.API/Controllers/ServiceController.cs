@@ -64,8 +64,8 @@ namespace INBS.API.Controllers
         /// <param name="id">The service ID.</param>
         /// <param name="service">The service update request.</param>
         /// <returns>An action result.</returns>
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] ServiceRequest service)
+        [HttpPut]
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ServiceRequest service)
         {
             try
             {
@@ -83,8 +83,8 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="id">The service ID.</param>
         /// <returns>An action result.</returns>
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
             try
             {

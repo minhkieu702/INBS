@@ -62,8 +62,8 @@ namespace INBS.API.Controllers
         /// <param name="id">The store ID.</param>
         /// <param name="store">The store update request.</param>
         /// <returns>An action result.</returns>
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromForm] StoreRequest store)
+        [HttpPut]
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] StoreRequest store)
         {
             try
             {
@@ -81,8 +81,8 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="id">The store ID.</param>
         /// <returns>An action result.</returns>
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
             try
             {
