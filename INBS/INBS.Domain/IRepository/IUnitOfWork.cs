@@ -11,7 +11,7 @@ namespace INBS.Domain.IRepository
     {
         public IGenericRepository<Accessory> AccessoryRepository { get; }
 
-        public IGenericRepository<AccessoryCustomDesign> AccessoryCustomDesignRepository { get; }
+        public IGenericRepository<AccessoryCustomNailDesign> AccessoryCustomDesignRepository { get; }
 
         public IGenericRepository<Admin> AdminRepository { get; }
 

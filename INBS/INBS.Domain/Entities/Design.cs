@@ -17,6 +17,7 @@ namespace INBS.Domain.Entities
             Name = string.Empty;
             Images = [];
             CustomDesigns = [];
+            NailDesigns = [];
             StoreDesigns = [];
             DesignPreferences = [];
         }
@@ -34,6 +35,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(CustomDesign.Design))]
         public virtual ICollection<CustomDesign> CustomDesigns { get; set; }
+        [InverseProperty(nameof(NailDesign.Design))]
+        public virtual ICollection<NailDesign> NailDesigns { get; set; }
 
         [InverseProperty(nameof(StoreDesign.Design))]
         public virtual ICollection<StoreDesign> StoreDesigns { get; set; }

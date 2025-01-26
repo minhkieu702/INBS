@@ -19,7 +19,7 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Accessory> Accessories { get; set; }
 
-        public virtual DbSet<AccessoryCustomDesign> AccessoryCustomDesigns { get; set; }
+        public virtual DbSet<AccessoryCustomNailDesign> AccessoryCustomDesigns { get; set; }
 
         public virtual DbSet<Admin> Admins { get; set; }
 
@@ -31,11 +31,7 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Cancellation> Cancellations { get; set; }
 
-        //public virtual DbSet<Category> Categories { get; set; }
-
         public virtual DbSet<CategoryService> CategoryServices { get; set; }
-
-        //public virtual DbSet<Color> Colors { get; set; }
 
         public virtual DbSet<CustomCombo> CustomCombos { get; set; }
 
@@ -44,6 +40,8 @@ namespace INBS.Persistence.Data
         public virtual DbSet<Customer> Customers { get; set; }
 
         public virtual DbSet<CustomerPreference> CustomerPreferences { get; set; }
+
+        public virtual DbSet<CustomNailDesign> CustomNailDesigns { get; set; }
 
         public virtual DbSet<Design> Designs { get; set; }
 
@@ -55,11 +53,9 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Image> Images { get; set; }
 
+        public virtual DbSet<NailDesign> NailDesigns { get; set; }
+
         public virtual DbSet<Notification> Notifications { get; set; }
-
-        //public virtual DbSet<PaintType> PaintTypes { get; set; }
-
-        //public virtual DbSet<Occasion> Occasions { get; set; }
 
         public virtual DbSet<Recommendation> Recommendations { get; set; }
 
@@ -68,8 +64,6 @@ namespace INBS.Persistence.Data
         public virtual DbSet<ServiceCustomCombo> ServiceCustomCombos { get; set; }
 
         public virtual DbSet<ServiceTemplateCombo> ServiceTemplateCombos { get; set; }
-
-        //public virtual DbSet<SkinTone> SkinTones { get; set; }
 
         public virtual DbSet<Store> Stores { get; set; }
 
@@ -84,7 +78,7 @@ namespace INBS.Persistence.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //thiết lập superkey cho các bảng trong gian
-            modelBuilder.Entity<AccessoryCustomDesign>().HasKey(c => new { c.AccessoryId, c.CustomDesignId });
+            modelBuilder.Entity<AccessoryCustomNailDesign>().HasKey(c => new { c.AccessoryId, c.CustomNailDesignId });
             modelBuilder.Entity<ServiceCustomCombo>().HasKey(c => new { c.ServiceId, c.CustomComboId });
             modelBuilder.Entity<ServiceTemplateCombo>().HasKey(c => new { c.ServiceId, c.TemplateComboId });
             modelBuilder.Entity<DesignPreference>().HasKey(c => new { c.DesignId, c.PreferenceId, c.PreferenceType });
@@ -92,6 +86,7 @@ namespace INBS.Persistence.Data
             modelBuilder.Entity<StoreService>().HasKey(c => new { c.StoreId, c.ServiceId });
             modelBuilder.Entity<StoreDesign>().HasKey(c => new { c.StoreId, c.DesignId });
             modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
+            modelBuilder.Entity<NailDesign>().HasKey(c => new { c.DesignId, c.NailPosition, c.IsLeft });
 
             //modelBuilder.ConfigureRestrictOneToOne<Admin, User>(a => a.User, u => u.Admin, a => a.UserId);
 
@@ -143,7 +138,7 @@ namespace INBS.Persistence.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
-            //optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBSDatabase; TrustServerCertificate=True");
+            //optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBS; TrustServerCertificate=True");
         }
 
     }

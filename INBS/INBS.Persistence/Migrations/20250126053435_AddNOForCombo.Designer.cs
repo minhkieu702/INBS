@@ -4,6 +4,7 @@ using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    partial class INBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250126053435_AddNOForCombo")]
+    partial class AddNOForCombo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,17 +56,17 @@ namespace INBS.Persistence.Migrations
                     b.ToTable("Accessories");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.AccessoryCustomNailDesign", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.AccessoryCustomDesign", b =>
                 {
                     b.Property<Guid>("AccessoryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CustomNailDesignId")
+                    b.Property<Guid>("CustomDesignId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("AccessoryId", "CustomNailDesignId");
+                    b.HasKey("AccessoryId", "CustomDesignId");
 
-                    b.HasIndex("CustomNailDesignId");
+                    b.HasIndex("CustomDesignId");
 
                     b.ToTable("AccessoryCustomDesigns");
                 });
@@ -317,31 +320,6 @@ namespace INBS.Persistence.Migrations
                     b.ToTable("CustomDesigns");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.CustomNailDesign", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CustomDesignId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("CustomDesignId");
-
-                    b.ToTable("CustomNailDesigns");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Customer", b =>
                 {
                     b.Property<Guid>("ID")
@@ -496,6 +474,9 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -506,6 +487,12 @@ namespace INBS.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("NumerialOrder")
                         .HasColumnType("int");
 
@@ -514,22 +501,6 @@ namespace INBS.Persistence.Migrations
                     b.HasIndex("DesignId");
 
                     b.ToTable("Images");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.NailDesign", b =>
-                {
-                    b.Property<Guid>("DesignId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("NailPosition")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsLeft")
-                        .HasColumnType("bit");
-
-                    b.HasKey("DesignId", "NailPosition", "IsLeft");
-
-                    b.ToTable("NailDesigns");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Notification", b =>
@@ -812,23 +783,23 @@ namespace INBS.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.AccessoryCustomNailDesign", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.AccessoryCustomDesign", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.Accessory", "Accessory")
-                        .WithMany("AccessoryCustomNailDesigns")
+                        .WithMany("AccessoryCustomDesigns")
                         .HasForeignKey("AccessoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("INBS.Domain.Entities.CustomNailDesign", "CustomNailDesign")
-                        .WithMany("AccessoryCustomNailDesigns")
-                        .HasForeignKey("CustomNailDesignId")
+                    b.HasOne("INBS.Domain.Entities.CustomDesign", "CustomDesign")
+                        .WithMany("AccessoryCustomDesigns")
+                        .HasForeignKey("CustomDesignId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Accessory");
 
-                    b.Navigation("CustomNailDesign");
+                    b.Navigation("CustomDesign");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Admin", b =>
@@ -951,17 +922,6 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Design");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.CustomNailDesign", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.CustomDesign", "CustomDesign")
-                        .WithMany("CustomNailDesigns")
-                        .HasForeignKey("CustomDesignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CustomDesign");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Customer", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.User", "User")
@@ -1021,17 +981,6 @@ namespace INBS.Persistence.Migrations
                 {
                     b.HasOne("INBS.Domain.Entities.Design", "Design")
                         .WithMany("Images")
-                        .HasForeignKey("DesignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Design");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.NailDesign", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Design", "Design")
-                        .WithMany("NailDesigns")
                         .HasForeignKey("DesignId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1150,7 +1099,7 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Accessory", b =>
                 {
-                    b.Navigation("AccessoryCustomNailDesigns");
+                    b.Navigation("AccessoryCustomDesigns");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Admin", b =>
@@ -1184,14 +1133,9 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.CustomDesign", b =>
                 {
+                    b.Navigation("AccessoryCustomDesigns");
+
                     b.Navigation("Bookings");
-
-                    b.Navigation("CustomNailDesigns");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.CustomNailDesign", b =>
-                {
-                    b.Navigation("AccessoryCustomNailDesigns");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Customer", b =>
@@ -1214,8 +1158,6 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("DesignPreferences");
 
                     b.Navigation("Images");
-
-                    b.Navigation("NailDesigns");
 
                     b.Navigation("StoreDesigns");
                 });

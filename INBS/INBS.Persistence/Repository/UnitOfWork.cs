@@ -33,13 +33,13 @@ namespace INBS.Persistence.Repository
         #endregion
 
         #region AccessoryCustomDesign
-        private IGenericRepository<AccessoryCustomDesign>? _accessoryCustomDesignRepository;
+        private IGenericRepository<AccessoryCustomNailDesign>? _accessoryCustomDesignRepository;
 
-        public IGenericRepository<AccessoryCustomDesign> AccessoryCustomDesignRepository
+        public IGenericRepository<AccessoryCustomNailDesign> AccessoryCustomDesignRepository
         {
             get
             {
-                _accessoryCustomDesignRepository ??= new GenericRepository<AccessoryCustomDesign>(_context);
+                _accessoryCustomDesignRepository ??= new GenericRepository<AccessoryCustomNailDesign>(_context);
                 return _accessoryCustomDesignRepository;
             }
         }

@@ -18,5 +18,7 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(ServiceId))]
         [InverseProperty(nameof(Service.ServiceCustomCombos))]
         public virtual Service? Service { get; set; }
+
+        public int NumerialOrder { get; set; }
     }
 }

@@ -9,6 +9,7 @@ using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -127,35 +128,47 @@ namespace INBS.Application.Services
         {
             if (!images.Any()) return;
 
-            var list = new List<Image>();
-            var semaphore = new SemaphoreSlim(5); // Giới hạn 5 tác vụ đồng thời (có thể thay đổi theo nhu cầu)
+            // Kiểm tra duplicate
+            var existingOrders = _unitOfWork.ImageRepository
+                .Get(filter: c => c.DesignId == designId)
+                .Select(c => c.NumerialOrder)
+                .ToHashSet();
+
+            if (images.Select(c => c.NumerialOrder).Any(n => existingOrders.Contains(n)))
+            {
+                throw new Exception("Duplicate NumerialOrder found");
+            }
+
+            // Upload ảnh
+            var list = new ConcurrentBag<Image>(); // Thread-safe collection
+            var semaphore = new SemaphoreSlim(5); // Giới hạn 5 task đồng thời
 
             var uploadTasks = images.Select(async image =>
             {
-                await semaphore.WaitAsync(); // Chờ cho đến khi có slot trống
+                await semaphore.WaitAsync();
                 try
                 {
                     var entity = _mapper.Map<Image>(image);
-
-                    entity.ImageUrl = image.Image != null ? await _firebaseService.UploadFileAsync(image.Image) : Constants.DEFAULT_IMAGE_URL; // Upload ảnh
+                    entity.ImageUrl = image.Image != null ? await _firebaseService.UploadFileAsync(image.Image) : Constants.DEFAULT_IMAGE_URL;
                     entity.DesignId = designId;
-                    entity.CreatedAt = DateTime.Now;
-
-                    lock (list)
-                    {
-                        list.Add(entity); // Thêm ảnh vào danh sách (tránh xung đột)
-                    }
+                    list.Add(entity);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Error uploading image for NumerialOrder: {image.NumerialOrder} with exception: {ex}");
                 }
                 finally
                 {
-                    semaphore.Release(); // Giải phóng slot
+                    semaphore.Release();
                 }
             });
 
-            await Task.WhenAll(uploadTasks); // Chờ tất cả tác vụ hoàn thành
+            await Task.WhenAll(uploadTasks); // Đợi tất cả upload xong
 
-            _unitOfWork.ImageRepository.InsertRange(list); // Thêm tất cả ảnh vào cơ sở dữ liệu
+            // Insert vào database
+            _unitOfWork.ImageRepository.InsertRange(list.ToList());
         }
+
 
 
         public async Task Delete(Guid designId)

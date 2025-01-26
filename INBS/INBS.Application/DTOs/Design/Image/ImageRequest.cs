@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.Design.Image
 {
-    public class ImageRequest : BaseEntity
+    public class ImageRequest
     {
+        public Guid ID { get; set; }
         public string? ImageUrl { get; set; }
         public int NumerialOrder { get; set; }
         public string? Description { get; set; }

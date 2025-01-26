@@ -13,7 +13,7 @@ namespace INBS.Domain.Entities
     {
         public Accessory() : base()
         {
-            AccessoryCustomDesigns = [];
+            AccessoryCustomNailDesigns = [];
             Name = string.Empty;
             ImageUrl = string.Empty;
         }
@@ -22,7 +22,7 @@ namespace INBS.Domain.Entities
         public double Price { get; set; }
         public string ImageUrl { get; set; }
 
-        [InverseProperty(nameof(AccessoryCustomDesign.Accessory))]
-        public virtual ICollection<AccessoryCustomDesign> AccessoryCustomDesigns { get; set; }
+        [InverseProperty(nameof(AccessoryCustomNailDesign.Accessory))]
+        public virtual ICollection<AccessoryCustomNailDesign> AccessoryCustomNailDesigns { get; set; }
     }
 }

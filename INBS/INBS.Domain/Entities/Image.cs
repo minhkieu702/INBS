@@ -1,4 +1,5 @@
-﻿using INBS.Domain.Entities.Common;
+﻿using INBS.Domain.Common;
+using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,12 +10,15 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Image : BaseEntity
+    public class Image
     {
-        public Image() : base()
+        public Image()
         {
-            ImageUrl = string.Empty;
+            ImageUrl = Constants.DEFAULT_IMAGE_URL;
         }
+
+        [Key]
+        public Guid ID { get; set; }
 
         public int NumerialOrder { get; set; }
 

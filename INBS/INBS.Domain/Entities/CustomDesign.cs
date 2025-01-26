@@ -16,7 +16,7 @@ namespace INBS.Domain.Entities
             IsSave = false;
             ImageUrl = string.Empty;
             Bookings = [];
-            AccessoryCustomDesigns = [];
+            CustomNailDesigns = [];
         }
         public bool IsSave { get; set; }
 
@@ -30,8 +30,8 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(Booking.CustomDesign))]
         public virtual ICollection<Booking> Bookings { get; set; }
 
-        [InverseProperty(nameof(AccessoryCustomDesign.CustomDesign))]
-        public virtual ICollection<AccessoryCustomDesign> AccessoryCustomDesigns { get; set; }
+        [InverseProperty(nameof(CustomNailDesign.CustomDesign))]
+        public virtual ICollection<CustomNailDesign> CustomNailDesigns { get; set; }
 
         public Guid DesignID { get; set; }
         [ForeignKey(nameof(DesignID))]
