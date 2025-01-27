@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.Service.CustomCombo
 {
-    internal class CustomComboResponse
+    public class CustomComboResponse
     {
     }
 }

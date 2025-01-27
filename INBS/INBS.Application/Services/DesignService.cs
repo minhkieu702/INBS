@@ -2,27 +2,19 @@
 using INBS.Application.Common;
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
+using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.Interfaces;
 using INBS.Application.IService;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
     public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService) : IDesignService
     {
-        public async Task Create(DesignRequest modelRequest, IList<NewImageRequest> newImages)
+        public async Task Create(DesignRequest modelRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns)
         {
             try
             {
@@ -38,8 +30,17 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.DesignRepository.InsertAsync(newEntity);
 
-                await HandleInsertImage(newImages, newEntity.ID);
-                await HandleInsertPreference(modelRequest, newEntity.ID);
+                if (images.Any())
+                {
+                    await HandleUpdateImage(images.OrderBy(c => c.NumerialOrder), []);
+                }
+
+                if (nailDesigns.Any())
+                {
+                    await HandleUpdateNailDesign(nailDesigns.OrderBy(c => (c.NailPosition, c.IsLeft)), []);
+                }
+
+                await HandleUpdatePreference(modelRequest, newEntity.ID);
 
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
@@ -111,7 +112,7 @@ namespace INBS.Application.Services
             return preferenceEntities;
         }
 
-        private async Task HandleInsertPreference(DesignRequest modelRequest, Guid designID)
+        private async Task HandleUpdatePreference(DesignRequest modelRequest, Guid designID)
         {
             var requestList = await PreferencesList(designID, modelRequest);
             
@@ -123,53 +124,6 @@ namespace INBS.Application.Services
             if (requestList.Any())
                 await _unitOfWork.DesignPreferenceRepository.InsertRangeAsync(requestList);
         }
-
-        private async Task HandleInsertImage(IList<NewImageRequest> images, Guid designId)
-        {
-            if (!images.Any()) return;
-
-            // Kiểm tra duplicate
-            var existingOrders = _unitOfWork.ImageRepository
-                .Get(filter: c => c.DesignId == designId)
-                .Select(c => c.NumerialOrder)
-                .ToHashSet();
-
-            if (images.Select(c => c.NumerialOrder).Any(n => existingOrders.Contains(n)))
-            {
-                throw new Exception("Duplicate NumerialOrder found");
-            }
-
-            // Upload ảnh
-            var list = new ConcurrentBag<Image>(); // Thread-safe collection
-            var semaphore = new SemaphoreSlim(5); // Giới hạn 5 task đồng thời
-
-            var uploadTasks = images.Select(async image =>
-            {
-                await semaphore.WaitAsync();
-                try
-                {
-                    var entity = _mapper.Map<Image>(image);
-                    entity.ImageUrl = image.Image != null ? await _firebaseService.UploadFileAsync(image.Image) : Constants.DEFAULT_IMAGE_URL;
-                    entity.DesignId = designId;
-                    list.Add(entity);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Error uploading image for NumerialOrder: {image.NumerialOrder} with exception: {ex}");
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            });
-
-            await Task.WhenAll(uploadTasks); // Đợi tất cả upload xong
-
-            // Insert vào database
-            _unitOfWork.ImageRepository.InsertRange(list.ToList());
-        }
-
-
 
         public async Task Delete(Guid designId)
         {
@@ -200,6 +154,7 @@ namespace INBS.Application.Services
                 .Include(d => d.DesignPreferences)
                 .Include(d => d.StoreDesigns.Where(sd => sd.Store != null && !sd.Store.IsDeleted))
                     .ThenInclude(sd => sd.Store)
+                .Include(d => d.NailDesigns)
                 //.Include(d => d.CustomDesigns.Where(cd => cd.Design != null && !cd.Design.IsDeleted))
                 //    .ThenInclude(cd => cd.AccessoryCustomDesigns.Where(cd => cd.Accessory != null && !cd.Accessory.IsDeleted))
                 //        .ThenInclude(acd => acd.Accessory)
@@ -237,7 +192,7 @@ namespace INBS.Application.Services
             return response;
         }
 
-        public async Task Update(Guid designId, DesignRequest modelRequest, IList<NewImageRequest> newImages, IList<ImageRequest> currentImages)
+        public async Task Update(Guid designId, DesignRequest modelRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns)
         {
             try
             {
@@ -247,12 +202,20 @@ namespace INBS.Application.Services
                 
                 _mapper.Map(modelRequest, existedEntity);
 
-                var currentList = await _unitOfWork.ImageRepository.GetAsync(filter: i => i.DesignId == designId);
+                var currentImagesList = await _unitOfWork.ImageRepository.GetAsync(filter: i => i.DesignId == designId);
 
-                HandleDeleteImage(currentImages, designId, currentList);
-                HandleUpdateImage(currentImages, designId, currentList);
-                await HandleInsertImage(newImages, designId);
-                await HandleInsertPreference(modelRequest, designId);
+                var currentNailDesignList = await _unitOfWork.NailDesignRepository.GetAsync(filter: nd => nd.DesignId == designId);
+
+                await HandleUpdateImage(
+                    images.OrderBy(c => c.NumerialOrder), 
+                    currentImagesList.OrderBy(c => c.NumerialOrder).ToDictionary(c => (c.NumerialOrder)));
+
+                await HandleUpdatePreference(modelRequest, designId);
+
+                await HandleUpdateNailDesign(
+                    nailDesigns.OrderBy(c => c.NailPosition), 
+                    currentNailDesignList.OrderBy(c => c.NailPosition).ToDictionary(c => (c.NailPosition, c.IsLeft)));
+
                 await _unitOfWork.DesignRepository.UpdateAsync(existedEntity);
 
                 if (await _unitOfWork.SaveAsync() == 0)
@@ -267,36 +230,133 @@ namespace INBS.Application.Services
             }
         }
 
-        private void HandleUpdateImage(IList<ImageRequest> currentImagesRequest, Guid designId, IEnumerable<Image> currentList)
+        private static void ValidateNailDesigns(IEnumerable<NailDesignRequest> nailDesignsReq)
         {
-            var imageList = new List<Image>();
-            foreach (var currentImage in currentList)
+            if (!nailDesignsReq.Any()) return;
+
+            foreach (var group in nailDesignsReq.GroupBy(c => c.NailPosition))
             {
-                var updateEntity = currentImagesRequest.FirstOrDefault(c => c.ID == currentImage.ID);
+                int count = group.Count();
+                int distinctIsLeft = group.Select(c => c.IsLeft).Distinct().Count();
 
-                if (updateEntity == null) continue;
-
-                if (updateEntity.NumerialOrder != currentImage.NumerialOrder ||
-                    updateEntity.ImageUrl != currentImage.ImageUrl ||
-                    updateEntity.Description != currentImage.Description)
+                if (count > 2 || distinctIsLeft == 1) // Điều kiện kiểm tra chặt chẽ hơn
                 {
-                    imageList.Add(_mapper.Map(updateEntity, currentImage));
+                    throw new Exception($"Invalid nail design: NailPosition {group.Key}");
                 }
             }
-            _unitOfWork.ImageRepository.UpdateRangeAsync(imageList);
         }
 
-        private void HandleDeleteImage(IList<ImageRequest> currentImagesRequest, Guid designId, IEnumerable<Image> currentList)
+        private async Task HandleUpdateNailDesign(IEnumerable<NailDesignRequest> nailDesignsReq, Dictionary<(int, bool), NailDesign> nailDesignDict)
         {
-            var imageList = new List<Image>();
-            foreach (var currentImage in currentList)
+            ValidateNailDesigns(nailDesignsReq);
+
+            var list = new List<NailDesign>();
+
+            // Danh sách các task upload ảnh (chạy đồng thời)
+            var uploadTasks = new List<Task>();
+
+            foreach (var nailDesignRq in nailDesignsReq)
             {
-                if (!currentImagesRequest.Select(c => c.ID).Contains(currentImage.ID))
+                if (nailDesignRq.NewImage == null && nailDesignRq.ImageUrl == null)
+                    continue;
+
+                // Lấy NailDesign hiện tại từ dictionary, kiểm tra nếu tồn tại
+                if (!nailDesignDict.TryGetValue((nailDesignRq.NailPosition, nailDesignRq.IsLeft), out var nailDesign))
+                    throw new KeyNotFoundException($"NailDesign với vị trí {nailDesignRq.NailPosition} và IsLeft {nailDesignRq.IsLeft} không tồn tại.");
+
+                // Nếu có ảnh mới, upload ảnh đồng thời
+                if (nailDesignRq.NewImage != null)
                 {
-                    imageList.Add(currentImage);
+                    var uploadTask = Task.Run(async () => nailDesign.ImageUrl = await _firebaseService.UploadFileAsync(nailDesignRq.NewImage));
+
+                    uploadTasks.Add(uploadTask);
+                }
+                else
+                {
+                    nailDesign.ImageUrl = nailDesignRq.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                }
+
+                list.Add(nailDesign);
+            }
+
+            // Đợi tất cả ảnh upload xong
+            await Task.WhenAll(uploadTasks);
+
+            // Cập nhật database
+            _unitOfWork.NailDesignRepository.UpdateRange(list);
+        }
+
+        private void ValidateImages(IEnumerable<ImageRequest> imageReqs)
+        {
+            var seenOrders = new HashSet<int>();
+
+            foreach (var img in imageReqs)
+            {
+                if (!seenOrders.Add(img.NumerialOrder)) // Nếu đã tồn tại, Add() trả về false
+                {
+                    throw new Exception($"Duplicate NumerialOrder found: {img.NumerialOrder}");
                 }
             }
-            _unitOfWork.ImageRepository.DeleteRange(imageList);
+        }
+
+        private async Task HandleUpdateImage(IEnumerable<ImageRequest> imageReqs, Dictionary<int, Image> currentImageList)
+        {
+
+            ValidateImages(imageReqs);
+
+            var updatingList = new List<Image>();
+            var insertingList = new List<Image>();
+            var uploadTasks = new List<Task>(); // Danh sách task upload ảnh
+
+            foreach (var imgReq in imageReqs)
+            {
+                if (currentImageList.TryGetValue(imgReq.NumerialOrder, out var image)) // Ảnh đã tồn tại
+                {
+                    if (imgReq.NewImage != null)
+                    {
+                        // Upload ảnh đồng thời
+                        var uploadTask = _firebaseService.UploadFileAsync(imgReq.NewImage)
+                            .ContinueWith(t => image.ImageUrl = t.Result);
+                        uploadTasks.Add(uploadTask);
+                    }
+                    else
+                    {
+                        image.ImageUrl = imgReq.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                    }
+
+                    updatingList.Add(image);
+                }
+                else // Ảnh mới cần thêm vào
+                {
+                    image = _mapper.Map<Image>(imgReq);
+
+                    if (imgReq.NewImage != null)
+                    {
+                        // Upload ảnh đồng thời
+                        var uploadTask = _firebaseService.UploadFileAsync(imgReq.NewImage)
+                            .ContinueWith(t => image.ImageUrl = t.Result);
+                        uploadTasks.Add(uploadTask);
+                    }
+                    else
+                    {
+                        image.ImageUrl = imgReq.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                    }
+
+                    insertingList.Add(image);
+                }
+            }
+
+            // Đợi tất cả ảnh upload hoàn thành
+            await Task.WhenAll(uploadTasks);
+
+            // Xóa ảnh không còn tồn tại trong danh sách đầu vào
+            var deleteList = currentImageList.Values
+                .Where(img => !imageReqs.Select(req => req.NumerialOrder).Contains(img.NumerialOrder))
+                .ToList();
+
+            _unitOfWork.ImageRepository.DeleteRange(deleteList);
+            _unitOfWork.ImageRepository.UpdateRange(updatingList);
+            _unitOfWork.ImageRepository.InsertRange(insertingList);
         }
     }
 }

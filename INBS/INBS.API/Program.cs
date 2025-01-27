@@ -1,13 +1,4 @@
 using INBS.API.AppStart;
-using System.Reflection;
-using Microsoft.EntityFrameworkCore;
-using INBS.Domain.IRepository;
-using INBS.Persistence.Repository;
-using INBS.Persistence.Data;
-using INBS.Application.Mappers;
-using Microsoft.AspNetCore.OData;
-using Microsoft.OData.ModelBuilder;
-using INBS.Application.DTOs.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,15 +19,12 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseRouting(); 
+app.UseRouting();
 
 app.UseCors("AllowAnyOrigins");
 
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.MapControllers();
 
 app.Run();

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.User.Admin
 {
-    internal class AdminRequest
+    public class AdminRequest
     {
     }
 }

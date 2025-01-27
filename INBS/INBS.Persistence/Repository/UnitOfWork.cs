@@ -9,15 +9,10 @@ using System.Threading.Tasks;
 
 namespace INBS.Persistence.Repository
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork(INBSDbContext context) : IUnitOfWork
     {
-        private readonly INBSDbContext _context;
+        private readonly INBSDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
         private bool disposed = false;
-
-        public UnitOfWork(INBSDbContext context)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-        }
 
         #region Accessory
         private IGenericRepository<Accessory>? _accessoryRepository;
@@ -32,15 +27,15 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region AccessoryCustomDesign
-        private IGenericRepository<AccessoryCustomNailDesign>? _accessoryCustomDesignRepository;
+        #region AccessoryCustomNailDesign
+        private IGenericRepository<AccessoryCustomNailDesign>? _accessoryCustomNailDesignRepository;
 
-        public IGenericRepository<AccessoryCustomNailDesign> AccessoryCustomDesignRepository
+        public IGenericRepository<AccessoryCustomNailDesign> AccessoryCustomNailDesignRepository
         {
             get
             {
-                _accessoryCustomDesignRepository ??= new GenericRepository<AccessoryCustomNailDesign>(_context);
-                return _accessoryCustomDesignRepository;
+                _accessoryCustomNailDesignRepository ??= new GenericRepository<AccessoryCustomNailDesign>(_context);
+                return _accessoryCustomNailDesignRepository;
             }
         }
         #endregion
@@ -201,6 +196,19 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
+        #region CustomNailDesign
+        private IGenericRepository<CustomNailDesign>? _customNailDesignRepository;
+
+        public IGenericRepository<CustomNailDesign> CustomNailDesignRepository
+        {
+            get 
+            {
+                _customNailDesignRepository ??= new GenericRepository<CustomNailDesign>(_context);
+                return _customNailDesignRepository; 
+            }
+        }
+        #endregion
+
         #region Design
         private IGenericRepository<Design>? _designRepository;
 
@@ -262,6 +270,19 @@ namespace INBS.Persistence.Repository
             {
                 _imageRepository ??= new GenericRepository<Image>(_context);
                 return _imageRepository;
+            }
+        }
+        #endregion
+
+        #region NailDesign
+        private IGenericRepository<NailDesign>? _nailDesignRepository;
+
+        public IGenericRepository<NailDesign> NailDesignRepository
+        {
+            get 
+            {
+                _nailDesignRepository ??= new GenericRepository<NailDesign>(_context);
+                return _nailDesignRepository; 
             }
         }
         #endregion

@@ -11,6 +11,6 @@ namespace INBS.Application.Interfaces
     {
         Task<string> UploadFileAsync(IFormFile file);
 
-        Task DeleteImageAsync(string imageUrl);
+        Task DeleteFileAsync(string imageUrl);
     }
 }

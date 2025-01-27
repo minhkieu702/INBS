@@ -87,6 +87,7 @@ namespace INBS.Persistence.Data
             modelBuilder.Entity<StoreDesign>().HasKey(c => new { c.StoreId, c.DesignId });
             modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
             modelBuilder.Entity<NailDesign>().HasKey(c => new { c.DesignId, c.NailPosition, c.IsLeft });
+            modelBuilder.Entity<Image>().HasKey(c => new { c.DesignId, c.NumerialOrder });
 
             //modelBuilder.ConfigureRestrictOneToOne<Admin, User>(a => a.User, u => u.Admin, a => a.UserId);
 

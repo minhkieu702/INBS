@@ -12,55 +12,73 @@ namespace INBS.Infrastructure.Integrations
 {
     public class FirebaseService : IFirebaseService
     {
-        async Task IFirebaseService.DeleteImageAsync(string imageUrl)
+        private readonly string _apiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey") ?? string.Empty;
+        private readonly string _storage = Environment.GetEnvironmentVariable("FirebaseSettings:storage") ?? string.Empty;
+        private readonly string _appId = Environment.GetEnvironmentVariable("FirebaseSettings:email") ?? string.Empty;
+        private readonly string _projectId = Environment.GetEnvironmentVariable("FirebaseSettings:password") ?? string.Empty;
+
+        private readonly Lazy<Task<FirebaseAuthLink>> _firebaseAuth;
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(5); // Giới hạn 5 tệp tải lên cùng lúc
+
+        public FirebaseService()
         {
-            
+            _firebaseAuth = new Lazy<Task<FirebaseAuthLink>>(async () =>
+            {
+                var auth = new FirebaseAuthProvider(new FirebaseConfig(_apiKey));
+                return await auth.SignInWithEmailAndPasswordAsync(_appId, _projectId);
+            });
         }
 
-        async Task<string> IFirebaseService.UploadFileAsync(IFormFile file)
+        public async Task DeleteFileAsync(string fileUrl)
         {
             try
             {
-                var _apiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey");
-                var _storage = Environment.GetEnvironmentVariable("FirebaseSettings:storage");
-                var _appId = Environment.GetEnvironmentVariable("FirebaseSettings:email");
-                var _projectId = Environment.GetEnvironmentVariable("FirebaseSettings:password");
-
-                var auth = new FirebaseAuthProvider(new FirebaseConfig(_apiKey));
-                var a = await auth.SignInWithEmailAndPasswordAsync(_appId, _projectId);
-
-                var fileName = $"{Guid.NewGuid()}_{file.FileName}";
-
-                string folderName;
-
-                var fileExtension = Path.GetExtension(file.FileName);
-
-                switch (fileExtension)
+                if (string.IsNullOrEmpty(fileUrl))
                 {
-                    case ".jpg":
-                    case ".jpeg":
-                    case ".png":
-                        folderName = "images";
-                        break;
-                    case ".docx":
-                        folderName = "docx";
-                        break;
-                    case ".ppt":
-                    case ".pptx":
-                        folderName = "ppt";
-                        break;
-                    case ".mp4":
-                    case ".mov":
-                        folderName = "videos";
-                        break;
-                    default:
-                        folderName = "other";
-                        break;
+                    throw new ArgumentException("Invalid file URL");
                 }
+
+                // Lấy tên file từ URL (Firebase Storage format: https://firebasestorage.googleapis.com/...)
+                var fileName = ExtractFileNameFromUrl(fileUrl);
 
                 var storage = new FirebaseStorage(_storage, new FirebaseStorageOptions
                 {
-                    AuthTokenAsyncFactory = () => Task.FromResult(a.FirebaseToken),
+                    AuthTokenAsyncFactory = async () =>
+                    {
+                        var auth = await _firebaseAuth.Value;
+                        return auth.FirebaseToken;
+                    },
+                    ThrowOnCancel = true
+                });
+
+                await storage.Child(fileName).DeleteAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error deleting file from Firebase Storage: " + ex);
+            }
+        }
+
+        private string ExtractFileNameFromUrl(string fileUrl)
+        {
+            var uri = new Uri(fileUrl);
+            var pathSegments = uri.AbsolutePath.Split('/');
+            return string.Join("/", pathSegments.Skip(2)); // Bỏ phần đầu URL để lấy đường dẫn file trên Firebase Storage
+        }
+
+
+        public async Task<string> UploadFileAsync(IFormFile file)
+        {
+            await _semaphore.WaitAsync();
+            try
+            {
+                var auth = await _firebaseAuth.Value;
+                var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                string folderName = GetFolderName(Path.GetExtension(file.FileName));
+
+                var storage = new FirebaseStorage(_storage, new FirebaseStorageOptions
+                {
+                    AuthTokenAsyncFactory = () => Task.FromResult(auth.FirebaseToken),
                     ThrowOnCancel = true
                 });
 
@@ -68,15 +86,26 @@ namespace INBS.Infrastructure.Integrations
                 {
                     var storageReference = storage.Child(folderName).Child(fileName);
                     await storageReference.PutAsync(stream);
-
                     return await storageReference.GetDownloadUrlAsync();
                 }
             }
-            catch (Exception)
+            finally
             {
-                throw;
+                _semaphore.Release();
             }
+        }
 
+        private string GetFolderName(string fileExtension)
+        {
+            return fileExtension.ToLower() switch
+            {
+                ".jpg" or ".jpeg" or ".png" => "images",
+                ".docx" => "docx",
+                ".ppt" or ".pptx" => "ppt",
+                ".mp4" or ".mov" => "videos",
+                _ => "other"
+            };
         }
     }
+
 }

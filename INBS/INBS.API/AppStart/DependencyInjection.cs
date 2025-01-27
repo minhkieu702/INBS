@@ -1,6 +1,7 @@
 ﻿using INBS.Application.DependencyInjection;
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
+using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Design.Preference;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
@@ -16,8 +17,17 @@ using System.Reflection;
 
 namespace INBS.API.AppStart
 {
+    /// <summary>
+    /// Provides methods to add services to the dependency injection container.
+    /// </summary>
     public static class DependencyInjection
     {
+        /// <summary>
+        /// Adds presentation layer services to the specified IServiceCollection.
+        /// </summary>
+        /// <param name="services">The IServiceCollection to add services to.</param>
+        /// <param name="configuration">The configuration to use for the services.</param>
+        /// <returns>The IServiceCollection with the added services.</returns>
         public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
         {
             // Add Swagger for API documentation
@@ -31,6 +41,10 @@ namespace INBS.API.AppStart
             return services;
         }
 
+        /// <summary>
+        /// Adds Swagger services to the specified IServiceCollection.
+        /// </summary>
+        /// <param name="services">The IServiceCollection to add services to.</param>
         private static void AddSwagger(this IServiceCollection services)
         {
             // Configure Swagger and OData
@@ -44,6 +58,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<TemplateComboResponse>("TemplateCombo");
                     odataBuilder.EntitySet<ServiceTemplateComboResponse>("ServiceTemplateCombo");
                     odataBuilder.EntitySet<DesignResponse>("Design");
+                    odataBuilder.EntitySet<NailDesignRequest>("NailDesign");
                     odataBuilder.EntitySet<ImageResponse>("Image");
                     odataBuilder.EntitySet<DesignPreferenceResponse>("DesignPreference");
                     odataBuilder.EntitySet<StoreServiceResponse>("StoreService");
@@ -52,7 +67,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<ServiceResponse>("Service");
                     odataBuilder.EntitySet<Color>("Color");
                     odataBuilder.EntitySet<Category>("Category");
-                    
+
                     // Add OData route components
                     opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())
                        .Select()
@@ -83,17 +98,17 @@ namespace INBS.API.AppStart
                 // Add security requirements
                 option.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    {
-                        new OpenApiSecurityScheme
                         {
-                            Reference = new OpenApiReference
+                            new OpenApiSecurityScheme
                             {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
                 });
             });
         }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
+using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Design.Preference;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
@@ -50,10 +51,14 @@ namespace INBS.Application.Mappers
             #region Design
             CreateMap<DesignRequest, Design>();
             CreateMap<Design, DesignResponse>();
+
             CreateMap<ImageRequest, Image>();
-            CreateMap<NewImageRequest, Image>();
             CreateMap<Image, ImageResponse>();
+            
             CreateMap<DesignPreference, DesignPreferenceResponse>();
+
+            CreateMap<NailDesignRequest, NailDesign>();
+            CreateMap<NailDesign, NailDesignResponse>();
             #endregion
         }
     }

@@ -36,7 +36,7 @@ namespace INBS.Infrastructure.SignalR
             await base.OnConnectedAsync();
         }
 
-        public override async Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception? exception)
         {
             _connectionMapping.Remove(Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);

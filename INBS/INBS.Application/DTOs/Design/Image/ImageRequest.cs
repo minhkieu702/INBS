@@ -11,9 +11,8 @@ namespace INBS.Application.DTOs.Design.Image
 {
     public class ImageRequest
     {
-        public Guid ID { get; set; }
+        public IFormFile? NewImage { get; set; }
         public string? ImageUrl { get; set; }
         public int NumerialOrder { get; set; }
-        public string? Description { get; set; }
     }
 }

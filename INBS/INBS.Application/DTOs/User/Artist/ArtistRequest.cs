@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.User.Artist
 {
-    internal class ArtistRequest
+    public class ArtistRequest
     {
     }
 }

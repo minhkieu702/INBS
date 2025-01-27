@@ -1,5 +1,6 @@
 ﻿using INBS.Application.DTOs.Common;
 using INBS.Application.DTOs.Store;
+using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,11 @@ namespace INBS.Application.DTOs.Service.Service
 {
     public class ServiceResponse : BaseEntity
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public string? Description { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
 
         public double Price { get; set; }
 

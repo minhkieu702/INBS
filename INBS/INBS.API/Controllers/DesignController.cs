@@ -1,5 +1,6 @@
 ﻿using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
+using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.IService;
 using INBS.Domain.Entities;
@@ -8,10 +9,18 @@ using Microsoft.AspNetCore.OData.Query;
 
 namespace INBS.API.Controllers
 {
+    /// <summary>
+    /// Controller for managing designs.
+    /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="DesignController"/> class.
+    /// </remarks>
+    /// <param name="service">The design service.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class DesignController(IDesignService _service) : ControllerBase
+    public class DesignController(IDesignService service) : ControllerBase
     {
+
         /// <summary>
         /// Gets the list of designs.
         /// </summary>
@@ -22,7 +31,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                var designs = await _service.Get();
+                var designs = await service.Get();
                 return Ok(designs.AsQueryable());
             }
             catch (Exception ex)
@@ -32,16 +41,18 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Creates a new design
+        /// Creates a new design.
         /// </summary>
         /// <param name="design">The design creation request.</param>
+        /// <param name="images">The list of image requests.</param>
+        /// <param name="nailDesigns">The list of nail design requests.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] DesignRequest design, [FromForm] IList<NewImageRequest> newImages)
+        public async Task<IActionResult> Create([FromForm] DesignRequest design, [FromForm] IList<ImageRequest> images, [FromForm] IList<NailDesignRequest> nailDesigns)
         {
             try
             {
-                await _service.Create(design, newImages);
+                await service.Create(design, images, nailDesigns);
                 return Ok();
             }
             catch (Exception ex)
@@ -55,13 +66,15 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="id">The design ID.</param>
         /// <param name="design">The design update request.</param>
+        /// <param name="images">The list of image requests.</param>
+        /// <param name="nailDesigns">The list of nail design requests.</param>
         /// <returns>An action result.</returns>
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] DesignRequest design, [FromForm] IList<NewImageRequest> newImages, [FromForm] IList<ImageRequest> currentImages)
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] DesignRequest design, [FromForm] IList<ImageRequest> images, [FromForm] IList<NailDesignRequest> nailDesigns)
         {
             try
             {
-                await _service.Update(id, design, newImages, currentImages);
+                await service.Update(id, design, images, nailDesigns);
                 return Ok();
             }
             catch (Exception ex)
@@ -80,7 +93,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await _service.Delete(id);
+                await service.Delete(id);
                 return Ok();
             }
             catch (Exception ex)

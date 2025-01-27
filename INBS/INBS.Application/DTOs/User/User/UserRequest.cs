@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.User.User
 {
-    internal class UserRequest
+    public class UserRequest
     {
     }
 }

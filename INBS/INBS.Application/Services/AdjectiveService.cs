@@ -6,7 +6,7 @@ using INBS.Domain.IRepository;
 
 namespace INBS.Application.Services
 {
-    public class AdjectiveService(IMapper _mapper, IUnitOfWork _unitOfWork) : IAdjectiveService
+    public class AdjectiveService() : IAdjectiveService
     {
         public async Task<IEnumerable<Category>> GetCategory()
         {

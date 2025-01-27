@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.User.Customer
+namespace INBS.Application.DTOs.Booking.CustomDesign
 {
-    public class CustomerRequest
+    public class CustomDesignRequest
     {
+
     }
 }

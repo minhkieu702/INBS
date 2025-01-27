@@ -11,7 +11,7 @@ namespace INBS.Domain.IRepository
     {
         public IGenericRepository<Accessory> AccessoryRepository { get; }
 
-        public IGenericRepository<AccessoryCustomNailDesign> AccessoryCustomDesignRepository { get; }
+        public IGenericRepository<AccessoryCustomNailDesign> AccessoryCustomNailDesignRepository { get; }
 
         public IGenericRepository<Admin> AdminRepository { get; }
 
@@ -48,32 +48,36 @@ namespace INBS.Domain.IRepository
         public IGenericRepository<Image> ImageRepository { get; }
 
         public IGenericRepository<Occasion> OccasionRepository { get; }
-        
+
         public IGenericRepository<PaintType> PaintTypeRepository { get; }
-        
+
         public IGenericRepository<Recommendation> RecommendationRepository { get; }
-        
+
         public IGenericRepository<Service> ServiceRepository { get; }
-        
+
         public IGenericRepository<ServiceCustomCombo> ServiceCustomComboRepository { get; }
-        
+
         public IGenericRepository<ServiceTemplateCombo> ServiceTemplateComboRepository { get; }
-        
+
         public IGenericRepository<SkinTone> SkinToneRepository { get; }
-        
+
         public IGenericRepository<Store> StoreRepository { get; }
-        
+
         public IGenericRepository<StoreDesign> StoreDesignRepository { get; }
-        
+
         public IGenericRepository<StoreService> StoreServiceRepository { get; }
 
         public IGenericRepository<TemplateCombo> TemplateComboRepository { get; }
 
         public IGenericRepository<User> UserRepository { get; }
 
+        public IGenericRepository<CustomNailDesign> CustomNailDesignRepository { get; }
+
+        public IGenericRepository<NailDesign> NailDesignRepository { get; }
+
         int Save();
         Task<int> SaveAsync();
-        void Dispose();
+        new void Dispose();
         void BeginTransaction();
         void CommitTransaction();
         void RollBack();

@@ -3,6 +3,7 @@ using INBS.Application.DTOs.User.Admin;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Customer;
 using INBS.Application.DTOs.User.Notification;
+using INBS.Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,7 +25,7 @@ namespace INBS.Application.DTOs.User.User
 
         public int Role { get; set; } //Customer, Artist, Admin
 
-        public string ImageUrl { get; set; }
+        public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
 
         public string? Preferences { get; set; }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Interfaces
 {
-    internal interface IAuthentication
+    public interface IAuthentication
     {
     }
 }

@@ -46,7 +46,7 @@ namespace INBS.Domain.IRepository
         Task<int> CountAsync();
         Task DeleteAsync(object[] keyValues);
         void DeleteRange(IEnumerable<TEntity> obj);
-        void UpdateRangeAsync(IList<TEntity> obj);
+        void UpdateRange(IList<TEntity> obj);
     }
 
 }
