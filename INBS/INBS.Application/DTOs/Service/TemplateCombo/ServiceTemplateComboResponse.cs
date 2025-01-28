@@ -18,6 +18,7 @@ namespace INBS.Application.DTOs.Service.TemplateCombo
 
         [Key]
         public Guid ServiceId { get; set; }
+        public int NumerialOrder { get; set; }
         public ServiceResponse? Service { get; set; }
     }
 }

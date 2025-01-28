@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
+using INBS.Application.DTOs.Service.TemplateCombo;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
@@ -29,50 +30,83 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task InsertServiceTemplateCombo(
-    Guid templateComboId,
-    IList<Guid> serviceIds,
-    IEnumerable<ServiceTemplateCombo> existedServiceTemplateCombos)
+        private async Task HandleServiceTemplateCombo(Guid templateComboId, IList<ServiceTemplateComboRequest> services)
         {
-            var existingServiceTemplateComboIds = existedServiceTemplateCombos.Select(stc => stc.ServiceId).ToHashSet();
-            var list = new List<ServiceTemplateCombo>();
+            var requestList = await ValidateServiceTemplateCombo(services);
 
-            foreach (var serviceId in serviceIds.Distinct())
-            {
-                if (existingServiceTemplateComboIds.Contains(serviceId)) continue;
+            await DeleteServiceTemplateCombo(templateComboId, requestList);
 
-                try
-                {
-                    var service = await _unitOfWork.ServiceRepository.GetByIdAsync(serviceId);
-                    if (service != null) continue;
-
-                    list.Add(new ServiceTemplateCombo
-                    {
-                        ServiceId = serviceId,
-                        TemplateComboId = templateComboId
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to process ServiceTemplateCombo with ServiceId: {serviceId}, Error: {ex.Message}");
-                }
-            }
-
-            if (list.Any())
-                await _unitOfWork.ServiceTemplateComboRepository.InsertRangeAsync(list);
+            await InsertServiceTemplateCombo(templateComboId, requestList);
         }
 
+        private async Task<List<ServiceTemplateComboRequest>> ValidateServiceTemplateCombo(IList<ServiceTemplateComboRequest> servicesReq)
+        {
+            var dict = new HashSet<int>();
 
-        public async Task Create(TemplateComboRequest request)
+            foreach (var item in servicesReq)
+            {
+                if (!dict.Add(item.NumerialOrder))
+                    throw new Exception($"This {item.NumerialOrder} is duplicated");
+            }
+
+            var orders = servicesReq.OrderBy(c => c.NumerialOrder).ToList();
+
+            var i = 0;
+            foreach (var item in orders)
+            {
+                item.NumerialOrder = ++i;
+            }
+
+            var serviceIds = servicesReq.Select(c => c.ServiceId);
+            
+            var services = await _unitOfWork.ServiceRepository.GetAsync(filter: c => serviceIds.Contains(c.ID));
+            
+            if (serviceIds.Count() != services.Count())
+                throw new Exception("Some services is not correctly");
+
+            return orders;
+        }
+
+        private async Task DeleteServiceTemplateCombo(Guid templateComboId, List<ServiceTemplateComboRequest> services)
+        {
+            var stc = await _unitOfWork.ServiceTemplateComboRepository.GetAsync(filter: c => c.TemplateComboId == templateComboId);
+            if (stc.Any()/* && services.Count != 0*/) 
+                _unitOfWork.ServiceTemplateComboRepository.DeleteRange(stc);
+        }
+
+        private async Task InsertServiceTemplateCombo(
+            Guid templateComboId,
+            IList<ServiceTemplateComboRequest> servicesReq)
+        {
+            var list = new List<ServiceTemplateCombo>();
+
+            foreach (var serviceRq in servicesReq)
+            {
+                var service = _mapper.Map<ServiceTemplateCombo>(serviceRq);
+
+                service.TemplateComboId = templateComboId;
+
+                list.Add(service);
+            }
+
+            await _unitOfWork.ServiceTemplateComboRepository.InsertRangeAsync(list);
+        }
+
+        private async Task ValidateTemplateCombo(TemplateComboRequest request)
+        {
+            var existedTemplateCombo = await _unitOfWork.TemplateComboRepository.GetAsync(filter: tc => tc.Name.Equals(request.Name));
+
+            if (existedTemplateCombo.Any())
+                throw new Exception("Template service combo name already exists");
+        }
+
+        public async Task Create(TemplateComboRequest request, IList<ServiceTemplateComboRequest> services)
         {
             try
             {
+                await ValidateTemplateCombo(request);
+
                 _unitOfWork.BeginTransaction();
-
-                var existedTemplateCombo = await _unitOfWork.TemplateComboRepository.GetAsync(filter: tc => tc.Name.Equals(request.Name));
-
-                if (existedTemplateCombo.Any())
-                    throw new Exception("Template service combo name already exists");
 
                 var templateCombo = _mapper.Map<TemplateCombo>(request);
 
@@ -80,8 +114,7 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.TemplateComboRepository.InsertAsync(templateCombo);
 
-                await InsertServiceTemplateCombo(templateCombo.ID, request.ServiceIds,
-                    await _unitOfWork.ServiceTemplateComboRepository.GetAsync(filter: stc => stc.TemplateComboId == templateCombo.ID));
+                await HandleServiceTemplateCombo(templateCombo.ID, services);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("Create template combo failed");
@@ -124,16 +157,7 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task HandleServiceTemplateComboUpdating(Guid templateComboId, IList<Guid> serviceIds)
-        {
-            var existedServiceTemplateCombos = await _unitOfWork.ServiceTemplateComboRepository.GetAsync(stc => stc.TemplateComboId == templateComboId);
-
-            DeleteServiceTemplateCombo(existedServiceTemplateCombos.Where(stc => !serviceIds.Contains(stc.ServiceId)).ToList());
-            
-            await InsertServiceTemplateCombo(templateComboId, serviceIds, existedServiceTemplateCombos);
-        }
-
-        public async Task Update(Guid id, TemplateComboRequest request)
+        public async Task Update(Guid id, TemplateComboRequest request, IList<ServiceTemplateComboRequest> services)
         {
             try
             {
@@ -148,7 +172,7 @@ namespace INBS.Application.Services
 
                 var newEntity = _mapper.Map(request, existedEntity);
 
-                await HandleServiceTemplateComboUpdating(id, request.ServiceIds);
+                await HandleServiceTemplateCombo(id, services);
 
                 await _unitOfWork.TemplateComboRepository.UpdateAsync(newEntity);
 

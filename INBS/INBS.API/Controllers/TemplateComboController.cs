@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Service.ServiceTemplateCombo;
+using INBS.Application.DTOs.Service.TemplateCombo;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -40,13 +41,14 @@ namespace INBS.API.Controllers
         /// Creates a new template combo.
         /// </summary>
         /// <param name="templateCombo">The template combo request.</param>
+        /// <param name="services">The list of service template combo requests.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] TemplateComboRequest templateCombo)
+        public async Task<IActionResult> Create([FromForm] TemplateComboRequest templateCombo, [FromForm] IList<ServiceTemplateComboRequest> services)
         {
             try
             {
-                await service.Create(templateCombo);
+                await service.Create(templateCombo, services);
                 return Ok();
             }
             catch (Exception ex)
@@ -60,13 +62,14 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="id">The template combo ID.</param>
         /// <param name="templateCombo">The template combo request.</param>
+        /// <param name="services">The list of service template combo requests.</param>
         /// <returns>An action result.</returns>
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] TemplateComboRequest templateCombo)
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] TemplateComboRequest templateCombo, [FromForm] IList<ServiceTemplateComboRequest> services)
         {
             try
             {
-                await service.Update(id, templateCombo);
+                await service.Update(id, templateCombo, services);
                 return Ok();
             }
             catch (Exception ex)

@@ -10,16 +10,7 @@ namespace INBS.Application.DTOs.Service.CustomCombo
 {
     public class CustomComboRequest
     {
-        //public bool IsFavorite { get; set; }
-        //public Guid CustomerID { get; set; }
-        //[ForeignKey(nameof(CustomerID))]
-        //[InverseProperty(nameof(Customer.CustomCombos))]
-        //public virtual Customer? Customer { get; set; }
-
-        //[InverseProperty(nameof(ServiceCustomCombo.CustomCombo))]
-        //public virtual ICollection<ServiceCustomCombo> ServiceCustomCombos { get; set; }
-
-        //[InverseProperty(nameof(Booking.CustomCombo))]
-        //public virtual ICollection<Booking> Bookings { get; set; }
+        public bool IsFavorite { get; set; }
+        public virtual ICollection<Guid> ServiceIds { get; set; } = [];
     }
 }

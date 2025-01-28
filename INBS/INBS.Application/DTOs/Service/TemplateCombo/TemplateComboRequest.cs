@@ -1,4 +1,5 @@
-﻿using System;
+﻿using INBS.Application.DTOs.Service.TemplateCombo;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -13,6 +14,5 @@ namespace INBS.Application.DTOs.Service.ServiceTemplateCombo
 
         public string? Description { get; set; }
 
-        public virtual IList<Guid> ServiceIds { get; set; } = [];
     }
 }
