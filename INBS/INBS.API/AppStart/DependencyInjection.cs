@@ -58,7 +58,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<TemplateComboResponse>("TemplateCombo");
                     odataBuilder.EntitySet<ServiceTemplateComboResponse>("ServiceTemplateCombo");
                     odataBuilder.EntitySet<DesignResponse>("Design");
-                    odataBuilder.EntitySet<NailDesignRequest>("NailDesign");
+                    odataBuilder.EntitySet<NailDesignResponse>("NailDesign");
                     odataBuilder.EntitySet<ImageResponse>("Image");
                     odataBuilder.EntitySet<DesignPreferenceResponse>("DesignPreference");
                     odataBuilder.EntitySet<StoreServiceResponse>("StoreService");
