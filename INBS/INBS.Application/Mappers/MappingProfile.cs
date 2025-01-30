@@ -3,6 +3,7 @@ using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Design.Preference;
+using INBS.Application.DTOs.Service.CustomCombo;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
 using INBS.Application.DTOs.Service.TemplateCombo;
@@ -30,6 +31,13 @@ namespace INBS.Application.Mappers
             CreateMap<TemplateCombo, TemplateComboResponse>();
             CreateMap<ServiceTemplateComboRequest, ServiceTemplateCombo>();
             CreateMap<ServiceTemplateCombo, ServiceTemplateComboResponse>();
+            #endregion
+
+            #region CustomCombo
+            CreateMap<CustomComboRequest, CustomCombo>();
+            CreateMap<CustomCombo, CustomComboResponse>();
+            CreateMap<ServiceCustomComboRequest, ServiceCustomCombo>();
+            CreateMap<ServiceCustomCombo, ServiceCustomComboResponse>();
             #endregion
 
             #region Store

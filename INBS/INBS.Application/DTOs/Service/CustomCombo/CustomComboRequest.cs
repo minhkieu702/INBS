@@ -11,6 +11,5 @@ namespace INBS.Application.DTOs.Service.CustomCombo
     public class CustomComboRequest
     {
         public bool IsFavorite { get; set; }
-        public virtual ICollection<Guid> ServiceIds { get; set; } = [];
     }
 }

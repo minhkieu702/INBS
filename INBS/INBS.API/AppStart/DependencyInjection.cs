@@ -3,6 +3,7 @@ using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Design.Preference;
+using INBS.Application.DTOs.Service.CustomCombo;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
 using INBS.Application.DTOs.Service.TemplateCombo;
@@ -57,6 +58,8 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<ServiceResponse>("Service");
                     odataBuilder.EntitySet<TemplateComboResponse>("TemplateCombo");
                     odataBuilder.EntitySet<ServiceTemplateComboResponse>("ServiceTemplateCombo");
+                    odataBuilder.EntitySet<CustomComboResponse>("CustomCombo");
+                    odataBuilder.EntitySet<ServiceCustomComboResponse>("ServiceCustomCombo");
                     odataBuilder.EntitySet<DesignResponse>("Design");
                     odataBuilder.EntitySet<NailDesignResponse>("NailDesign");
                     odataBuilder.EntitySet<ImageResponse>("Image");
