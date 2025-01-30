@@ -5,6 +5,8 @@ import Home from './components/Home';
 import Store from './components/Store';
 import Artist from './components/Artist';
 import Waitlist from './components/Waitlist';
+import ArtistHome from './components/ArtistHome';
+import AddArtist from './components/AddArtist';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
         <Route path="/store" element={<Store />} />
         <Route path="/artist" element={<Artist />} />
         <Route path="/waitlist" element={<Waitlist />} />
+        <Route path="/artisthome" element={<ArtistHome />} />
+        <Route path="/add-artist" element={<AddArtist />} />
       </Routes>
     </Router>
   );

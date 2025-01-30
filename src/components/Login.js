@@ -9,9 +9,13 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add authentication logic here
-    if (username === 'test' && password === '123') {
-      navigate('/home');
+    if ((username === 'test' && password === '123') || 
+        (username === 'user' && password === '123')) {
+      if (username === 'test') {
+        navigate('/home');
+      } else {
+        navigate('/artisthome');
+      }
     } else {
       alert('Invalid username or password!');
     }

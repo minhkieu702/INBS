@@ -4,19 +4,24 @@ import '../css/Store.css';
 
 function Store() {
   const [showSidebar, setShowSidebar] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [newProduct, setNewProduct] = useState({
+  const [services, setServices] = useState([]);
+  const [nailDesigns, setNailDesigns] = useState([]);
+  const [activeTab, setActiveTab] = useState('services');
+
+  const [newItem, setNewItem] = useState({
     name: '',
     price: '',
     category: '',
-    quantity: '',
-    description: ''
+    duration: '',
+    description: '',
+    imageUrl: ''
   });
+
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct(prev => ({
+    setNewItem(prev => ({
       ...prev,
       [name]: value
     }));
@@ -24,18 +29,30 @@ function Store() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setProducts([...products, { ...newProduct, id: Date.now() }]);
-    setNewProduct({
+    const newItemWithId = { ...newItem, id: Date.now() };
+    
+    if (activeTab === 'services') {
+      setServices([...services, newItemWithId]);
+    } else {
+      setNailDesigns([...nailDesigns, newItemWithId]);
+    }
+    
+    setNewItem({
       name: '',
       price: '',
       category: '',
-      quantity: '',
-      description: ''
+      duration: '',
+      description: '',
+      imageUrl: ''
     });
   };
 
   const handleDelete = (id) => {
-    setProducts(products.filter(product => product.id !== id));
+    if (activeTab === 'services') {
+      setServices(services.filter(item => item.id !== id));
+    } else {
+      setNailDesigns(nailDesigns.filter(item => item.id !== id));
+    }
   };
 
   const handleLogout = () => navigate('/');
@@ -81,18 +98,35 @@ function Store() {
       {/* Main Content */}
       <div className={`main-content ${showSidebar ? 'sidebar-expanded' : ''}`}>
         <div className="header">
-          <h1 className="page-title">Store Management</h1>
+          <h1 className="page-title">Services & Nail Designs Management</h1>
+        </div>
+
+        <div className="tabs">
+          <button 
+            className={`tab-button ${activeTab === 'services' ? 'active' : ''}`}
+            onClick={() => setActiveTab('services')}
+          >
+            Nail Services
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'designs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('designs')}
+          >
+            Nail Designs
+          </button>
         </div>
 
         <div className="product-form">
-          <h2 className="section-title">Add New Product</h2>
+          <h2 className="section-title">
+            {activeTab === 'services' ? 'Add New Service' : 'Add New Design'}
+          </h2>
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
               <input
                 type="text"
                 name="name"
-                placeholder="Product Name"
-                value={newProduct.name}
+                placeholder={activeTab === 'services' ? "Service name" : "Design name"}
+                value={newItem.name}
                 onChange={handleInputChange}
                 required
                 className="form-input"
@@ -100,71 +134,102 @@ function Store() {
               <input
                 type="number"
                 name="price"
-                placeholder="Price"
-                value={newProduct.price}
+                placeholder="Price (VND)"
+                value={newItem.price}
                 onChange={handleInputChange}
                 required
                 className="form-input"
               />
               <select
                 name="category"
-                value={newProduct.category}
+                value={newItem.category}
                 onChange={handleInputChange}
                 required
                 className="form-input"
               >
-                <option value="">Select Category</option>
-                <option value="skincare">Skincare</option>
-                <option value="makeup">Makeup</option>
-                <option value="haircare">Haircare</option>
-                <option value="bodycare">Bodycare</option>
+                <option value="">Select category</option>
+                {activeTab === 'services' ? (
+                  <>
+                    <option value="basic">Basic Nail</option>
+                    <option value="gel">Gel Nail</option>
+                    <option value="acrylic">Acrylic Nail</option>
+                    <option value="care">Nail Care</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="simple">Simple</option>
+                    <option value="medium">Medium</option>
+                    <option value="complex">Complex</option>
+                    <option value="art">Art</option>
+                  </>
+                )}
               </select>
+              {activeTab === 'services' && (
+                <input
+                  type="number"
+                  name="duration"
+                  placeholder="Duration (minutes)"
+                  value={newItem.duration}
+                  onChange={handleInputChange}
+                  required
+                  className="form-input"
+                />
+              )}
               <input
-                type="number"
-                name="quantity"
-                placeholder="Quantity"
-                value={newProduct.quantity}
+                type="text"
+                name="imageUrl"
+                placeholder="Image URL"
+                value={newItem.imageUrl}
                 onChange={handleInputChange}
-                required
                 className="form-input"
               />
               <textarea
                 name="description"
-                placeholder="Product Description"
-                value={newProduct.description}
+                placeholder="Description"
+                value={newItem.description}
                 onChange={handleInputChange}
                 required
                 className="form-input"
               />
             </div>
-            <button type="submit" className="submit-button">Add Product</button>
+            <button type="submit" className="submit-button">Add New</button>
           </form>
         </div>
 
         <div className="product-list">
-          <h2 className="section-title">Product List</h2>
+          <h2 className="section-title">
+            {activeTab === 'services' ? 'Services List' : 'Designs List'}
+          </h2>
           <table className="product-table">
             <thead>
               <tr className="product-table-header">
-                <th className="product-table-header-cell">Product Name</th>
+                <th className="product-table-header-cell">Name</th>
                 <th className="product-table-header-cell">Price</th>
                 <th className="product-table-header-cell">Category</th>
-                <th className="product-table-header-cell">Quantity</th>
+                {activeTab === 'services' && (
+                  <th className="product-table-header-cell">Duration</th>
+                )}
                 <th className="product-table-header-cell">Description</th>
+                <th className="product-table-header-cell">Image</th>
                 <th className="product-table-header-cell">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
-                <tr key={product.id} className="product-table-row">
-                  <td className="product-table-cell">{product.name}</td>
-                  <td className="product-table-cell">{product.price}</td>
-                  <td className="product-table-cell">{product.category}</td>
-                  <td className="product-table-cell">{product.quantity}</td>
-                  <td className="product-table-cell">{product.description}</td>
+              {(activeTab === 'services' ? services : nailDesigns).map((item) => (
+                <tr key={item.id} className="product-table-row">
+                  <td className="product-table-cell">{item.name}</td>
+                  <td className="product-table-cell">{item.price}</td>
+                  <td className="product-table-cell">{item.category}</td>
+                  {activeTab === 'services' && (
+                    <td className="product-table-cell">{item.duration}</td>
+                  )}
+                  <td className="product-table-cell">{item.description}</td>
+                  <td className="product-table-cell">
+                    <img src={item.imageUrl} alt={item.name} style={{ width: '100px', height: '100px' }} />
+                  </td>
                   <td className="product-table-cell">
                     <button 
-                      onClick={() => handleDelete(product.id)}
+                      onClick={() => handleDelete(item.id)}
                       className="delete-button"
                     >
                       Delete

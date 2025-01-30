@@ -15,6 +15,7 @@ function Home() {
     price: ''
   });
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,10 +97,22 @@ function Home() {
     return [...new Set(bookings.map(booking => booking[key]))];
   };
 
+  // Helper function to filter bookings by month
+  const filterBookingsByMonth = (bookings) => {
+    if (selectedMonth === 'all') return bookings;
+    
+    return bookings.filter(booking => {
+      const bookingDate = new Date(booking.date);
+      const bookingMonth = bookingDate.getMonth() + 1; // getMonth() returns 0-11
+      return bookingMonth === parseInt(selectedMonth);
+    });
+  };
+
   // Get data for pie chart
   const getPieChartData = () => {
+    const filteredBookings = filterBookingsByMonth(bookings);
     const serviceCount = {};
-    bookings.forEach(booking => {
+    filteredBookings.forEach(booking => {
       serviceCount[booking.service] = (serviceCount[booking.service] || 0) + 1;
     });
     
@@ -111,6 +124,7 @@ function Home() {
 
   // Get data for price bar chart
   const getPriceChartData = () => {
+    const filteredBookings = filterBookingsByMonth(bookings);
     const priceRanges = {
       '200,000-250,000': 0,
       '250,001-500,000': 0,
@@ -119,15 +133,15 @@ function Home() {
       '2,000,000+': 0
     };
 
-    bookings.forEach(booking => {
+    filteredBookings.forEach(booking => {
       const price = Number(booking.price);
       if (price <= 250000) {
         priceRanges['200,000-250,000']++;
       } else if (price <= 500000) {
         priceRanges['250,001-500,000']++;
-      } else if (price <= 10000000) {
+      } else if (price <= 1000000) {
         priceRanges['500,001-1,000,000']++;
-      } else if (price <= 20000000) {
+      } else if (price <= 2000000) {
         priceRanges['1,000,001-2,000,000']++;
       } else {
         priceRanges['2,000,000+']++;
@@ -141,8 +155,9 @@ function Home() {
   };
 
   const getRevenueData = () => {
+    const filteredBookings = filterBookingsByMonth(bookings);
     const storeRevenue = {};
-    bookings.forEach(booking => {
+    filteredBookings.forEach(booking => {
       if (!storeRevenue[booking.store]) {
         storeRevenue[booking.store] = 0;
       }
@@ -240,6 +255,65 @@ function Home() {
               textShadow: '2px 2px 4px rgba(0,0,0,0.12)',
               letterSpacing: '0.5px'
             }}>Booking Management</h1>
+          </div>
+
+          {/* Add Month Filter */}
+          <div style={{
+            background: 'rgba(255,255,255,0.98)',
+            padding: '20px',
+            borderRadius: '20px',
+            marginBottom: '20px',
+            boxShadow: '0 12px 35px rgba(0,0,0,0.1)',
+            border: '1px solid rgba(255,255,255,0.3)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '15px'
+            }}>
+              <label style={{
+                color: '#1e3c72',
+                fontWeight: '600',
+                fontSize: '16px'
+              }}>Filter by Month:</label>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                style={{
+                  padding: '10px 15px',
+                  borderRadius: '10px',
+                  border: '2px solid #eee',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  color: '#1e3c72',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  outline: 'none'
+                }}
+                onFocus={e => {
+                  e.target.style.borderColor = '#24BFDD';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(36,191,221,0.2)';
+                }}
+                onBlur={e => {
+                  e.target.style.borderColor = '#eee';
+                  e.target.style.boxShadow = 'none';
+                }}
+              >
+                <option value="all">All Months</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
           </div>
 
           {/* Analytics Section */}

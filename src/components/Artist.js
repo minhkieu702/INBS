@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Artist.css';
+import artistData from '../data.json';
 
 function Artist() {
   const [artists, setArtists] = useState([]);
@@ -11,24 +12,8 @@ function Artist() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchArtists();
+    setArtists(artistData);
   }, []);
-
-  const fetchArtists = async () => {
-    try {
-      const response = await fetch('https://6772b9a7ee76b92dd49333cb.mockapi.io/Artist');
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setArtists(data);
-      } else {
-        setArtists([]);
-        console.error('Fetched data is not an array:', data);
-      }
-    } catch (error) {
-      console.error('Error fetching artists:', error);
-      setArtists([]);
-    }
-  };
 
   const handleLogout = () => navigate('/');
   const handleHome = () => navigate('/home'); 
@@ -116,6 +101,28 @@ function Artist() {
       <div className={`main-content ${showSidebar ? 'sidebar-expanded' : ''}`}>
         <div className="header">
           <h1>Artist Management</h1>
+          <button 
+            onClick={() => navigate('/add-artist')}
+            className="add-button"
+            style={{
+              padding: '12px 24px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              marginLeft: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '16px',
+              fontWeight: '500',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            <span>➕</span>
+            Add New Artist
+          </button>
         </div>
 
         <div className="search-bar">
