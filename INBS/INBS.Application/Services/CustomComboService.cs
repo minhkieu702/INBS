@@ -20,7 +20,7 @@ namespace INBS.Application.Services
             var services = await _unitOfWork.ServiceRepository.GetAsync(include: query => query.Where(c => !c.IsDeleted && serviceIdsRequest.Contains(c.ID)));
             if (services.Count() != serviceIdsRequest.Count())
             {
-                throw new Exception("Some service is not existed");
+                    throw new Exception("Some service is not existed");
             }
         }
 
@@ -69,18 +69,18 @@ namespace INBS.Application.Services
         {
             try
             {
-                //var cusId = claims.FindFirst(ClaimTypes.NameIdentifier) ?? throw new Exception("You must login first");
+                var cusId = claims.FindFirst(ClaimTypes.NameIdentifier) ?? throw new Exception("You must login first");
 
                 await ValidateService(serviceCustomCombos.Select(c => c.ServiceId));
 
-                if (await ValidateServiceCustomCombo(Guid.Parse(/*cusId.Value*/"e492d8f4-43ee-4ae2-be26-6128e2d8c582"), serviceCustomCombos) == false)
+                if (await ValidateServiceCustomCombo(Guid.Parse(cusId.Value/*"e492d8f4-43ee-4ae2-be26-6128e2d8c582"*/), serviceCustomCombos) == false)
                     throw new Exception("This combo is already in your favorite combo service, you don't need create more!");
 
                 _unitOfWork.BeginTransaction();
 
                 var entity = _mapper.Map<CustomCombo>(request);
 
-                entity.CustomerID = Guid.Parse(/*cusId.Value*/"e492d8f4-43ee-4ae2-be26-6128e2d8c582");
+                entity.CustomerID = Guid.Parse(cusId.Value/*"e492d8f4-43ee-4ae2-be26-6128e2d8c582"*/);
 
                 await _unitOfWork.CustomComboRepository.InsertAsync(entity);
 
@@ -140,7 +140,7 @@ namespace INBS.Application.Services
         {
             try
             {
-                //var cusId = claims.FindFirst(ClaimTypes.NameIdentifier) ?? throw new Exception("You must login first");
+                var cusId = claims.FindFirst(ClaimTypes.NameIdentifier) ?? throw new Exception("You must login first");
 
                 var entity = await _unitOfWork.CustomComboRepository.GetByIdAsync(id) ?? throw new Exception($"The entity with {id} is not existed.");
 
@@ -153,7 +153,7 @@ namespace INBS.Application.Services
                 {
                     await _unitOfWork.CustomComboRepository.UpdateAsync(_mapper.Map(request, entity));
                 }
-                else if (await ValidateServiceCustomCombo(Guid.Parse(/*cusId.Value*/"e492d8f4-43ee-4ae2-be26-6128e2d8c582"), serviceCustomCombos) == false)
+                else if (await ValidateServiceCustomCombo(Guid.Parse(cusId.Value), serviceCustomCombos) == false)
                 {
                     entity.IsDeleted = true;
                     await _unitOfWork.CustomComboRepository.UpdateAsync(_mapper.Map(request, entity));

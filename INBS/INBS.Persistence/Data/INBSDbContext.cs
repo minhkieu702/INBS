@@ -93,7 +93,7 @@ namespace INBS.Persistence.Data
 
             //modelBuilder.ConfigureRestrictOneToOne<Artist, User>(a => a.User, u => u.Artist, a => a.UserId);
 
-            modelBuilder.ConfigureRestrictOneToOne<Customer, User>(a => a.User, u => u.Customer, a => a.UserId);
+            modelBuilder.ConfigureRestrictOneToOne<Customer, User>(a => a.User, u => u.Customer, a => a.ID);
 
             modelBuilder.ConfigureRestrictOneToMany<Store, Admin>(s => s.Admin, a => a.Stores, s => s.AdminId);
 

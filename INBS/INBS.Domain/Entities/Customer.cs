@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Customer : BaseEntity
+    public class Customer
     {
-        public Customer() : base()
+        public Customer()
         {
             Recommendations = [];
             CustomCombos = [];
@@ -20,8 +20,9 @@ namespace INBS.Domain.Entities
             CustomerPreferences = [];
             DeviceTokens = [];
         }
-        public Guid UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
+        [Key]
+        public Guid ID { get; set; }
+        [ForeignKey(nameof(ID))]
         [InverseProperty(nameof(User.Customer))]
         public virtual User? User { get; set; }
 

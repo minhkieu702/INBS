@@ -10,15 +10,15 @@ using INBS.Domain.Entities.Common;
 
 namespace INBS.Domain.Entities
 {
-    public class Admin : BaseEntity
+    public class Admin
     {
-        public Admin() : base()
+        public Admin()
         {
             Stores = [];
         }
-        public Guid UserId { get; set; }
-        
-        [ForeignKey(nameof(UserId))]
+        [Key]
+        public Guid ID { get; set; }
+        [ForeignKey(nameof(ID))]
         [InverseProperty(nameof(User.Admin))]
         public virtual User? User { get; set; }
 

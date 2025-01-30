@@ -10,15 +10,15 @@ using INBS.Domain.Entities.Common;
 
 namespace INBS.Domain.Entities
 {
-    public class Artist : BaseEntity
+    public class Artist
     {
-        public Artist() : base()
+        public Artist()
         {
             ArtistAvailabilities = [];
         }
-
-        public Guid UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
+        [Key]
+        public Guid ID { get; set; }
+        [ForeignKey(nameof(ID))]
         [InverseProperty(nameof(User.Artist))]
         public virtual User? User { get; set; }
 
