@@ -23,16 +23,16 @@ jobs:
           include-prerelease: true
 
       - name: Restore dependencies
-        run: dotnet restore INBS/INBS.sln
+        run: dotnet restore INBS/INBS.sln --verbosity minimal
 
       - name: Build with dotnet
-        run: dotnet build INBS/INBS.sln --configuration Release --no-restore
+        run: dotnet build INBS/INBS.sln --configuration Release --no-restore --verbosity minimal
 
       - name: Run tests
-        run: dotnet test INBS/INBS.sln --configuration Release --no-build
+        run: dotnet test INBS/INBS.sln --configuration Release --no-build --verbosity minimal
 
       - name: dotnet publish
-        run: dotnet publish INBS/INBS.API/INBS.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish INBS/INBS.API/INBS.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp --verbosity minimal
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
