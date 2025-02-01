@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using INBS.Application.DTOs.Design.Accessory;
+using INBS.Application.DTOs.Design.CustomDesign;
+using INBS.Application.DTOs.Design.CustomNailDesign;
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
@@ -16,6 +19,11 @@ namespace INBS.Application.Mappers
     {
         public MappingProfile()
         {
+            #region Accessory
+            CreateMap<AccessoryRequest, Accessory>();
+            CreateMap<Accessory, AccessoryResponse>();
+            #endregion
+
             #region CategoryService
             //CreateMap<CategoryServiceRequest, CategoryService>();
             CreateMap<CategoryService, CategoryServiceResponse>();
@@ -68,6 +76,17 @@ namespace INBS.Application.Mappers
 
             CreateMap<NailDesignRequest, NailDesign>();
             CreateMap<NailDesign, NailDesignResponse>();
+            #endregion
+
+            #region CustomDesign
+            CreateMap<CustomDesignRequest, CustomDesign>();
+            CreateMap<CustomDesign, CustomDesignResponse>();
+
+            CreateMap<CustomNailDesignRequest,  CustomNailDesign>();
+            CreateMap<CustomNailDesign, CustomNailDesignResponse>();
+
+            CreateMap<AccessoryCustomNailDesignRequest, AccessoryCustomNailDesign>();
+            CreateMap<AccessoryCustomNailDesign, AccessoryCustomNailDesignResponse>();
             #endregion
         }
     }

@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Common;
+using INBS.Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,7 +16,7 @@ namespace INBS.Application.DTOs.Design.CustomNailDesign
 
         public Guid CustomDesignId { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
 
         public int NailPosition { get; set; }
 

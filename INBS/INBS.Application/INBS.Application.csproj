@@ -17,6 +17,10 @@
     <ProjectReference Include="..\INBS.Domain\INBS.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Booking\" />
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties common_4occasion_1json__JsonSchema="https://cdn.jsdelivr.net/gh/roadrunner-server/roadrunner@latest/schemas/config/3.0.schema.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

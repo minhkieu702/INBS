@@ -19,7 +19,7 @@ namespace INBS.Domain.Entities
         }
 
         public string Name { get; set; }
-        public double Price { get; set; }
+        public int Price { get; set; }
         public string ImageUrl { get; set; }
 
         [InverseProperty(nameof(AccessoryCustomNailDesign.Accessory))]

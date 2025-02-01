@@ -1,5 +1,4 @@
-﻿using INBS.Application.DTOs.Booking;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +8,6 @@ namespace INBS.Application.Interfaces
 {
     public interface IBookingHubService
     {
-        Task SendAppointmentAsync(BookingHubResponse response);
+        //Task SendAppointmentAsync(BookingHubResponse response);
     }
 }

@@ -17,5 +17,7 @@ namespace INBS.Application.DTOs.Design.CustomNailDesign
         [Key]
         public Guid CustomNailDesignId { get; set; }
         public virtual CustomNailDesignResponse? CustomNailDesign { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
     }
 }

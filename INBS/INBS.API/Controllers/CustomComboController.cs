@@ -5,10 +5,17 @@ using Microsoft.AspNetCore.OData.Query;
 
 namespace INBS.API.Controllers
 {
+    /// <summary>
+    /// Controller for managing custom combos.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class CustomComboController(ICustomComboService service) : ControllerBase
     {
+        /// <summary>
+        /// Gets the list of custom combos.
+        /// </summary>
+        /// <returns>A list of custom combos.</returns>
         [HttpGet]
         [EnableQuery]
         public async Task<IActionResult> Get()
@@ -24,6 +31,12 @@ namespace INBS.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Creates a new custom combo.
+        /// </summary>
+        /// <param name="customCombo">The custom combo request.</param>
+        /// <param name="serviceCustomCombos">The list of service custom combo requests.</param>
+        /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CustomComboRequest customCombo, [FromForm] IList<ServiceCustomComboRequest> serviceCustomCombos)
         {
@@ -38,6 +51,13 @@ namespace INBS.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing custom combo.
+        /// </summary>
+        /// <param name="id">The ID of the custom combo to update.</param>
+        /// <param name="customCombo">The custom combo request.</param>
+        /// <param name="serviceCustomCombos">The list of service custom combo requests.</param>
+        /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPut]
         public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] CustomComboRequest customCombo, [FromForm] IList<ServiceCustomComboRequest> serviceCustomCombos)
         {
@@ -52,6 +72,11 @@ namespace INBS.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a custom combo.
+        /// </summary>
+        /// <param name="id">The ID of the custom combo to delete.</param>
+        /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
@@ -65,7 +90,5 @@ namespace INBS.API.Controllers
                 return Ok(ex.Message);
             }
         }
-
-
     }
 }

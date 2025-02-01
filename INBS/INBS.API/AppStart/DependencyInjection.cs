@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DependencyInjection;
+using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
@@ -70,6 +71,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<ServiceResponse>("Service");
                     odataBuilder.EntitySet<Color>("Color");
                     odataBuilder.EntitySet<Category>("Category");
+                    odataBuilder.EntitySet<CustomDesignResponse>("CustomDesign");
 
                     // Add OData route components
                     opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())

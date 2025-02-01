@@ -14,13 +14,13 @@ namespace INBS.Domain.Entities
         public CustomDesign() : base()
         {
             IsSave = false;
-            ImageUrl = string.Empty;
+            //ImageUrl = string.Empty;
             Bookings = [];
             CustomNailDesigns = [];
         }
         public bool IsSave { get; set; }
 
-        public string ImageUrl { get; set; }
+        public int Price { get; set; }
 
         public Guid CustomerID { get; set; }
         [ForeignKey(nameof(CustomerID))]

@@ -17,5 +17,9 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(CustomNailDesignId))]
         [InverseProperty(nameof(CustomNailDesign.AccessoryCustomNailDesigns))]
         public virtual CustomNailDesign? CustomNailDesign { get; set; }
+
+        public int X { get; set; }
+
+        public int Y { get; set; }
     }
 }

@@ -27,6 +27,7 @@ namespace INBS.Application.DependencyInjection
             services.AddScoped<ICustomComboService, CustomComboService>();
             services.AddScoped<IStoreService, StoreService>();
             services.AddScoped<IDesignService, DesignService>();
+            services.AddScoped<ICustomDesignService, CustomDesignService>();
             services.AddScoped<IAccessoryService, AccessoryService>();
         }
     }

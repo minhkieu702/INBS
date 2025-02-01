@@ -1,5 +1,5 @@
-﻿using INBS.Application.DTOs.Booking.CustomNailDesign;
-using INBS.Application.DTOs.Design.CustomDesign;
+﻿using INBS.Application.DTOs.Design.CustomDesign;
+using INBS.Application.DTOs.Design.CustomNailDesign;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.IServices
 {
-    public interface ICustomDesign
+    public interface ICustomDesignService
     {
         Task<IEnumerable<CustomDesignResponse>> Get();
 
