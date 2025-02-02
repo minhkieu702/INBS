@@ -52,6 +52,57 @@ namespace INBS.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all occasions
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Occasions")]
+        [EnableQuery]
+        public async Task<IActionResult> GetOccasions()
+        {
+            try
+            {
+                var occasions = await _service.GetOccasions();
+                return Ok(occasions.AsQueryable());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
 
+        /// <summary>
+        /// Get all skintone
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Skintone")]
+        [EnableQuery]
+        public async Task<IActionResult> GetSkintones()
+        {
+            try
+            {
+                var paintType = await _service.GetSkinTone();
+                return Ok(paintType.AsQueryable());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpGet("PaintType")]
+        [EnableQuery]
+        public async Task<IActionResult> GetPaintTypes()
+        {
+            try
+            {
+                var paintTypes = await _service.GetPaintType();
+                return Ok(paintTypes.AsQueryable());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }
