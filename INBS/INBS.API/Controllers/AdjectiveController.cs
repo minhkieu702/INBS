@@ -90,6 +90,10 @@ namespace INBS.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all paint types
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("PaintType")]
         [EnableQuery]
         public async Task<IActionResult> GetPaintTypes()

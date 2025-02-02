@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DependencyInjection;
+using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
@@ -55,6 +56,7 @@ namespace INBS.API.AppStart
                 {
                     // Define OData Entity Sets
                     var odataBuilder = new ODataConventionModelBuilder();
+                    odataBuilder.EntitySet<AccessoryResponse>("Accessory");
                     odataBuilder.EntitySet<CategoryServiceResponse>("CategoryService");
                     odataBuilder.EntitySet<ServiceResponse>("Service");
                     odataBuilder.EntitySet<TemplateComboResponse>("TemplateCombo");
