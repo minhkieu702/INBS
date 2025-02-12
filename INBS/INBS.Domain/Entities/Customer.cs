@@ -26,6 +26,12 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(User.Customer))]
         public virtual User? User { get; set; }
 
+        public double LengthOfNail { get; set; }
+
+        public int StatusOfNail { get; set; }
+
+        public bool IsUsually { get; set; }
+
         [InverseProperty(nameof(Recommendation.Customer))]
         public virtual ICollection<Recommendation> Recommendations { get; set; }
 
