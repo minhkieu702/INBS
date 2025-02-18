@@ -22,6 +22,7 @@ namespace INBS.Domain.Entities
         public int Price { get; set; }
         public string ImageUrl { get; set; }
         public int UnitInStock { get; set; }
+        public int ReorderLevel { get; set; }
 
         [InverseProperty(nameof(AccessoryCustomNailDesign.Accessory))]
         public virtual ICollection<AccessoryCustomNailDesign> AccessoryCustomNailDesigns { get; set; }
