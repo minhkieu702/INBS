@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class ServiceTemplateCombo
+    public class 
+        ServiceTemplateCombo
     {
         public Guid TemplateComboId { get; set; }
         [ForeignKey(nameof(TemplateComboId))]

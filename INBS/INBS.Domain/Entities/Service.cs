@@ -29,6 +29,8 @@ namespace INBS.Domain.Entities
 
         public double Price { get; set; }
 
+        public bool IsAdditional { get; set; }
+
         [InverseProperty(nameof(StoreService.Service))]
         public virtual ICollection<StoreService> StoreServices { get; set; }
 
