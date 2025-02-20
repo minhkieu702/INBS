@@ -39,9 +39,6 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.StoreRepository.InsertAsync(newEntity);
 
-                await InsertStoreService(newEntity.ID, modelRequest.ServiceIds, []);
-                    await InsertStoreDesign(newEntity.ID, modelRequest.DesignIds, []);
-
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("Create service failed");
 
@@ -52,35 +49,6 @@ namespace INBS.Application.Services
                 _unitOfWork.RollBack();
                 throw;
             }
-        }
-
-        private async Task InsertStoreService(Guid iD, IList<Guid> serviceIds, IEnumerable<Domain.Entities.StoreService> existedStoreServices)
-        {
-            if (serviceIds ==null || !serviceIds.Any()) return;
-            var existingServiceIds = existedStoreServices.Select(ss => ss.ServiceId).ToHashSet();
-
-            var list = new List<Domain.Entities.StoreService>();
-
-            foreach (var serviceId in serviceIds)
-            {
-                if (existingServiceIds.Contains(serviceId)) continue;
-
-                try
-                {
-                    if (await _unitOfWork.ServiceRepository.GetByIdAsync(serviceId) == null) continue;
-
-                    list.Add(new Domain.Entities.StoreService
-                    {
-                        ServiceId = serviceId,
-                        StoreId = iD
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to process StoreService with serviceId: {serviceId}, Error: {ex.Message}");
-                }
-            }
-            await _unitOfWork.StoreServiceRepository.InsertRangeAsync(list);
         }
 
         public async Task Delete(Guid id)
@@ -113,7 +81,6 @@ namespace INBS.Application.Services
             {
                 var result = await _unitOfWork.StoreRepository.GetAsync(include:
                     query => query.Where(s => !s.IsDeleted)
-                    .Include(s => s.StoreServices.Where(ss => ss.Service != null && !ss.Service.IsDeleted)).ThenInclude(ss => ss.Service)
                     .Include(s => s.StoreDesigns.Where(sd => sd.Design != null && !sd.Design.IsDeleted)).ThenInclude(sd => sd.Design)
                     //.Include(s => s.Artists.Where(a => !a.IsDeleted))
                     //.Include(s => s.Admin)
@@ -149,7 +116,6 @@ namespace INBS.Application.Services
                 await _unitOfWork.StoreRepository.UpdateAsync(existingEntity);
 
                 await HandleStoreDesignUpdating(id, request.DesignIds);
-                await HandleStoreServiceUpdating(id, request.ServiceIds);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("Update store failed");
@@ -161,17 +127,6 @@ namespace INBS.Application.Services
                 _unitOfWork.RollBack();
                 throw;
             }
-        }
-
-        private async Task HandleStoreServiceUpdating(Guid storeId, IList<Guid> serviceIds)
-        {
-            if (serviceIds == null || !serviceIds.Any()) return;
-
-            var existedStoreServices = await _unitOfWork.StoreServiceRepository.GetAsync(ss => ss.StoreId == storeId);
-
-            _unitOfWork.StoreServiceRepository.DeleteRange(existedStoreServices.Where(c => !serviceIds.Contains(c.ServiceId)));
-
-            await InsertStoreService(storeId, serviceIds, existedStoreServices);
         }
 
         private async Task HandleStoreDesignUpdating(Guid storeId, IList<Guid> designIds)

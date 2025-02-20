@@ -23,7 +23,7 @@ namespace INBS.Persistence.Repository
             this.dbSet = context.Set<TEntity>();
         }
 
-        public virtual TEntity GetByID(object id)
+        public virtual TEntity? GetByID(object id)
         {
             return dbSet.Find(id);
         }
@@ -36,8 +36,8 @@ namespace INBS.Persistence.Repository
 
         public virtual void Delete(object id)
         {
-            TEntity entityToDelete = dbSet.Find(id);
-            Delete(entityToDelete);
+            TEntity? entityToDelete = dbSet.Find(id);
+            if(entityToDelete != null) Delete(entityToDelete);
         }
 
         public virtual void Delete(TEntity entityToDelete)
@@ -55,10 +55,9 @@ namespace INBS.Persistence.Repository
             context.Entry(entityToUpdate).State = EntityState.Modified;
         }
 
-
-        public bool Exists(Expression<Func<TEntity, bool>> filter)
+        public bool Exists(Expression<Func<TEntity, bool>>? filter)
         {
-            return dbSet.Any(filter);
+            return filter == null ? throw new ArgumentNullException(nameof(filter)) : dbSet.Any(filter);
         }
 
         public IEnumerable<TEntity> GetAll()

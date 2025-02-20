@@ -125,7 +125,6 @@ namespace INBS.Application.Services
                     .Include(c => c.CategoryServices)
                     //.Include(s => s.ServiceCustomCombos).ThenInclude(scc => scc.CustomCombo)
                     .Include(s => s.ServiceTemplateCombos.Where(stc => stc.TemplateCombo != null && !stc.TemplateCombo.IsDeleted)).ThenInclude(stc => stc.TemplateCombo)
-                    .Include(s => s.StoreServices.Where(ss => ss.Store != null && !ss.Store.IsDeleted)).ThenInclude(ss => ss.Store)
                     ) ?? throw new Exception("Something was wrong!");
 
                 var responses = _mapper.Map<IEnumerable<ServiceResponse>>(services);

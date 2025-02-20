@@ -27,6 +27,8 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<ArtistAvailability> ArtistAvailabilities { get; set; }
 
+        public virtual DbSet<ArtistService> ArtistServices { get; set; }
+
         public virtual DbSet<Booking> Bookings { get; set; }
 
         public virtual DbSet<Cancellation> Cancellations { get; set; }
@@ -69,7 +71,7 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<StoreDesign> StoreDesigns { get; set; }
 
-        public virtual DbSet<StoreService> StoreServices { get; set; }
+        //public virtual DbSet<StoreService> StoreServices { get; set; }
 
         public virtual DbSet<TemplateCombo> TemplateCombos { get; set; }
 
@@ -79,11 +81,12 @@ namespace INBS.Persistence.Data
         {
             //thiết lập superkey cho các bảng trong gian
             modelBuilder.Entity<AccessoryCustomNailDesign>().HasKey(c => new { c.AccessoryId, c.CustomNailDesignId });
+            modelBuilder.Entity<ArtistService>().HasKey(c => new { c.ArtistId, c.ServiceId });
             modelBuilder.Entity<ServiceCustomCombo>().HasKey(c => new { c.ServiceId, c.CustomComboId });
             modelBuilder.Entity<ServiceTemplateCombo>().HasKey(c => new { c.ServiceId, c.TemplateComboId });
             modelBuilder.Entity<DesignPreference>().HasKey(c => new { c.DesignId, c.PreferenceId, c.PreferenceType });
             modelBuilder.Entity<CustomerPreference>().HasKey(c => new { c.CustomerId, c.PreferenceId, c.PreferenceType });
-            modelBuilder.Entity<StoreService>().HasKey(c => new { c.StoreId, c.ServiceId });
+            //modelBuilder.Entity<StoreService>().HasKey(c => new { c.StoreId, c.ServiceId });
             modelBuilder.Entity<StoreDesign>().HasKey(c => new { c.StoreId, c.DesignId });
             modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
             modelBuilder.Entity<NailDesign>().HasKey(c => new { c.DesignId, c.NailPosition, c.IsLeft });

@@ -15,10 +15,10 @@ namespace INBS.Domain.Entities
         {
             Name = string.Empty;
             ImageUrl = string.Empty;
-            StoreServices = [];
             ServiceCustomCombos = [];
             ServiceTemplateCombos = [];
             CategoryServices = [];
+            ArtistServices = [];
         }
 
         public string Name { get; set; }
@@ -31,9 +31,6 @@ namespace INBS.Domain.Entities
 
         public bool IsAdditional { get; set; }
 
-        [InverseProperty(nameof(StoreService.Service))]
-        public virtual ICollection<StoreService> StoreServices { get; set; }
-
         [InverseProperty(nameof(ServiceTemplateCombo.Service))]
         public virtual ICollection<ServiceTemplateCombo> ServiceTemplateCombos { get; set; }
 
@@ -42,5 +39,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(CategoryService.Service))]
         public virtual ICollection<CategoryService> CategoryServices { get; set; }
+
+        [InverseProperty(nameof(ArtistService.Service))]
+        public virtual ICollection<ArtistService> ArtistServices { get; set; }
     }
 }

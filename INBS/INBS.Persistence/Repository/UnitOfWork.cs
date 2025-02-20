@@ -417,15 +417,15 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region StoreService
-        private IGenericRepository<StoreService>? _storeServiceRepository;
+        #region ArtistService
+        private IGenericRepository<ArtistService>? _artistServiceRepository;
 
-        public IGenericRepository<StoreService> StoreServiceRepository
+        public IGenericRepository<ArtistService> ArtistServiceRepository
         {
             get
             {
-                _storeServiceRepository ??= new GenericRepository<StoreService>(_context);
-                return _storeServiceRepository;
+                _artistServiceRepository ??= new GenericRepository<ArtistService>(_context);
+                return _artistServiceRepository;
             }
         }
         #endregion

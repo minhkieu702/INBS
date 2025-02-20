@@ -15,7 +15,6 @@ namespace INBS.Domain.Entities
         {
             Artists = [];
             StoreDesigns = [];
-            StoreServices = [];
             Address = string.Empty;
             ImageUrl = string.Empty;
         }
@@ -38,8 +37,5 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(StoreDesign.Store))]
         public virtual ICollection<StoreDesign> StoreDesigns { get; set; }
-
-        [InverseProperty(nameof(StoreService.Store))]
-        public virtual ICollection<StoreService> StoreServices { get; set; }
     }
 }

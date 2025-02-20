@@ -14,6 +14,7 @@ namespace INBS.Domain.Entities
     {
         public Artist()
         {
+            ArtistServices = [];
             ArtistAvailabilities = [];
         }
         [Key]
@@ -28,5 +29,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(ArtistAvailability.Artist))]
         public virtual ICollection<ArtistAvailability> ArtistAvailabilities { get; set; }
+
+        [InverseProperty(nameof(ArtistService.Artist))]
+        public virtual ICollection<ArtistService> ArtistServices { get; set; }
     }
 }

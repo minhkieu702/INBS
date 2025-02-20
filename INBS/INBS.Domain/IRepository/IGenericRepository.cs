@@ -19,7 +19,7 @@ namespace INBS.Domain.IRepository
 
         IEnumerable<TEntity> GetAll();
 
-        TEntity GetByID(object id);
+        TEntity? GetByID(object id);
         void Insert(TEntity entity);
         void InsertRange(IList<TEntity> obj);
         Task InsertRangeAsync(IEnumerable<TEntity> obj);
