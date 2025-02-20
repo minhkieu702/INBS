@@ -152,8 +152,6 @@ namespace INBS.Application.Services
                 query => query
                 .Include(d => d.Images.OrderBy(i => i.NumerialOrder))
                 .Include(d => d.DesignPreferences)
-                .Include(d => d.StoreDesigns.Where(sd => sd.Store != null && !sd.Store.IsDeleted))
-                    .ThenInclude(sd => sd.Store)
                 .Include(d => d.NailDesigns)
                 //.Include(d => d.CustomDesigns.Where(cd => cd.Design != null && !cd.Design.IsDeleted))
                 //    .ThenInclude(cd => cd.AccessoryCustomDesigns.Where(cd => cd.Accessory != null && !cd.Accessory.IsDeleted))

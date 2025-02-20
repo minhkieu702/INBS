@@ -14,7 +14,6 @@ namespace INBS.Domain.Entities
         public Store() : base()
         {
             Artists = [];
-            StoreDesigns = [];
             Address = string.Empty;
             ImageUrl = string.Empty;
         }
@@ -34,8 +33,5 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(AdminId))]
         [InverseProperty(nameof(Admin.Stores))]
         public virtual Admin? Admin { get; set; }
-
-        [InverseProperty(nameof(StoreDesign.Store))]
-        public virtual ICollection<StoreDesign> StoreDesigns { get; set; }
     }
 }

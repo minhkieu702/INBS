@@ -60,9 +60,6 @@ namespace INBS.Application.Mappers
                         _ => "No Info"
                     };
                 });
-
-            CreateMap<StoreDesign, StoreDesignResponse>();
-            //CreateMap<StoreService, StoreServiceResponse>();
             #endregion
 
             #region Design

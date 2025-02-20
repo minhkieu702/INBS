@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class StoreDesign
+    public class ArtistDesign
     {
-        public Guid StoreId { get; set; }
-        [ForeignKey(nameof(StoreId))]
-        [InverseProperty(nameof(Store.StoreDesigns))]
-        public virtual Store? Store { get; set; }
+        public Guid ArtistId { get; set; }
+        [ForeignKey(nameof(ArtistId))]
+        [InverseProperty(nameof(Artist.ArtistDesigns))]
+        public virtual Artist? Artist { get; set; }
 
         public Guid DesignId { get; set; }
         [ForeignKey(nameof(DesignId))]
-        [InverseProperty(nameof(Design.StoreDesigns))]
+        [InverseProperty(nameof(Design.ArtistDesigns))]
         public virtual Design? Design { get; set; }
     }
 }

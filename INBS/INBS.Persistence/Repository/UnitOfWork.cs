@@ -78,7 +78,33 @@ namespace INBS.Persistence.Repository
             }
         }
         #endregion
-        
+
+        #region ArtistDesign
+        private IGenericRepository<ArtistDesign>? _artistDesignRepository;
+
+        public IGenericRepository<ArtistDesign> ArtistDesignRepository
+        {
+            get
+            {
+                _artistDesignRepository ??= new GenericRepository<ArtistDesign>(_context);
+                return _artistDesignRepository;
+            }
+        }
+        #endregion
+
+        #region ArtistService
+        private IGenericRepository<ArtistService>? _artistServiceRepository;
+
+        public IGenericRepository<ArtistService> ArtistServiceRepository
+        {
+            get
+            {
+                _artistServiceRepository ??= new GenericRepository<ArtistService>(_context);
+                return _artistServiceRepository;
+            }
+        }
+        #endregion
+
         #region Booking
         private IGenericRepository<Booking>? _bookingRepository;
 
@@ -400,32 +426,6 @@ namespace INBS.Persistence.Repository
             {
                 _storeRepository ??= new GenericRepository<Store>(_context);
                 return _storeRepository;
-            }
-        }
-        #endregion
-
-        #region StoreDesign
-        private IGenericRepository<StoreDesign>? _storeDesignRepository;
-
-        public IGenericRepository<StoreDesign> StoreDesignRepository
-        {
-            get
-            {
-                _storeDesignRepository ??= new GenericRepository<StoreDesign>(_context);
-                return _storeDesignRepository;
-            }
-        }
-        #endregion
-
-        #region ArtistService
-        private IGenericRepository<ArtistService>? _artistServiceRepository;
-
-        public IGenericRepository<ArtistService> ArtistServiceRepository
-        {
-            get
-            {
-                _artistServiceRepository ??= new GenericRepository<ArtistService>(_context);
-                return _artistServiceRepository;
             }
         }
         #endregion

@@ -81,7 +81,6 @@ namespace INBS.Application.Services
             {
                 var result = await _unitOfWork.StoreRepository.GetAsync(include:
                     query => query.Where(s => !s.IsDeleted)
-                    .Include(s => s.StoreDesigns.Where(sd => sd.Design != null && !sd.Design.IsDeleted)).ThenInclude(sd => sd.Design)
                     //.Include(s => s.Artists.Where(a => !a.IsDeleted))
                     //.Include(s => s.Admin)
                     );
@@ -115,8 +114,6 @@ namespace INBS.Application.Services
                 
                 await _unitOfWork.StoreRepository.UpdateAsync(existingEntity);
 
-                await HandleStoreDesignUpdating(id, request.DesignIds);
-
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("Update store failed");
 
@@ -127,48 +124,6 @@ namespace INBS.Application.Services
                 _unitOfWork.RollBack();
                 throw;
             }
-        }
-
-        private async Task HandleStoreDesignUpdating(Guid storeId, IList<Guid> designIds)
-        {
-            if (designIds == null || !designIds.Any()) return;
-
-            var existedStoreDesigns = await _unitOfWork.StoreDesignRepository.GetAsync(ss => ss.StoreId == storeId);
-
-            _unitOfWork.StoreDesignRepository.DeleteRange(existedStoreDesigns.Where(c => !designIds.Contains(c.DesignId)));
-
-            await InsertStoreDesign(storeId, designIds, existedStoreDesigns);
-        }
-
-        private async Task InsertStoreDesign(Guid storeId, IList<Guid> designIds, IEnumerable<StoreDesign> existedStoreDesigns)
-        {
-            if(designIds == null || !designIds.Any()) return ;
-
-            var existingDesignIds = existedStoreDesigns.Select(c => c.DesignId).ToHashSet();
-
-            var list = new List<StoreDesign>();
-
-            foreach (var designId in designIds)
-            {
-                if (existingDesignIds.Contains(designId)) continue;
-
-                try
-                {
-                    if (_unitOfWork.DesignRepository.GetByID(designId) == null) continue;
-
-                    list.Add(new StoreDesign
-                    {
-                        DesignId = designId,
-                        StoreId = storeId
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to process StoreDesign with DesignId: {designId}, Error: {ex.Message}");
-                }
-            }
-
-            await _unitOfWork.StoreDesignRepository.InsertRangeAsync(list);
         }
     }
 }

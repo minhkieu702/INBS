@@ -17,6 +17,10 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Artist> ArtistRepository { get; }
 
+        public IGenericRepository<ArtistDesign> ArtistDesignRepository { get; }
+
+        public IGenericRepository<ArtistService> ArtistServiceRepository { get; }
+
         public IGenericRepository<ArtistAvailability> ArtistAvailabilityRepository { get; }
 
         public IGenericRepository<Booking> BookingRepository { get; }
@@ -62,10 +66,6 @@ namespace INBS.Domain.IRepository
         public IGenericRepository<SkinTone> SkinToneRepository { get; }
 
         public IGenericRepository<Store> StoreRepository { get; }
-
-        public IGenericRepository<StoreDesign> StoreDesignRepository { get; }
-
-        //public IGenericRepository<StoreService> StoreServiceRepository { get; }
 
         public IGenericRepository<TemplateCombo> TemplateComboRepository { get; }
 

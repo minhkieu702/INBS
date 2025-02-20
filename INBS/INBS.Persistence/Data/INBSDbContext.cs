@@ -27,6 +27,8 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<ArtistAvailability> ArtistAvailabilities { get; set; }
 
+        public virtual DbSet<ArtistDesign> ArtistDesigns { get; set; }
+
         public virtual DbSet<ArtistService> ArtistServices { get; set; }
 
         public virtual DbSet<Booking> Bookings { get; set; }
@@ -69,10 +71,6 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Store> Stores { get; set; }
 
-        public virtual DbSet<StoreDesign> StoreDesigns { get; set; }
-
-        //public virtual DbSet<StoreService> StoreServices { get; set; }
-
         public virtual DbSet<TemplateCombo> TemplateCombos { get; set; }
 
         public virtual DbSet<User> Users { get; set; }
@@ -81,13 +79,12 @@ namespace INBS.Persistence.Data
         {
             //thiết lập superkey cho các bảng trong gian
             modelBuilder.Entity<AccessoryCustomNailDesign>().HasKey(c => new { c.AccessoryId, c.CustomNailDesignId });
+            modelBuilder.Entity<ArtistDesign>().HasKey(c => new { c.ArtistId, c.DesignId });
             modelBuilder.Entity<ArtistService>().HasKey(c => new { c.ArtistId, c.ServiceId });
             modelBuilder.Entity<ServiceCustomCombo>().HasKey(c => new { c.ServiceId, c.CustomComboId });
             modelBuilder.Entity<ServiceTemplateCombo>().HasKey(c => new { c.ServiceId, c.TemplateComboId });
             modelBuilder.Entity<DesignPreference>().HasKey(c => new { c.DesignId, c.PreferenceId, c.PreferenceType });
             modelBuilder.Entity<CustomerPreference>().HasKey(c => new { c.CustomerId, c.PreferenceId, c.PreferenceType });
-            //modelBuilder.Entity<StoreService>().HasKey(c => new { c.StoreId, c.ServiceId });
-            modelBuilder.Entity<StoreDesign>().HasKey(c => new { c.StoreId, c.DesignId });
             modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
             modelBuilder.Entity<NailDesign>().HasKey(c => new { c.DesignId, c.NailPosition, c.IsLeft });
             modelBuilder.Entity<Image>().HasKey(c => new { c.DesignId, c.NumerialOrder });
@@ -142,7 +139,7 @@ namespace INBS.Persistence.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
-            //optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBS; TrustServerCertificate=True");
+            optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBS; TrustServerCertificate=True");
         }
 
     }
