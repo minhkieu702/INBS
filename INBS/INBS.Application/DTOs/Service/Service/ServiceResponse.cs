@@ -1,5 +1,6 @@
 ﻿using INBS.Application.DTOs.Common;
 using INBS.Application.DTOs.Store;
+using INBS.Application.DTOs.User.Artist;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using System;
@@ -23,6 +24,6 @@ namespace INBS.Application.DTOs.Service.Service
 
         public ICollection<CategoryServiceResponse> CategoryServices { get; set; } = [];
 
-        public ICollection<StoreServiceResponse> StoreServices { get; set; } = [];
+        public ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];
     }
 }

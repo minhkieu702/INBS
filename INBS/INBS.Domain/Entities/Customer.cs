@@ -19,12 +19,14 @@ namespace INBS.Domain.Entities
             CustomDesigns = [];
             CustomerPreferences = [];
             DeviceTokens = [];
+            Preferences = string.Empty;
         }
         [Key]
         public Guid ID { get; set; }
         [ForeignKey(nameof(ID))]
         [InverseProperty(nameof(User.Customer))]
         public virtual User? User { get; set; }
+        public string? Preferences { get; set; }
 
         [InverseProperty(nameof(Recommendation.Customer))]
         public virtual ICollection<Recommendation> Recommendations { get; set; }

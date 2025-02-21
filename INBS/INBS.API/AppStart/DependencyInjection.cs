@@ -10,6 +10,7 @@ using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
 using INBS.Application.DTOs.Service.TemplateCombo;
 using INBS.Application.DTOs.Store;
+using INBS.Application.DTOs.User.Artist;
 using INBS.Domain.Entities;
 using INBS.Persistence.DependencyInjection;
 using Infrastructure.DependencyInjection;
@@ -67,8 +68,8 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<NailDesignResponse>("NailDesign");
                     odataBuilder.EntitySet<ImageResponse>("Image");
                     odataBuilder.EntitySet<DesignPreferenceResponse>("DesignPreference");
-                    odataBuilder.EntitySet<StoreServiceResponse>("StoreService");
-                    odataBuilder.EntitySet<StoreDesignResponse>("StoreDesign");
+                    odataBuilder.EntitySet<ArtistServiceResponse>("ArtistService");
+                    odataBuilder.EntitySet<ArtistDesignResponse>("ArtistDesign");
                     odataBuilder.EntitySet<StoreResponse>("Store");
                     odataBuilder.EntitySet<ServiceResponse>("Service");
                     odataBuilder.EntitySet<Color>("Color");
