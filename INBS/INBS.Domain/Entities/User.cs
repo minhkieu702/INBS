@@ -15,20 +15,22 @@ namespace INBS.Domain.Entities
         public User() : base()
         {
             PasswordHash = string.Empty;
-            Email = string.Empty;
+            Username = string.Empty;
             Notifications = [];
             ImageUrl = string.Empty;
         }
 
         public string? FullName { get; set; }
 
-        public string Email { get; set; }
+        public string Username { get; set; }
 
         public string PasswordHash { get; set; }
 
         public string? PhoneNumber { get; set; }
 
         public int Role { get; set; } //Customer, Artist, Admin
+
+        public DateOnly DateOfBirth { get; set; }
 
         public string ImageUrl { get; set; }
 
