@@ -30,7 +30,8 @@ namespace INBS.Application.Services
 
                 var newEntity = _mapper.Map<Accessory>(requestModel);
 
-                newEntity.ImageUrl = requestModel.NewImage != null ? await _firebaseService.UploadFileAsync(requestModel.NewImage) : Constants.DEFAULT_IMAGE_URL;
+                if(requestModel.NewImage != null)
+                    newEntity.ImageUrl = await _firebaseService.UploadFileAsync(requestModel.NewImage);
 
                 newEntity.CreatedAt = DateTime.Now;
 
