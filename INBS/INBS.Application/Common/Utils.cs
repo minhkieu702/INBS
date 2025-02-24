@@ -1,8 +1,10 @@
 ﻿using INBS.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -12,6 +14,22 @@ namespace INBS.Application.Common
 {
     public static class Utils
     {
+        public static string HashedPassword(string password)
+        {
+            try
+            {
+                var passwordHasher = new PasswordHasher<User>();
+
+                var hashedPassword = passwordHasher.HashPassword(new User(), password);
+
+                return hashedPassword;
+            }
+            catch (Exception ex)
+            {
+                throw new SecurityException("An error occurred while hashing the password.", ex);
+            }
+        }
+
         public static string RemoveNonAlphabetic(string input)
         {
             return Regex.Replace(input, "[^a-zA-Z]", "");

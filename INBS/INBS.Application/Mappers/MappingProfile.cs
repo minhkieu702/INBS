@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using INBS.Application.Common;
 using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.CustomNailDesign;
@@ -11,6 +12,9 @@ using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
 using INBS.Application.DTOs.Service.TemplateCombo;
 using INBS.Application.DTOs.Store;
+using INBS.Application.DTOs.User.Artist;
+using INBS.Application.DTOs.User.Artist.ArtistAvailability;
+using INBS.Application.DTOs.User.User;
 using INBS.Domain.Entities;
 
 namespace INBS.Application.Mappers
@@ -84,6 +88,23 @@ namespace INBS.Application.Mappers
 
             CreateMap<AccessoryCustomNailDesignRequest, AccessoryCustomNailDesign>();
             CreateMap<AccessoryCustomNailDesign, AccessoryCustomNailDesignResponse>();
+            #endregion
+
+            #region User
+            CreateMap<UserRequest, User>();
+            CreateMap<User, UserResponse>();
+            #endregion
+
+            #region Artist
+            CreateMap<ArtistRequest, Artist>();
+            CreateMap<Artist, ArtistResponse>();
+            CreateMap<ArtistService, ArtistServiceResponse>();
+            CreateMap<ArtistDesign, ArtistDesignResponse>();
+            #endregion
+
+            #region ArtistAvailability
+            CreateMap<ArtistAvailabilityRequest, ArtistAvailability>();
+            CreateMap<ArtistAvailability, ArtistAvailabilityResponse>();
             #endregion
         }
     }
