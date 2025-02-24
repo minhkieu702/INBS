@@ -30,7 +30,7 @@ namespace INBS.Infrastructure.Authentication
             var claims = new List<Claim>()
             {
                 new (ClaimTypes.NameIdentifier, user.ID.ToString()),
-                new (ClaimTypes.Email, user.Email.ToString()),
+                new (ClaimTypes.Name, user.Username.ToString()),
                 new (ClaimTypes.Role, user.Role.ToString())
             };
 
@@ -53,7 +53,7 @@ namespace INBS.Infrastructure.Authentication
             var claims = new List<Claim>()
             {
                 new(ClaimTypes.NameIdentifier, user.ID.ToString()),
-                new(ClaimTypes.Email, user.Email.ToString()),
+                new(ClaimTypes.Name, user.Username.ToString()),
                 new(ClaimTypes.Role, user.Role.ToString())
             };
 
