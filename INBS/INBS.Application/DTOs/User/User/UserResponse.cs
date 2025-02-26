@@ -29,11 +29,11 @@ namespace INBS.Application.DTOs.User.User
 
         public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
 
-        //public CustomerResponse? Customer { get; set; }
+        public CustomerResponse? Customer { get; set; }
 
-        //public AdminResponse? Admin { get; set; }
+        public AdminResponse? Admin { get; set; }
 
-        //public ArtistResponse? Artist { get; set; }
+        public ArtistResponse? Artist { get; set; }
 
         public ICollection<NotificationResponse> Notifications { get; set; } = [];
     }
