@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using INBS.Application.DTOs.User.User;
+using INBS.Application.DTOs.User.User.Login;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;
@@ -17,12 +18,14 @@ namespace INBS.Application.Services
     {
         private const string DEFAULT_IMAGE_URL = "https://your-default-image-url.com/default.png";
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAuthentication _authentication;
         private readonly IFirebaseService _firebaseService;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher<User> _passwordHasher;
-        public UserService(IUnitOfWork unitOfWork,IFirebaseService firebaseService, IMapper mapper,IPasswordHasher<User> passwordHasher)
+        public UserService(IUnitOfWork unitOfWork, IAuthentication authentication,IFirebaseService firebaseService, IMapper mapper,IPasswordHasher<User> passwordHasher)
         {
             _unitOfWork = unitOfWork;
+            _authentication = authentication;
             _firebaseService = firebaseService;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
@@ -74,6 +77,9 @@ namespace INBS.Application.Services
 
                 if (verifyPassword != PasswordVerificationResult.Success)
                     throw new Exception("Invalid phone number or password");
+
+                var accessToken = await _authentication.GenerateDefaultTokenAsync(existingUser);
+                var refreshToken = await _authentication.GenerateRefreshTokenAsync(existingUser);
 
                 return _mapper.Map<UserResponse>(existingUser);
             }

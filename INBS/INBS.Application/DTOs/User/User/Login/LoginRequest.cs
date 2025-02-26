@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.User.User
+namespace INBS.Application.DTOs.User.User.Login
 {
     public class LoginRequest
     {

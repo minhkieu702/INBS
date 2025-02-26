@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.User.User;
+using INBS.Application.DTOs.User.User.Login;
 using INBS.Application.IServices;
 using INBS.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -45,7 +46,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
