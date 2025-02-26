@@ -67,7 +67,12 @@ namespace INBS.Infrastructure.Authentication
                 throw new UnauthorizedAccessException("User ID claim not found in token.");
             }
 
-            return Guid.Parse(userIdClaim.Value);
+            if (!Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                throw new UnauthorizedAccessException("Invalid User ID format in token.");
+            }
+
+            return userId;
         }
 
         public string HashedPassword(string password)
