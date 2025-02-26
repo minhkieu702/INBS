@@ -19,13 +19,15 @@ namespace INBS.Application.Services
         private const string DEFAULT_IMAGE_URL = "https://your-default-image-url.com/default.png";
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthentication _authentication;
+        private readonly ISMSService _smsService;
         private readonly IFirebaseService _firebaseService;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher<User> _passwordHasher;
-        public UserService(IUnitOfWork unitOfWork, IAuthentication authentication,IFirebaseService firebaseService, IMapper mapper,IPasswordHasher<User> passwordHasher)
+        public UserService(IUnitOfWork unitOfWork, IAuthentication authentication, ISMSService smsService, IFirebaseService firebaseService, IMapper mapper,IPasswordHasher<User> passwordHasher)
         {
             _unitOfWork = unitOfWork;
             _authentication = authentication;
+            _smsService = smsService;
             _firebaseService = firebaseService;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
@@ -36,10 +38,10 @@ namespace INBS.Application.Services
             {
                 _unitOfWork.BeginTransaction();
 
-                var existedUser = await _unitOfWork.UserRepository.GetAsync(x => x.Email == requestModel.Email);
+                var existedUser = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == requestModel.PhoneNumber);
 
                 if (existedUser != null && existedUser.Any())
-                    throw new Exception("This email is already registered");
+                    throw new Exception("This phone number is already registered");
 
                 var newUser = _mapper.Map<User>(requestModel);
 
@@ -47,11 +49,16 @@ namespace INBS.Application.Services
                 newUser.ImageUrl = requestModel.NewImage != null ? await _firebaseService.UploadFileAsync(requestModel.NewImage) : DEFAULT_IMAGE_URL;
                 newUser.Notifications = new List<Notification>();
 
+                var otpCode = _smsService.GenerateOtp();
+                newUser.OtpCode = otpCode;
+                newUser.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
+
                 await _unitOfWork.UserRepository.InsertAsync(newUser);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("User registration failed");
 
+                await _smsService.SendOtpSmsAsync(newUser.PhoneNumber, otpCode);
                 _unitOfWork.CommitTransaction();
                 return _mapper.Map<UserResponse>(newUser);
             }
@@ -72,9 +79,10 @@ namespace INBS.Application.Services
                     throw new Exception("Invalid phone number or password");
 
                 var existingUser = user.First();
+                if (!existingUser.IsVerified)
+                    throw new Exception("Phone number is not verified. Please verify your OTP first.");
 
                 var verifyPassword = _passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash, requestModel.Password);
-
                 if (verifyPassword != PasswordVerificationResult.Success)
                     throw new Exception("Invalid phone number or password");
 

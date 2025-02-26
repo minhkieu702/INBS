@@ -28,6 +28,9 @@ namespace INBS.Domain.Entities
         public string PasswordHash { get; set; }
 
         public string? PhoneNumber { get; set; }
+        public string? OtpCode { get; set; }
+        public DateTime? OtpExpiry { get; set; }
+        public bool IsVerified { get; set; }
 
         public int Role { get; set; } //Customer, Artist, Admin
 
