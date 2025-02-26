@@ -32,7 +32,7 @@ namespace INBS.Application.Services
             _mapper = mapper;
             _passwordHasher = passwordHasher;
         }
-        public async Task<UserResponse> Register(UserRequest requestModel)
+        public async Task<UserResponse> Register(RegisterRequest requestModel)
         {
             try
             {
