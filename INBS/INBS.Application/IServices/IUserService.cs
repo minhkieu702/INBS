@@ -10,7 +10,7 @@ namespace INBS.Application.IServices
 {
     public interface IUserService
     {
-        Task<UserResponse> Register(UserRequest requestModel);
+        Task<UserResponse> Register(RegisterRequest requestModel);
         Task<LoginResponse> Login(LoginRequest requestModel);
         Task<LoginResponse> VerifyOtpAsync(VerifyOtpRequest requestModel);
     }

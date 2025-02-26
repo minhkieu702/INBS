@@ -23,7 +23,7 @@ namespace INBS.API.Controllers
         /// <param name="request">The user registration request model.</param>
         /// <returns>The registered user details.</returns>
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             try
             {
@@ -36,6 +36,10 @@ namespace INBS.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Login
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -49,7 +53,10 @@ namespace INBS.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
+        /// <summary>
+        /// Verify OTP before login
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
         {
