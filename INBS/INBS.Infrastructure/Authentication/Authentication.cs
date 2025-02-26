@@ -59,46 +59,16 @@ namespace INBS.Infrastructure.Authentication
         }
 
         public Guid GetUserIdFromHttpContext(HttpContext httpContext)
-    {
-        if (!httpContext.Request.Headers.TryGetValue("Authorization", out var authorizationHeader))
         {
-            throw new UnauthorizedAccessException("Authorization header is missing.");
-        }
-
-        if (string.IsNullOrWhiteSpace(authorizationHeader) || !authorizationHeader.ToString().StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new UnauthorizedAccessException("Invalid Authorization header format.");
-        }
-
-        string jwtToken = authorizationHeader.ToString()[7..]; // Extract token part
-
-        var tokenHandler = new JwtSecurityTokenHandler();
-        if (!tokenHandler.CanReadToken(jwtToken))
-        {
-            throw new SecurityTokenException("Invalid JWT token format.");
-        }
-
-        try
-        {
-            var token = tokenHandler.ReadJwtToken(jwtToken);
-            var idClaim = token.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier || claim.Type == "sub" || claim.Type == "user_id");
-
-                if (idClaim == null || string.IsNullOrWhiteSpace(idClaim.Value))
+            Claim? userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            
+            if (userIdClaim == null || string.IsNullOrWhiteSpace(userIdClaim.Value))
             {
-                throw new SecurityTokenException("User ID claim not found in token.");
+                throw new UnauthorizedAccessException("User ID claim not found in token.");
             }
 
-            return Guid.Parse(idClaim.Value);
+            return Guid.Parse(userIdClaim.Value);
         }
-        catch (FormatException)
-        {
-            throw new SecurityTokenException("Invalid GUID format in token.");
-        }
-        catch (Exception ex)
-        {
-            throw new SecurityTokenException($"Error parsing token: {ex.Message}");
-        }
-    }
 
         public string HashedPassword(string password)
         {
