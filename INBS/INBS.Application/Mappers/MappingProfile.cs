@@ -15,6 +15,7 @@ using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Artist.ArtistAvailability;
 using INBS.Application.DTOs.User.User;
+
 using INBS.Domain.Entities;
 
 namespace INBS.Application.Mappers
