@@ -69,7 +69,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<UserResponse> Login(LoginRequest requestModel)
+        public async Task<LoginResponse> Login(LoginRequest requestModel)
         {
             try
             {
@@ -89,14 +89,43 @@ namespace INBS.Application.Services
                 var accessToken = await _authentication.GenerateDefaultTokenAsync(existingUser);
                 var refreshToken = await _authentication.GenerateRefreshTokenAsync(existingUser);
 
-                return _mapper.Map<UserResponse>(existingUser);
+                var response = _mapper.Map<LoginResponse>(existingUser);
+                response.AccessToken = accessToken;
+                response.RefreshToken = refreshToken;
+
+                return response;
             }
             catch (Exception)
             {
                 throw;
             }
         }
+        public async Task<LoginResponse> VerifyOtpAsync(VerifyOtpRequest requestModel)
+        {
+            var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == requestModel.PhoneNumber);
 
+            if (user == null || !user.Any())
+                throw new Exception("Phone number is not registered");
 
+            var existingUser = user.First();
+
+            if (existingUser.OtpCode != requestModel.OtpCode || existingUser.OtpExpiry < DateTime.UtcNow)
+                throw new Exception("Invalid or expired OTP");
+
+            existingUser.IsVerified = true;
+            existingUser.OtpCode = null;
+            existingUser.OtpExpiry = null;
+            await _unitOfWork.UserRepository.UpdateAsync(existingUser);
+            await _unitOfWork.SaveAsync();
+
+            var accessToken = await _authentication.GenerateDefaultTokenAsync(existingUser);
+            var refreshToken = await _authentication.GenerateRefreshTokenAsync(existingUser);
+
+            return new LoginResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
+        }
     }
 }
