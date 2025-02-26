@@ -11,6 +11,7 @@ using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Service.ServiceTemplateCombo;
 using INBS.Application.DTOs.Service.TemplateCombo;
 using INBS.Application.DTOs.Store;
+using INBS.Application.DTOs.User.User;
 using INBS.Domain.Entities;
 
 namespace INBS.Application.Mappers
@@ -85,6 +86,12 @@ namespace INBS.Application.Mappers
             CreateMap<AccessoryCustomNailDesignRequest, AccessoryCustomNailDesign>();
             CreateMap<AccessoryCustomNailDesign, AccessoryCustomNailDesignResponse>();
             #endregion
+
+            #region User
+            CreateMap<UserRequest, User>();
+            CreateMap<User, UserResponse>();
+            #endregion
+
         }
     }
 }
