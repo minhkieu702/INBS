@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.User.User.Login
+namespace INBS.Application.DTOs.Authentication
 {
     public class LoginResponse
     {

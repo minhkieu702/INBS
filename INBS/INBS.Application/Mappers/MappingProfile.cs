@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using INBS.Application.Common;
+using INBS.Application.DTOs.Authentication.Customer;
 using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.CustomNailDesign;
@@ -9,13 +9,10 @@ using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Design.Preference;
 using INBS.Application.DTOs.Service.CustomCombo;
 using INBS.Application.DTOs.Service.Service;
-using INBS.Application.DTOs.Service.ServiceTemplateCombo;
-using INBS.Application.DTOs.Service.TemplateCombo;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Artist.ArtistAvailability;
 using INBS.Application.DTOs.User.User;
-using INBS.Application.DTOs.User.User.Login;
 using INBS.Domain.Entities;
 
 namespace INBS.Application.Mappers
