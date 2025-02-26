@@ -15,7 +15,7 @@ using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Artist.ArtistAvailability;
 using INBS.Application.DTOs.User.User;
-
+using INBS.Application.DTOs.User.User.Login;
 using INBS.Domain.Entities;
 
 namespace INBS.Application.Mappers
@@ -85,6 +85,7 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region User
+            CreateMap<RegisterRequest, User>();
             CreateMap<UserRequest, User>();
             CreateMap<User, UserResponse>();
             #endregion

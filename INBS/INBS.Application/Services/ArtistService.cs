@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class ArtistService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper) : IArtistService
+    public class ArtistService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper, IAuthentication _authentication) : IArtistService
     {
 
         private async Task IsUniquePhoneNumber(string phoneNumber, Guid? userId = null)
@@ -91,7 +91,7 @@ namespace INBS.Application.Services
             
             user.Username = await GetUsername(userRequest.FullName);
             
-            user.PasswordHash = Utils.HashedPassword("password123!@#");
+            user.PasswordHash = _authentication.HashedPassword(user, "password123!@#");
             
             if (userRequest.NewImage != null)
                 user.ImageUrl = await _firebaseService.UploadFileAsync(userRequest.NewImage);

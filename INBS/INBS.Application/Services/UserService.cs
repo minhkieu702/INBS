@@ -3,6 +3,7 @@ using INBS.Application.DTOs.User.User;
 using INBS.Application.DTOs.User.User.Login;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
+using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Identity;
@@ -22,15 +23,13 @@ namespace INBS.Application.Services
         private readonly ISMSService _smsService;
         private readonly IFirebaseService _firebaseService;
         private readonly IMapper _mapper;
-        private readonly IPasswordHasher<User> _passwordHasher;
-        public UserService(IUnitOfWork unitOfWork, IAuthentication authentication, ISMSService smsService, IFirebaseService firebaseService, IMapper mapper,IPasswordHasher<User> passwordHasher)
+        public UserService(IUnitOfWork unitOfWork, IAuthentication authentication, ISMSService smsService, IFirebaseService firebaseService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _authentication = authentication;
             _smsService = smsService;
             _firebaseService = firebaseService;
             _mapper = mapper;
-            _passwordHasher = passwordHasher;
         }
         public async Task<UserResponse> Register(RegisterRequest requestModel)
         {
@@ -45,9 +44,9 @@ namespace INBS.Application.Services
 
                 var newUser = _mapper.Map<User>(requestModel);
 
-                newUser.PasswordHash = _passwordHasher.HashPassword(newUser, requestModel.Password);
-                newUser.ImageUrl = requestModel.NewImage != null ? await _firebaseService.UploadFileAsync(requestModel.NewImage) : DEFAULT_IMAGE_URL;
-                newUser.Notifications = new List<Notification>();
+                newUser.PasswordHash = _authentication.HashedPassword(newUser, requestModel.Password);
+
+                newUser.ImageUrl = requestModel.NewImage != null ? await _firebaseService.UploadFileAsync(requestModel.NewImage) : Constants.DEFAULT_IMAGE_URL;
 
                 var otpCode = _smsService.GenerateOtp();
                 newUser.OtpCode = otpCode;
@@ -58,7 +57,7 @@ namespace INBS.Application.Services
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("User registration failed");
 
-                await _smsService.SendOtpSmsAsync(newUser.PhoneNumber, otpCode);
+                await _smsService.SendOtpSmsAsync(newUser.PhoneNumber ?? string.Empty, otpCode);
                 _unitOfWork.CommitTransaction();
                 return _mapper.Map<UserResponse>(newUser);
             }
@@ -82,8 +81,8 @@ namespace INBS.Application.Services
                 if (!existingUser.IsVerified)
                     throw new Exception("Phone number is not verified. Please verify your OTP first.");
 
-                var verifyPassword = _passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash, requestModel.Password);
-                if (verifyPassword != PasswordVerificationResult.Success)
+                var verifyPassword = _authentication.VerifyPassword(existingUser, requestModel.Password);
+                if (!verifyPassword)
                     throw new Exception("Invalid phone number or password");
 
                 var accessToken = await _authentication.GenerateDefaultTokenAsync(existingUser);

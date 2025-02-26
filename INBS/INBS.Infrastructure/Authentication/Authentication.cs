@@ -12,50 +12,46 @@ namespace INBS.Infrastructure.Authentication
 {
     public class Authentication : IAuthentication
     {
-        public async Task<string> GenerateRefreshTokenAsync(User user)
+        public string GenerateJwtToken(User user, int expirationInMinutes = 30)
         {
             var issuer = Environment.GetEnvironmentVariable("Jwt:Issuer");
             var audience = Environment.GetEnvironmentVariable("Jwt:Audience");
             var key = Environment.GetEnvironmentVariable("Jwt:Key");
 
+            if (string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(key))
+            {
+                throw new InvalidOperationException("JWT configuration is missing.");
+            }
+
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key ?? string.Empty));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
-            var claims = new List<Claim>()
+            var claims = new List<Claim>
             {
                 new (ClaimTypes.NameIdentifier, user.ID.ToString()),
-                new (ClaimTypes.Name, user.Username.ToString()),
+                new (ClaimTypes.Name, user.Username),
                 new (ClaimTypes.Role, user.Role.ToString())
             };
 
-            var expired = DateTime.UtcNow.AddDays(14);
+            var expiration = DateTime.UtcNow.AddMinutes(expirationInMinutes);
 
-            var token = new JwtSecurityToken(issuer, audience, claims, notBefore: DateTime.UtcNow, expires: expired, signingCredentials: credentials);
-            return await Task.FromResult(jwtSecurityTokenHandler.WriteToken(token));
+            var token = new JwtSecurityToken(issuer, audience, claims,
+                notBefore: DateTime.UtcNow,
+                expires: expiration,
+                signingCredentials: credentials);
+
+            return jwtSecurityTokenHandler.WriteToken(token);
         }
 
         public async Task<string> GenerateDefaultTokenAsync(User user)
         {
-            var issuer = Environment.GetEnvironmentVariable("Jwt:Issuer");
-            var audience = Environment.GetEnvironmentVariable("Jwt:Audience");
-            var key = Environment.GetEnvironmentVariable("Jwt:Key");
+            return await Task.FromResult(GenerateJwtToken(user, expirationInMinutes: 30)); // Access token với thời gian sống 30 phút
+        }
 
-            var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key ?? string.Empty));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-
-            var claims = new List<Claim>()
-            {
-                new(ClaimTypes.NameIdentifier, user.ID.ToString()),
-                new(ClaimTypes.Name, user.Username.ToString()),
-                new(ClaimTypes.Role, user.Role.ToString())
-            };
-
-            var expired = DateTime.UtcNow.AddMinutes(30);
-
-            var token = new JwtSecurityToken(issuer, audience, claims, notBefore: DateTime.UtcNow, expires: expired, signingCredentials: credentials);
-            return await Task.FromResult(jwtSecurityTokenHandler.WriteToken(token));
+        public async Task<string> GenerateRefreshTokenAsync(User user)
+        {
+            return await Task.FromResult(GenerateJwtToken(user, expirationInMinutes: 20160)); // Refresh token với thời gian sống 14 ngày (20160 phút)
         }
 
         public Guid GetUserIdFromHttpContext(HttpContext httpContext)
@@ -75,15 +71,31 @@ namespace INBS.Infrastructure.Authentication
             return userId;
         }
 
-        public string HashedPassword(string password)
+        public string HashedPassword(User user, string password)
         {
             try
             {
                 var passwordHasher = new PasswordHasher<User>();
 
-                var hashedPassword = passwordHasher.HashPassword(new User(), password);
+                var hashedPassword = passwordHasher.HashPassword(user, password);
 
                 return hashedPassword;
+            }
+            catch (Exception ex)
+            {
+                throw new SecurityException("An error occurred while hashing the password.", ex);
+            }
+        }
+
+        public bool VerifyPassword(User user, string password)
+        {
+            try
+            {
+                var passwordHasher = new PasswordHasher<User>();
+
+                var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
+
+                return result == PasswordVerificationResult.Success;
             }
             catch (Exception ex)
             {

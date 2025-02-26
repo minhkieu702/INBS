@@ -107,21 +107,21 @@ namespace Infrastructure.DependencyInjection
 
         public static void AddAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(options =>
-            //    {
-            //        options.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateIssuer = true,
-            //            ValidateAudience = true,
-            //            ValidateLifetime = true,
-            //            RequireExpirationTime = true,
-            //            ClockSkew = TimeSpan.Zero,
-            //            ValidIssuer = config["Jwt:Issuer"],
-            //            ValidAudience = config["Jwt:Audience"],
-            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
-            //        };
-            //    });
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        RequireExpirationTime = true,
+                        ClockSkew = TimeSpan.Zero,
+                        ValidIssuer = Environment.GetEnvironmentVariable("Jwt:Issuer") ?? throw new InvalidOperationException("Issuer is not configured."),
+                        ValidAudience = Environment.GetEnvironmentVariable("Jwt:Audience") ?? throw new InvalidOperationException("Audience is not configured."),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt:Key") ?? throw new InvalidOperationException("Key is not configured.")))
+                    };
+                });
         }
     }
 }

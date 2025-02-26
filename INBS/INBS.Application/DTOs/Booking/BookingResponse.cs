@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.Booking
 {
-    internal class BookingResponse
+    public class BookingResponse
     {
     }
 }
