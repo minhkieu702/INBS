@@ -42,7 +42,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await service.Create(customCombo, serviceCustomCombos, User);
+                await service.Create(customCombo, serviceCustomCombos);
                 return Ok();
             }
             catch (Exception ex)
@@ -63,7 +63,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await service.Update(id, customCombo, serviceCustomCombos, User);
+                await service.Update(id, customCombo, serviceCustomCombos);
                 return Ok();
             }
             catch (Exception ex)
