@@ -15,7 +15,7 @@ namespace INBS.Application.Services
 {
     public class UserService : IUserService
     {
-        public const string DEFAULT_IMAGE_URL = "https://your-default-image-url.com/default.png";
+        private const string DEFAULT_IMAGE_URL = "https://your-default-image-url.com/default.png";
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFirebaseService _firebaseService;
         private readonly IMapper _mapper;
@@ -58,6 +58,31 @@ namespace INBS.Application.Services
                 throw;
             }
         }
+
+        public async Task<UserResponse> Login(LoginRequest requestModel)
+        {
+            try
+            {
+                var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == requestModel.PhoneNumber);
+
+                if (user == null || !user.Any())
+                    throw new Exception("Invalid phone number or password");
+
+                var existingUser = user.First();
+
+                var verifyPassword = _passwordHasher.VerifyHashedPassword(existingUser, existingUser.PasswordHash, requestModel.Password);
+
+                if (verifyPassword != PasswordVerificationResult.Success)
+                    throw new Exception("Invalid phone number or password");
+
+                return _mapper.Map<UserResponse>(existingUser);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
 
     }
 }

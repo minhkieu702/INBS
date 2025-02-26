@@ -89,6 +89,7 @@ namespace INBS.Application.Mappers
 
             #region User
             CreateMap<UserRequest, User>();
+            CreateMap<LoginRequest, User>();
             CreateMap<User, UserResponse>();
             #endregion
 

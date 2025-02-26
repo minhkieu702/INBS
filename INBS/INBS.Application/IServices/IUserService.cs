@@ -10,5 +10,6 @@ namespace INBS.Application.IServices
     public interface IUserService
     {
         Task<UserResponse> Register(UserRequest requestModel);
+        Task<UserResponse> Login(LoginRequest requestModel);
     }
 }
