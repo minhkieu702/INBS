@@ -1,6 +1,7 @@
 ﻿
 
 using INBS.Application.DTOs.Common;
+using INBS.Application.DTOs.User.Artist;
 using INBS.Domain.Common;
 
 namespace INBS.Application.DTOs.Store
@@ -17,9 +18,9 @@ namespace INBS.Application.DTOs.Store
 
 #warning Add ArtistResponse, AdminResponse
 
-        public ICollection<StoreServiceResponse> StoreServices { get; set; } = [];
+        public ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];
 
-        public ICollection<StoreDesignResponse> StoreDesigns { get; set; } = [];
+        public ICollection<ArtistDesignResponse> ArtistDesigns { get; set; } = [];
 
     }
 }

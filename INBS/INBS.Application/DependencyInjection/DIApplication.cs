@@ -21,16 +21,16 @@ namespace INBS.Application.DependencyInjection
 
         public static void AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IAdjectiveService, AdjectiveService>();
-            services.AddScoped<IServiceService, ServiceService>();
-            services.AddScoped<ITemplateComboService, TemplateComboService>();
-            services.AddScoped<ICustomComboService, CustomComboService>();
-            services.AddScoped<IStoreService, StoreService>();
-            services.AddScoped<IDesignService, DesignService>();
-            services.AddScoped<ICustomDesignService, CustomDesignService>();
             services.AddScoped<IAccessoryService, AccessoryService>();
-            services.AddScoped<ISMSService, SMSService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAdjectiveService, AdjectiveService>();
+            services.AddScoped<IArtistService, ArtistService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<ICustomComboService, CustomComboService>();
+            services.AddScoped<ICustomDesignService, CustomDesignService>();
+            services.AddScoped<IDesignService, DesignService>();
+            services.AddScoped<IServiceService, ServiceService>();
+            services.AddScoped<IStoreService, StoreService>();
 
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using INBS.Domain.Common;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,10 @@ namespace INBS.Application.DTOs.User.User
 {
     public class UserRequest
     {
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string PhoneNumber { get; set; }
-        public int Role { get; set; }
+        public string FullName { get; set; } = string.Empty;
         public IFormFile? NewImage { get; set; }
+        public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public DateOnly DateOfBirth { get; set; }
     }
 }

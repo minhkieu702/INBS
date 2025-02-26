@@ -15,15 +15,14 @@ namespace INBS.Domain.Entities
         public User() : base()
         {
             PasswordHash = string.Empty;
-            Preferences = string.Empty;
-            Email = string.Empty;
+            Username = string.Empty;
             Notifications = [];
             ImageUrl = string.Empty;
         }
 
         public string? FullName { get; set; }
 
-        public string Email { get; set; }
+        public string Username { get; set; }
 
         public string PasswordHash { get; set; }
 
@@ -34,9 +33,9 @@ namespace INBS.Domain.Entities
 
         public int Role { get; set; } //Customer, Artist, Admin
 
-        public string ImageUrl { get; set; }
+        public DateOnly DateOfBirth { get; set; }
 
-        public string? Preferences { get; set; }
+        public string ImageUrl { get; set; }
 
         [InverseProperty(nameof(Customer.User))]
         public virtual Customer? Customer { get; set; }

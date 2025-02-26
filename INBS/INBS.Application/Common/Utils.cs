@@ -1,15 +1,67 @@
 ﻿using INBS.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace INBS.Application.Common
 {
     public static class Utils
     {
+        public static string HashedPassword(string password)
+        {
+            try
+            {
+                var passwordHasher = new PasswordHasher<User>();
+
+                var hashedPassword = passwordHasher.HashPassword(new User(), password);
+
+                return hashedPassword;
+            }
+            catch (Exception ex)
+            {
+                throw new SecurityException("An error occurred while hashing the password.", ex);
+            }
+        }
+
+        public static string RemoveNonAlphabetic(string input)
+        {
+            return Regex.Replace(input, "[^a-zA-Z]", "");
+        }
+
+        private static string RemoveDiacritics(string text)
+        {
+            string normalizedString = text.Normalize(NormalizationForm.FormD);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (char c in normalizedString)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+        public static string TransToUsername(string fullname)
+        {
+            var partOfName = RemoveDiacritics(fullname).ToLower().Split(" ");
+            var username = partOfName[partOfName.Length - 1];
+            for (int i = 0; i < partOfName.Length - 2; i++)
+            {
+                username += partOfName[i][0];
+            }
+            return username;
+        }
+
         public static async Task<(List<Color> colors, List<Occasion> occasions, List<PaintType> paintTypes, List<SkinTone> skintones)> GetPreferenceAsync()
         {
             List<Color> tempColors = [];

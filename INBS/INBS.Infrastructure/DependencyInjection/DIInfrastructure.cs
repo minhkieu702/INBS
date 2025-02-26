@@ -13,6 +13,8 @@ using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using INBS.Application.Interfaces;
 using INBS.Infrastructure.Integrations;
+using INBS.Application.Services;
+using INBS.Application.IServices;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -90,6 +92,8 @@ namespace Infrastructure.DependencyInjection
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<IFirebaseService, FirebaseService>();
+
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
         }
 
         public static void AddRepositories(this IServiceCollection services)

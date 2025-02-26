@@ -13,15 +13,11 @@ namespace INBS.Application.DTOs.Common
         protected BaseEntity()
         {
             ID = Guid.NewGuid();
-            IsDeleted = false;
             LastModifiedAt = DateTime.Now;
         }
 
         [Key]
         public Guid ID { get; set; }
-
-        [JsonIgnore]
-        public bool IsDeleted { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

@@ -24,7 +24,11 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(User.Artist))]
         public virtual User? User { get; set; }
 
-        public Guid StoreID { get; set; }
+        public int YearsOfExperience { get; set; }
+
+        public int Level { get; set; }
+
+        public Guid StoreId { get; set; }
         [InverseProperty(nameof(Store.Artists))]
         public virtual Store? Store { get; set; }
 

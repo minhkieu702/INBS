@@ -18,9 +18,5 @@ namespace INBS.Application.DTOs.Store
         public IFormFile? NewImage { get; set; }
 
         public int Status { get; set; }
-
-        public IList<Guid> DesignIds { get; set; } = [];
-
-        public IList<Guid> ServiceIds { get; set; } = [];
     }
 }

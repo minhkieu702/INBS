@@ -2,6 +2,8 @@
 using Firebase.Storage;
 using INBS.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Google.Apis.Auth.OAuth2;
+using FirebaseAdmin.Auth;
 
 namespace INBS.Infrastructure.Integrations
 {
@@ -91,5 +93,4 @@ namespace INBS.Infrastructure.Integrations
             }
         }
     }
-
 }

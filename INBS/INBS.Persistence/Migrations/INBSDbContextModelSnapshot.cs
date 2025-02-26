@@ -95,12 +95,18 @@ namespace INBS.Persistence.Migrations
                     b.Property<Guid>("ID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StoreID")
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StoreId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("YearsOfExperience")
+                        .HasColumnType("int");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("StoreID");
+                    b.HasIndex("StoreId");
 
                     b.ToTable("Artists");
                 });
@@ -362,6 +368,9 @@ namespace INBS.Persistence.Migrations
                 {
                     b.Property<Guid>("ID")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Preferences")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
 
@@ -642,32 +651,11 @@ namespace INBS.Persistence.Migrations
                     b.Property<Guid>("CustomComboId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("NumerialOrder")
-                        .HasColumnType("int");
-
                     b.HasKey("ServiceId", "CustomComboId");
 
                     b.HasIndex("CustomComboId");
 
                     b.ToTable("ServiceCustomCombos");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.ServiceTemplateCombo", b =>
-                {
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TemplateComboId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("NumerialOrder")
-                        .HasColumnType("int");
-
-                    b.HasKey("ServiceId", "TemplateComboId");
-
-                    b.HasIndex("TemplateComboId");
-
-                    b.ToTable("ServiceTemplateCombos");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Store", b =>
@@ -709,33 +697,6 @@ namespace INBS.Persistence.Migrations
                     b.ToTable("Stores");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.TemplateCombo", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("TemplateCombos");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("ID")
@@ -745,9 +706,8 @@ namespace INBS.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
 
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
@@ -769,11 +729,12 @@ namespace INBS.Persistence.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Preferences")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Role")
                         .HasColumnType("int");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
 
@@ -820,7 +781,7 @@ namespace INBS.Persistence.Migrations
 
                     b.HasOne("INBS.Domain.Entities.Store", "Store")
                         .WithMany("Artists")
-                        .HasForeignKey("StoreID")
+                        .HasForeignKey("StoreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1086,25 +1047,6 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.ServiceTemplateCombo", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Service", "Service")
-                        .WithMany("ServiceTemplateCombos")
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("INBS.Domain.Entities.TemplateCombo", "TemplateCombo")
-                        .WithMany("ServiceTemplateCombos")
-                        .HasForeignKey("TemplateComboId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Service");
-
-                    b.Navigation("TemplateCombo");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Store", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.Admin", "Admin")
@@ -1199,18 +1141,11 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("CategoryServices");
 
                     b.Navigation("ServiceCustomCombos");
-
-                    b.Navigation("ServiceTemplateCombos");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Store", b =>
                 {
                     b.Navigation("Artists");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.TemplateCombo", b =>
-                {
-                    b.Navigation("ServiceTemplateCombos");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.User", b =>

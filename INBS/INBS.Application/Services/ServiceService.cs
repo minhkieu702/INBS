@@ -119,13 +119,14 @@ namespace INBS.Application.Services
         {
             try
             {
-                var services = await _unitOfWork.ServiceRepository.GetAsync(
-                    include: 
-                    s => s.Where(s => !s.IsDeleted)
-                    .Include(c => c.CategoryServices)
-                    //.Include(s => s.ServiceCustomCombos).ThenInclude(scc => scc.CustomCombo)
-                    .Include(s => s.ServiceTemplateCombos.Where(stc => stc.TemplateCombo != null && !stc.TemplateCombo.IsDeleted)).ThenInclude(stc => stc.TemplateCombo)
-                    ) ?? throw new Exception("Something was wrong!");
+                var services = await _unitOfWork.ServiceRepository.GetAsync(include: s => s.Where(service => !service.IsDeleted)
+                  .Include(service => service.CategoryServices)
+                  .Include(service => service.ServiceCustomCombos
+                    .Where(scc => !scc.CustomCombo!.IsDeleted && !scc.CustomCombo.Customer!.User!.IsDeleted))
+                    .ThenInclude(scc => scc.CustomCombo!)
+                    .ThenInclude(customCombo => customCombo.Customer!)
+                    .ThenInclude(customer => customer.User!)
+                ) ?? throw new Exception("Something went wrong!");
 
                 var responses = _mapper.Map<IEnumerable<ServiceResponse>>(services);
 
