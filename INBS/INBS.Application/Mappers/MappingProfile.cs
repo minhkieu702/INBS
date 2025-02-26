@@ -38,13 +38,6 @@ namespace INBS.Application.Mappers
             CreateMap<Service, ServiceResponse>();
             #endregion
 
-            #region TemplateCombo
-            CreateMap<TemplateComboRequest, TemplateCombo>();
-            CreateMap<TemplateCombo, TemplateComboResponse>();
-            CreateMap<ServiceTemplateComboRequest, ServiceTemplateCombo>();
-            CreateMap<ServiceTemplateCombo, ServiceTemplateComboResponse>();
-            #endregion
-
             #region CustomCombo
             CreateMap<CustomComboRequest, CustomCombo>();
             CreateMap<CustomCombo, CustomComboResponse>();

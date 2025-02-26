@@ -391,19 +391,6 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region ServiceTemplateCombo
-        private IGenericRepository<ServiceTemplateCombo>? _serviceTemplateComboRepository;
-
-        public IGenericRepository<ServiceTemplateCombo> ServiceTemplateComboRepository
-        {
-            get
-            {
-                _serviceTemplateComboRepository ??= new GenericRepository<ServiceTemplateCombo>(_context);
-                return _serviceTemplateComboRepository;
-            }
-        }
-        #endregion
-
         #region SkinTone
         private IGenericRepository<SkinTone>? _skinToneRepository;
 
@@ -426,19 +413,6 @@ namespace INBS.Persistence.Repository
             {
                 _storeRepository ??= new GenericRepository<Store>(_context);
                 return _storeRepository;
-            }
-        }
-        #endregion
-
-        #region TemplateCombo
-        private IGenericRepository<TemplateCombo>? _templateComboRepository;
-
-        public IGenericRepository<TemplateCombo> TemplateComboRepository
-        {
-            get
-            {
-                _templateComboRepository ??= new GenericRepository<TemplateCombo>(_context);
-                return _templateComboRepository;
             }
         }
         #endregion

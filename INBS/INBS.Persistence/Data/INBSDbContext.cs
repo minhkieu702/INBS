@@ -67,11 +67,7 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<ServiceCustomCombo> ServiceCustomCombos { get; set; }
 
-        public virtual DbSet<ServiceTemplateCombo> ServiceTemplateCombos { get; set; }
-
         public virtual DbSet<Store> Stores { get; set; }
-
-        public virtual DbSet<TemplateCombo> TemplateCombos { get; set; }
 
         public virtual DbSet<User> Users { get; set; }
 
@@ -82,7 +78,6 @@ namespace INBS.Persistence.Data
             modelBuilder.Entity<ArtistDesign>().HasKey(c => new { c.ArtistId, c.DesignId });
             modelBuilder.Entity<ArtistService>().HasKey(c => new { c.ArtistId, c.ServiceId });
             modelBuilder.Entity<ServiceCustomCombo>().HasKey(c => new { c.ServiceId, c.CustomComboId });
-            modelBuilder.Entity<ServiceTemplateCombo>().HasKey(c => new { c.ServiceId, c.TemplateComboId });
             modelBuilder.Entity<DesignPreference>().HasKey(c => new { c.DesignId, c.PreferenceId, c.PreferenceType });
             modelBuilder.Entity<CustomerPreference>().HasKey(c => new { c.CustomerId, c.PreferenceId, c.PreferenceType });
             modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
