@@ -28,7 +28,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -46,7 +46,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return new BadRequestObjectResult(ex.Message);
             }
         }
         /// <summary>
@@ -63,7 +63,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return new BadRequestObjectResult(ex.Message);
             }
         }
         /// <summary>
@@ -90,7 +90,7 @@ namespace INBS.API.Controllers
 
             {
 
-                return BadRequest(new { message = ex.Message });
+                return new BadRequestObjectResult(ex.Message);
 
             }
 
@@ -112,7 +112,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -133,7 +133,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return new BadRequestObjectResult(ex.Message);
             }
         }
     }

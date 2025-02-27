@@ -35,7 +35,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return new BadRequestObjectResult(ex.Message);  
             }
         }
 
@@ -54,7 +54,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return Ok(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -74,7 +74,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return Ok(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -93,7 +93,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return Ok(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
     }
