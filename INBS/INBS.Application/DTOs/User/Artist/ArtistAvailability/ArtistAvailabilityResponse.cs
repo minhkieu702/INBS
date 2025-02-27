@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.Common;
+﻿using INBS.Application.DTOs.Booking;
+using INBS.Application.DTOs.Common;
 using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,6 @@ namespace INBS.Application.DTOs.User.Artist.ArtistAvailability
         public int BreakTime { get; set; } //minute
         public int MaximumBreakTime { get; set; }
         public virtual ArtistResponse? Artist { get; set; }
-        //public virtual ICollection<BookingResponse> Bookings { get; set; }
+        public virtual ICollection<BookingResponse> Bookings { get; set; } = [];
     }
 }
