@@ -3,6 +3,9 @@ using INBS.Application.DTOs.User.User;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace INBS.API.Controllers
 {
@@ -28,7 +31,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -44,11 +47,11 @@ namespace INBS.API.Controllers
             try
             {
                 await service.Create(artistRequest, userRequest);
-                return Ok();
+                return new OkResult();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -69,7 +72,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -88,7 +91,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
     }

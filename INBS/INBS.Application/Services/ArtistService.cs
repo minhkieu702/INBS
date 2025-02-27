@@ -24,7 +24,7 @@ namespace INBS.Application.Services
         private async Task IsUniquePhoneNumber(string phoneNumber, Guid? userId = null)
         {
             var artist = await _unitOfWork.UserRepository.GetAsync(c => c.ID != userId && c.PhoneNumber == phoneNumber);
-            if (artist != null)
+            if (artist.Any())
             {
                 throw new Exception("Phone number already exists");
             }
@@ -79,31 +79,40 @@ namespace INBS.Application.Services
         {
             var username = Utils.TransToUsername(fullname);
             
-            var users = await _unitOfWork.UserRepository.GetAsync(c => Utils.RemoveNonAlphabetic(c.Username) == username);
+            var users = await _unitOfWork.UserRepository.GetAsync(c => c.Username.Equals(username));
 
             return users.Any() ? username += users.Count() : username;
         }
 
         public async Task<User> CreateUser(UserRequest userRequest)
         {
-            await IsUniquePhoneNumber(userRequest.PhoneNumber);
+            try
+            {
+                await IsUniquePhoneNumber(userRequest.PhoneNumber);
 
-            var user = _mapper.Map<User>(userRequest);
-            
-            user.Username = await GetUsername(userRequest.FullName);
-            
-            user.PasswordHash = _authentication.HashedPassword(user, "password123!@#");
-            
-            user.Role = (int)Role.Artist;
+                var user = _mapper.Map<User>(userRequest);
 
-            user.IsVerified = true;
-            
-            if (userRequest.NewImage != null)
-                user.ImageUrl = await _firebaseService.UploadFileAsync(userRequest.NewImage);
-            
-            await _unitOfWork.UserRepository.InsertAsync(user);
-            
-            return user;
+                user.Username = await GetUsername(userRequest.FullName);
+
+                user.PasswordHash = _authentication.HashedPassword(user, "password123!@#");
+
+                user.Role = (int)Role.Artist;
+
+                user.IsVerified = true;
+
+                user.ImageUrl = userRequest.NewImage != null ?
+                    await _firebaseService.UploadFileAsync(userRequest.NewImage) :
+                    Constants.DEFAULT_IMAGE_URL;
+
+                await _unitOfWork.UserRepository.InsertAsync(user);
+
+                return user;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task<ArtistResponse> Create(ArtistRequest artistRequestModel, UserRequest userRequestModel)
