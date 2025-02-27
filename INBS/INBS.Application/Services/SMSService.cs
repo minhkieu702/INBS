@@ -13,8 +13,8 @@ namespace INBS.Application.Services
 {
     public class SMSService : ISMSService
     {
-        private readonly string _accountSid = Environment.GetEnvironmentVariable("Twilio:accountSid") ?? string.Empty;
-        private readonly string _authToken = Environment.GetEnvironmentVariable("Twilio:authToken") ?? string.Empty;
+        private readonly string _accountSid = Environment.GetEnvironmentVariable("Twilio:AccountSid") ?? string.Empty;
+        private readonly string _authToken = Environment.GetEnvironmentVariable("Twilio:AuthToken") ?? string.Empty;
         private readonly string _fromNumber = Environment.GetEnvironmentVariable("Twilio:FromNumber") ?? string.Empty;
 
         public async Task SendOtpSmsAsync(string toNumber, string otp)
