@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using INBS.Application.Common;
+using INBS.Application.Common.Enum;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Artist.ArtistAvailability;
 using INBS.Application.DTOs.User.User;
@@ -92,6 +93,10 @@ namespace INBS.Application.Services
             user.Username = await GetUsername(userRequest.FullName);
             
             user.PasswordHash = _authentication.HashedPassword(user, "password123!@#");
+            
+            user.Role = (int)Role.Artist;
+
+            user.IsVerified = true;
             
             if (userRequest.NewImage != null)
                 user.ImageUrl = await _firebaseService.UploadFileAsync(userRequest.NewImage);
