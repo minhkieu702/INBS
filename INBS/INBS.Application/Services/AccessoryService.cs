@@ -54,8 +54,12 @@ namespace INBS.Application.Services
             try
             {
                 var existedEntity = await _unitOfWork.AccessoryRepository.GetByIdAsync(id) ?? throw new Exception("This accessory was already existed");
-
-                await _unitOfWork.AccessoryRepository.DeleteAsync(id);
+                existedEntity.IsDeleted = true;
+                await _unitOfWork.AccessoryRepository.UpdateAsync(existedEntity);
+                if (await _unitOfWork.SaveAsync() <= 0)
+                {
+                    throw new Exception("This action failed");
+                }
             }
             catch (Exception)
             {

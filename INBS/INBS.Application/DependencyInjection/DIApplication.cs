@@ -16,6 +16,7 @@ namespace INBS.Application.DependencyInjection
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddServices();
+            services.AddHttpContextAccessor();
             return services;
         }
 
@@ -31,6 +32,9 @@ namespace INBS.Application.DependencyInjection
             services.AddScoped<IDesignService, DesignService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IStoreService, StoreService>();
+
+            services.AddScoped<ISMSService, SMSService>();
+
 
         }
     }
