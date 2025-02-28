@@ -23,6 +23,8 @@ app.UseRouting();
 
 app.UseCors("AllowAnyOrigins");
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

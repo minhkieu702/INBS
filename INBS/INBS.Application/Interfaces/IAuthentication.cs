@@ -12,9 +12,10 @@ namespace INBS.Application.Interfaces
 {
     public interface IAuthentication
     {
-        string HashedPassword(string password);
+        string HashedPassword(User user, string password);
         Task<string> GenerateDefaultTokenAsync(User user);
         Guid GetUserIdFromHttpContext(HttpContext httpContext);
         Task<string> GenerateRefreshTokenAsync(User user);
+        bool VerifyPassword(User user, string password);
     }
 }

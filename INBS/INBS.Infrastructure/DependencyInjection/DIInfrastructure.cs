@@ -15,6 +15,7 @@ using INBS.Application.Interfaces;
 using INBS.Infrastructure.Integrations;
 using INBS.Application.Services;
 using INBS.Application.IServices;
+using INBS.Infrastructure.Authentication;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -82,7 +83,7 @@ namespace Infrastructure.DependencyInjection
             //Quartz
             //services.AddQuartz();
 
-            //services.AddHttpClient();
+            services.AddHttpClient();
 
             return services;
         }
@@ -93,7 +94,7 @@ namespace Infrastructure.DependencyInjection
         {
             services.AddScoped<IFirebaseService, FirebaseService>();
 
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IAuthentication, Authentication>();
         }
 
         public static void AddRepositories(this IServiceCollection services)
@@ -107,21 +108,21 @@ namespace Infrastructure.DependencyInjection
 
         public static void AddAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(options =>
-            //    {
-            //        options.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateIssuer = true,
-            //            ValidateAudience = true,
-            //            ValidateLifetime = true,
-            //            RequireExpirationTime = true,
-            //            ClockSkew = TimeSpan.Zero,
-            //            ValidIssuer = config["Jwt:Issuer"],
-            //            ValidAudience = config["Jwt:Audience"],
-            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
-            //        };
-            //    });
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        RequireExpirationTime = true,
+                        ClockSkew = TimeSpan.Zero,
+                        ValidIssuer = Environment.GetEnvironmentVariable("JWTSettings:Issuer") ?? throw new InvalidOperationException("Issuer is not configured."),
+                        ValidAudience = Environment.GetEnvironmentVariable("JWTSettings:Audience") ?? throw new InvalidOperationException("Audience is not configured."),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWTSettings:Key") ?? throw new InvalidOperationException("Key is not configured.")))
+                    };
+                });
         }
     }
 }

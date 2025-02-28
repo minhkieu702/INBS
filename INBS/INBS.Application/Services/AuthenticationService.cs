@@ -1,41 +1,222 @@
 ﻿using AutoMapper;
-using INBS.Application.DTOs.User.User;
+using INBS.Application.Common.Enum;
+using INBS.Application.DTOs.Authentication;
+using INBS.Application.DTOs.Authentication.Customer;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
+using INBS.Domain.Common;
+using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class AuthenticationService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper) : IAuthenticationService
+    public class AuthenticationService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper, IAuthentication _authentication, ISMSService _smsService) : IAuthenticationService
     {
-        public Task ConfirmOTP(string verificationId, string otp)
+        public async Task<LoginResponse> LoginCustomer(string phone, string password)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phone);
+
+                if (user == null || !user.Any())
+                    throw new Exception("Invalid phone number or password");
+
+                var existingUser = user.First();
+                if (!existingUser.IsVerified)
+                    throw new Exception("Phone number is not verified. Please verify your OTP first.");
+
+                var verifyPassword = _authentication.VerifyPassword(existingUser, password);
+                if (!verifyPassword)
+                    throw new Exception("Invalid phone number or password");
+
+                var accessToken = await _authentication.GenerateDefaultTokenAsync(existingUser);
+                var refreshToken = await _authentication.GenerateRefreshTokenAsync(existingUser);
+
+                return new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Task ResetPassword(string phone)
+        public async Task<LoginResponse> LoginStaff(string username, string password)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var user = await _unitOfWork.UserRepository.GetAsync(x => x.Username == username);
+
+                if(user == null || !user.Any())
+                    throw new Exception("Invalid username or password");
+
+                var existingUser = user.First();
+                if (!existingUser.IsVerified)
+                    throw new Exception("Username is not verified. Please verify your OTP first.");
+
+                var verifyPassword = _authentication.VerifyPassword(existingUser, password);
+
+                if (!verifyPassword)
+                    throw new Exception("Invalid username or password");
+
+                return new LoginResponse
+                {
+                    AccessToken = await _authentication.GenerateDefaultTokenAsync(existingUser),
+                    RefreshToken = await _authentication.GenerateRefreshTokenAsync(existingUser)
+                };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        public Task<string> SignInCustomer(string phone, string password)
+        private async Task IsUniquePhoneNumber(string phoneNumber, Guid? userId = null)
         {
-            throw new NotImplementedException();
+            var artist = await _unitOfWork.UserRepository.GetAsync(c => c.ID != userId && c.PhoneNumber == phoneNumber);
+            if (artist.Any())
+            {
+                throw new Exception("Phone number already exists");
+            }
         }
 
-        public Task<string> SignInStaff(string username, string password)
+        private void IsPasswordMatching(string password, string confirmPassword)
         {
-            throw new NotImplementedException();
+            if (password != confirmPassword)
+                throw new Exception("Password and confirm password do not match");
         }
 
-        public Task<string> SignUpCustomer(UserRequest request)
+        private async Task<User> SendOtp(User user)
         {
-            throw new NotImplementedException();
+            var otpCode = _smsService.GenerateOtp();
+            user.IsVerified = false;
+            user.OtpCode = otpCode;
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
+            //await _smsService.SendOtpSmsAsync(user.PhoneNumber ?? string.Empty, otpCode);
+            return user;
+        }
+
+        public async Task RegisterCustomer(RegisterRequest requestModel)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                
+                IsPasswordMatching(requestModel.Password, requestModel.ConfirmPassword);
+
+                await IsUniquePhoneNumber(requestModel.PhoneNumber);
+
+                var newUser = _mapper.Map<User>(requestModel);
+
+                newUser.PasswordHash = _authentication.HashedPassword(newUser, requestModel.Password);
+
+                newUser.ImageUrl = requestModel.NewImage != null ? await _firebaseService.UploadFileAsync(requestModel.NewImage) : Constants.DEFAULT_IMAGE_URL;
+
+                newUser.Role = (int)Role.Customer;
+
+                newUser = await SendOtp(newUser);
+
+                var customer = new Customer { ID = newUser.ID };
+
+                await _unitOfWork.CustomerRepository.InsertAsync(customer);
+
+                await _unitOfWork.UserRepository.InsertAsync(newUser);
+
+                if (await _unitOfWork.SaveAsync() == 0)
+                    throw new Exception("User registration failed");
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
+        public async Task<string> ResetPasswordCustomer(string phone, string newPassword, string confirmPassword)
+        {
+            try
+            {
+                IsPasswordMatching(newPassword, confirmPassword);
+
+                var user = (await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phone)).FirstOrDefault();
+
+                if (user == null)
+                    throw new Exception("Phone number is not registered");
+
+                user.PasswordHash = _authentication.HashedPassword(user, newPassword);
+
+                user = await SendOtp(user);
+
+                await _unitOfWork.UserRepository.UpdateAsync(user);
+
+                return user.PhoneNumber!;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<string> ResetPasswordStaff(string username, string newPassword, string confirmPassword)
+        {
+            try
+            {
+                IsPasswordMatching(newPassword, confirmPassword);
+
+                var user = (await _unitOfWork.UserRepository.GetAsync(x => x.Username == username)).FirstOrDefault();
+
+                if (user == null)
+                    throw new Exception("Username not found");
+
+                user.PasswordHash = _authentication.HashedPassword(user, newPassword);
+
+                user = await SendOtp(user);
+
+                await _unitOfWork.UserRepository.UpdateAsync(user);
+
+                return user.PhoneNumber!;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<LoginResponse> VerifyOtpAsync(string phoneNumber, string otp)
+        {
+            var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phoneNumber);
+
+            if (user == null || !user.Any())
+                throw new Exception("Phone number is not registered");
+
+            var existingUser = user.First();
+
+            if (existingUser.OtpCode != otp || existingUser.OtpExpiry < DateTime.UtcNow)
+                throw new Exception("Invalid or expired OTP");
+
+            existingUser.IsVerified = true;
+            existingUser.OtpCode = null;
+            existingUser.OtpExpiry = null;
+
+            await _unitOfWork.UserRepository.UpdateAsync(existingUser);
+
+            await _unitOfWork.SaveAsync();
+
+            return new LoginResponse
+            {
+                AccessToken = await _authentication.GenerateDefaultTokenAsync(existingUser),
+                RefreshToken = await _authentication.GenerateRefreshTokenAsync(existingUser)
+            };
         }
     }
 }

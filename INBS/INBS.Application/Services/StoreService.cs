@@ -31,7 +31,7 @@ namespace INBS.Application.Services
                 var newEntity = _mapper.Map<Store>(modelRequest);
 
                 newEntity.AdminId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                    "7d9e01f9-d23a-403c-b496-097af797de02");
+                    "E492D8F4-43EE-4AE2-BE26-6128E2D8C582");
 
                 newEntity.ImageUrl = modelRequest.NewImage != null ? await _firebaseService.UploadFileAsync(modelRequest.NewImage) : Constants.DEFAULT_IMAGE_URL;
 

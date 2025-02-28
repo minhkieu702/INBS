@@ -7,10 +7,10 @@ using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Design.Preference;
 using INBS.Application.DTOs.Service.CustomCombo;
 using INBS.Application.DTOs.Service.Service;
-using INBS.Application.DTOs.Service.ServiceTemplateCombo;
-using INBS.Application.DTOs.Service.TemplateCombo;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.Artist;
+using INBS.Application.DTOs.User.Artist.ArtistAvailability;
+using INBS.Application.DTOs.User.Customer;
 using INBS.Domain.Entities;
 using INBS.Persistence.DependencyInjection;
 using Infrastructure.DependencyInjection;
@@ -58,10 +58,10 @@ namespace INBS.API.AppStart
                     // Define OData Entity Sets
                     var odataBuilder = new ODataConventionModelBuilder();
                     odataBuilder.EntitySet<AccessoryResponse>("Accessory");
+                    odataBuilder.EntitySet<ArtistResponse>("Artist");
+                    odataBuilder.EntitySet<ArtistAvailabilityResponse>("ArtistAvailability");
                     odataBuilder.EntitySet<CategoryServiceResponse>("CategoryService");
                     odataBuilder.EntitySet<ServiceResponse>("Service");
-                    odataBuilder.EntitySet<TemplateComboResponse>("TemplateCombo");
-                    odataBuilder.EntitySet<ServiceTemplateComboResponse>("ServiceTemplateCombo");
                     odataBuilder.EntitySet<CustomComboResponse>("CustomCombo");
                     odataBuilder.EntitySet<ServiceCustomComboResponse>("ServiceCustomCombo");
                     odataBuilder.EntitySet<DesignResponse>("Design");
@@ -75,6 +75,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<Color>("Color");
                     odataBuilder.EntitySet<Category>("Category");
                     odataBuilder.EntitySet<CustomDesignResponse>("CustomDesign");
+                    odataBuilder.EntitySet<CustomerResponse>("CustomerResponse");
 
                     // Add OData route components
                     opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())

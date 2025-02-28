@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Booking
+namespace INBS.Application.Common.Enum
 {
-    public class BookingResponse
+    public enum Role
     {
+        Customer = 0,
+        Artist = 1,
+        Admin = 2
     }
 }

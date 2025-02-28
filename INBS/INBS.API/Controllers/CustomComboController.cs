@@ -27,7 +27,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -35,19 +35,19 @@ namespace INBS.API.Controllers
         /// Creates a new custom combo.
         /// </summary>
         /// <param name="customCombo">The custom combo request.</param>
-        /// <param name="serviceCustomCombos">The list of service custom combo requests.</param>
+        /// <param name="additionalServiceIds">The list of service custom combo requests.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CustomComboRequest customCombo, [FromForm] IList<ServiceCustomComboRequest> serviceCustomCombos)
+        public async Task<IActionResult> Create([FromForm] CustomComboRequest customCombo, [FromForm] IList<Guid> additionalServiceIds)
         {
             try
             {
-                await service.Create(customCombo, serviceCustomCombos);
+                await service.Create(customCombo, additionalServiceIds);
                 return Ok();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -56,19 +56,19 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the custom combo to update.</param>
         /// <param name="customCombo">The custom combo request.</param>
-        /// <param name="serviceCustomCombos">The list of service custom combo requests.</param>
+        /// <param name="additionalServiceIds">The list of service custom combo requests.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] CustomComboRequest customCombo, [FromForm] IList<ServiceCustomComboRequest> serviceCustomCombos)
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] CustomComboRequest customCombo, [FromForm] IList<Guid> additionalServiceIds)
         {
             try
             {
-                await service.Update(id, customCombo, serviceCustomCombos);
+                await service.Update(id, customCombo, additionalServiceIds);
                 return Ok();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -87,7 +87,7 @@ namespace INBS.API.Controllers
             }
             catch (Exception ex)
             {
-                return Ok(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
             }
         }
     }

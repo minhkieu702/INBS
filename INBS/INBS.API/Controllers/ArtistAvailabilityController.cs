@@ -1,35 +1,34 @@
-﻿using INBS.Application.DTOs.Design.Design;
-using INBS.Application.DTOs.Store;
+﻿using INBS.Application.DTOs.User.Artist.ArtistAvailability;
 using INBS.Application.IServices;
-using INBS.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
 namespace INBS.API.Controllers
 {
     /// <summary>
-    /// Controller for managing store operations.
+    /// Controller for managing artist availability.
     /// </summary>
     /// <remarks>
-    /// Initializes a new instance of the <see cref="StoreController"/> class.
+    /// Initializes a new instance of the <see cref="ArtistAvailabilityController"/> class.
     /// </remarks>
-    /// <param name="service">The store service.</param>
+    /// <param name="service">The artist availability service.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class StoreController(IStoreService service) : ControllerBase
+    public class ArtistAvailabilityController(IArtistAvailabilityService service) : ControllerBase
     {
+
         /// <summary>
-        /// Gets the list of stores.
+        /// Gets the list of artist availabilities.
         /// </summary>
-        /// <returns>A list of stores.</returns>
+        /// <returns>A list of artist availabilities.</returns>
         [HttpGet]
         [EnableQuery]
         public async Task<IActionResult> Get()
         {
             try
             {
-                var stores = await service.Get();
-                return Ok(stores.AsQueryable());
+                var result = await service.Get();
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -38,16 +37,16 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Creates a new store.
+        /// Creates a new artist availability.
         /// </summary>
-        /// <param name="store">The store creation request.</param>
+        /// <param name="request">The artist availability request.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] StoreRequest store)
+        public async Task<IActionResult> Create([FromForm] ArtistAvailabilityRequest request)
         {
             try
             {
-                await service.Create(store, User);
+                await service.Create(request);
                 return Ok();
             }
             catch (Exception ex)
@@ -57,17 +56,17 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Updates an existing store.
+        /// Updates an existing artist availability.
         /// </summary>
-        /// <param name="id">The store ID.</param>
-        /// <param name="store">The store update request.</param>
+        /// <param name="id">The ID of the artist availability to update.</param>
+        /// <param name="request">The artist availability request.</param>
         /// <returns>An action result.</returns>
-        [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] StoreRequest store)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromForm] ArtistAvailabilityRequest request)
         {
             try
             {
-                await service.Update(id, store);
+                await service.Update(id, request);
                 return Ok();
             }
             catch (Exception ex)
@@ -77,12 +76,12 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Deletes a store by ID.
+        /// Deletes an existing artist availability.
         /// </summary>
-        /// <param name="id">The store ID.</param>
+        /// <param name="id">The ID of the artist availability to delete.</param>
         /// <returns>An action result.</returns>
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromQuery] Guid id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
             try
             {

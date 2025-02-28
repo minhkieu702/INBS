@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Booking
+namespace INBS.Domain.Common
 {
-    public class BookingResponse
+    internal class Enum
     {
     }
 }
