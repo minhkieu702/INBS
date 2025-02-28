@@ -1,37 +1,33 @@
 ﻿using INBS.Application.DTOs.User.Artist.ArtistAvailability;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace INBS.API.Controllers
 {
     /// <summary>
     /// Controller for managing artist availability.
     /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="ArtistAvailabilityController"/> class.
+    /// </remarks>
+    /// <param name="service">The artist availability service.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class ArtistAvailabilityController : ControllerBase
+    public class ArtistAvailabilityController(IArtistAvailabilityService service) : ControllerBase
     {
-        private readonly IArtistAvailabilityService _service;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ArtistAvailabilityController"/> class.
-        /// </summary>
-        /// <param name="service">The artist availability service.</param>
-        public ArtistAvailabilityController(IArtistAvailabilityService service)
-        {
-            _service = service;
-        }
 
         /// <summary>
         /// Gets the list of artist availabilities.
         /// </summary>
         /// <returns>A list of artist availabilities.</returns>
         [HttpGet]
+        [EnableQuery]
         public async Task<IActionResult> Get()
         {
             try
             {
-                var result = await _service.Get();
+                var result = await service.Get();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -50,7 +46,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await _service.Create(request);
+                await service.Create(request);
                 return Ok();
             }
             catch (Exception ex)
@@ -70,7 +66,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await _service.Update(id, request);
+                await service.Update(id, request);
                 return Ok();
             }
             catch (Exception ex)
@@ -89,7 +85,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await _service.Delete(id);
+                await service.Delete(id);
                 return Ok();
             }
             catch (Exception ex)

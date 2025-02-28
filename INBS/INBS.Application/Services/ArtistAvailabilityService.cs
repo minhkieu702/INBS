@@ -1,26 +1,66 @@
 ﻿using AutoMapper;
 using INBS.Application.DTOs.User.Artist.ArtistAvailability;
 using INBS.Application.IServices;
+using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
     public class ArtistAvailabilityService(IUnitOfWork _unitOfWork, IMapper _mapper) : IArtistAvailabilityService
     {
-        public Task Create(ArtistAvailabilityRequest requestModel)
+        private static void IsLessThanMaximumBreakTime(ArtistAvailabilityRequest requestModel)
         {
-            throw new NotImplementedException();
+            if (requestModel.MaximumBreakTime < requestModel.BreakTime)
+            {
+                throw new Exception("Break time must be less than maximum break time");
+            }
         }
 
-        public Task Delete(Guid id)
+        public async Task Create(ArtistAvailabilityRequest requestModel)
         {
-            throw new NotImplementedException();
+            try
+            {
+                IsLessThanMaximumBreakTime(requestModel);
+
+                var result = await _unitOfWork.ArtistAvailabilityRepository.GetAsync(include: query => query.Where(aa => aa.ArtistId == requestModel.ArtistId && aa.AvailableDate == requestModel.AvailableDate));
+                
+                if (result.Any())
+                {
+                    throw new Exception("This artist availability already exists");
+                }
+
+                var artistAvailability = _mapper.Map<ArtistAvailability>(requestModel);
+
+                await _unitOfWork.ArtistAvailabilityRepository.InsertAsync(artistAvailability);
+
+                if (await _unitOfWork.SaveAsync() <= 0)
+                    throw new Exception("This action failed");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task Delete(Guid id)
+        {
+            try
+            {
+                var result = await _unitOfWork.ArtistAvailabilityRepository.GetByIdAsync(id) ?? throw new Exception("This artist availability not found");
+
+                result.IsDeleted = true;
+
+                await _unitOfWork.ArtistAvailabilityRepository.UpdateAsync(result);
+
+                if (await _unitOfWork.SaveAsync() <= 0)
+                    throw new Exception("This action failed");
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public async Task<IEnumerable<ArtistAvailabilityResponse>> Get()
@@ -29,9 +69,9 @@ namespace INBS.Application.Services
 			{
                 var result = await _unitOfWork.ArtistAvailabilityRepository.GetAsync(include: query => 
                     query
-                    .Where(aa => !aa.IsDeleted && aa.Artist!.User!.IsDeleted)
                     .Include(aa => aa.Artist).ThenInclude(a => a!.User)
                     .Include(aa => aa.Bookings)
+                    .Where(aa => !aa.IsDeleted && !aa.Artist!.User!.IsDeleted)
                     );
                 return _mapper.Map<IEnumerable<ArtistAvailabilityResponse>>(result);
             }
@@ -42,9 +82,26 @@ namespace INBS.Application.Services
 			}
         }
 
-        public Task Update(Guid id, ArtistAvailabilityRequest requestModel)
+        public async Task Update(Guid id, ArtistAvailabilityRequest requestModel)
         {
-            throw new NotImplementedException();
+            try
+            {
+                IsLessThanMaximumBreakTime(requestModel);
+
+                var result = await _unitOfWork.ArtistAvailabilityRepository.GetByIdAsync(id) ?? throw new Exception("This artist availability not found");
+
+                _mapper.Map(requestModel, result);
+
+                await _unitOfWork.ArtistAvailabilityRepository.UpdateAsync(result);
+
+                if (await _unitOfWork.SaveAsync() <= 0)
+                    throw new Exception("This action failed");
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }
