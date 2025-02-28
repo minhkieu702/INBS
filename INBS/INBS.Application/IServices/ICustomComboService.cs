@@ -12,8 +12,8 @@ namespace INBS.Application.IServices
     public interface ICustomComboService
     {
         Task<IEnumerable<CustomComboResponse>> Get();
-        Task Create(CustomComboRequest request, IList<ServiceCustomComboRequest> serviceCustomCombos);
-        Task Update(Guid id, CustomComboRequest request, IList<ServiceCustomComboRequest> serviceCustomCombos);
+        Task Create(CustomComboRequest request, IList<Guid> serviceCustomCombos);
+        Task Update(Guid id, CustomComboRequest request, IList<Guid> serviceCustomCombos);
         Task Delete(Guid id);
     }
 }

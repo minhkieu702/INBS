@@ -27,7 +27,7 @@ namespace INBS.Application.Services
         }
 
         public async Task Create(CustomComboRequest request,
-            IList<ServiceCustomComboRequest> serviceCustomCombos)
+            IList<Guid> serviceCustomCombos)
         {
             try
             {
@@ -35,13 +35,15 @@ namespace INBS.Application.Services
 
                 var cusId = _authentication.GetUserIdFromHttpContext(_contextAccesstor.HttpContext);
 
-                await ValidateService(serviceCustomCombos.Select(c => c.ServiceId));
+                await ValidateService(serviceCustomCombos);
 
                 var entity = _mapper.Map<CustomCombo>(request);
 
                 entity.CustomerID = cusId;
 
                 await _unitOfWork.CustomComboRepository.InsertAsync(entity);
+
+                serviceCustomCombos.Add(request.MainService);
 
                 await HandleServiceCustomCombo(entity.ID, serviceCustomCombos);
 
@@ -81,27 +83,47 @@ namespace INBS.Application.Services
 
         public async Task<IEnumerable<CustomComboResponse>> Get()
         {
-            var entites = await _unitOfWork.CustomComboRepository.GetAsync(include: query =>
-                query.Where(c => !c.IsDeleted)
-                    .Include(c => c.ServiceCustomCombos.Where(c => !c.CustomCombo!.IsDeleted))
+            try
+            {
+                var entites = await _unitOfWork.CustomComboRepository.GetAsync(include: query =>
+                query
+                    .Include(c => c.ServiceCustomCombos.Where(c => !c.Service!.IsDeleted))
                         .ThenInclude(c => c.Service)
-                    .Include(c => c.Customer!).ThenInclude(c => c.User!)
+                    .Include(c => c.Customer).ThenInclude(c => c!.User)
+                    .Where(c => !c.IsDeleted && !c.Customer!.User!.IsDeleted)
                     //.Include(c => c.Bookings.Where(c => !c.IsDeleted)
                     );
-            return _mapper.Map<IEnumerable<CustomComboResponse>>(entites);
+                return _mapper.Map<IEnumerable<CustomComboResponse>>(entites);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        private async Task HandleServiceCustomCombo(Guid customComboId, IList<ServiceCustomComboRequest> serviceCustomCombos)
+        private async Task HandleServiceCustomCombo(Guid customComboId, IList<Guid> serviceIds)
         {
             var oldServiceCustomCombos = await _unitOfWork.ServiceCustomComboRepository.GetAsync(c => c.CustomComboId == customComboId);
             
             if (oldServiceCustomCombos.Any())
                 _unitOfWork.ServiceCustomComboRepository.DeleteRange(oldServiceCustomCombos);
-            
-            await _unitOfWork.ServiceCustomComboRepository.InsertRangeAsync(_mapper.Map<IEnumerable<ServiceCustomCombo>>(serviceCustomCombos));
+
+            var insertServiceCustomCombos = new List<ServiceCustomCombo>();
+
+            foreach (var serviceId in serviceIds)
+            {
+                insertServiceCustomCombos.Add(new ServiceCustomCombo
+                {
+                    CustomComboId = customComboId,
+                    ServiceId = serviceId
+                });
+            }
+
+            await _unitOfWork.ServiceCustomComboRepository.InsertRangeAsync(insertServiceCustomCombos);
         }
 
-        public async Task Update(Guid id, CustomComboRequest request, IList<ServiceCustomComboRequest> serviceCustomCombos)
+        public async Task Update(Guid id, CustomComboRequest request, IList<Guid> serviceCustomCombos)
         {
             try
             {
@@ -109,7 +131,7 @@ namespace INBS.Application.Services
 
                 var entity = await _unitOfWork.CustomComboRepository.GetByIdAsync(id) ?? throw new Exception($"The entity with {id} is not existed.");
 
-                await ValidateService(serviceCustomCombos.Select(c => c.ServiceId));
+                await ValidateService(serviceCustomCombos);
 
                 await HandleServiceCustomCombo(id, serviceCustomCombos);
 

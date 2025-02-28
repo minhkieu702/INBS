@@ -8,7 +8,6 @@ namespace INBS.Application.DTOs.Service.CustomCombo
 {
     public class ServiceCustomComboRequest
     {
-        public Guid ServiceId { get; set; }
-        public int NumerialOrder { get; set; }
+        public Guid AdditionalServiceId { get; set; }
     }
 }

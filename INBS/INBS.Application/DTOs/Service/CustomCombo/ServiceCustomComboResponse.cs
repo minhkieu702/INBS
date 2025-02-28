@@ -16,6 +16,5 @@ namespace INBS.Application.DTOs.Service.CustomCombo
         [Key]
         public Guid ServiceId { get; set; }
         public ServiceResponse? Service { get; set; }
-        public int NumerialOrder { get; set; }
     }
 }
