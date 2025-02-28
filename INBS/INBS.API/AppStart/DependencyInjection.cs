@@ -10,6 +10,7 @@ using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Artist.ArtistAvailability;
+using INBS.Application.DTOs.User.Customer;
 using INBS.Domain.Entities;
 using INBS.Persistence.DependencyInjection;
 using Infrastructure.DependencyInjection;
@@ -74,6 +75,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<Color>("Color");
                     odataBuilder.EntitySet<Category>("Category");
                     odataBuilder.EntitySet<CustomDesignResponse>("CustomDesign");
+                    odataBuilder.EntitySet<CustomerResponse>("CustomerResponse");
 
                     // Add OData route components
                     opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())

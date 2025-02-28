@@ -14,7 +14,7 @@ namespace INBS.API.Controllers
     public class AuthenticationController(IAuthenticationService service) : ControllerBase
     {
         /// <summary>
-        /// Registers a new user.
+        /// Registers a new customer.
         /// </summary>
         /// <param name="request">The user registration request model.</param>
         /// <returns>The registered user details.</returns>

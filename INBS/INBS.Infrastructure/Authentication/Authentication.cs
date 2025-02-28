@@ -14,9 +14,9 @@ namespace INBS.Infrastructure.Authentication
     {
         public string GenerateJwtToken(User user, int expirationInMinutes = 30)
         {
-            var issuer = Environment.GetEnvironmentVariable("Jwt:Issuer");
-            var audience = Environment.GetEnvironmentVariable("Jwt:Audience");
-            var key = Environment.GetEnvironmentVariable("Jwt:Key");
+            var issuer = Environment.GetEnvironmentVariable("JWTSettings:Issuer");
+            var audience = Environment.GetEnvironmentVariable("JWTSettings:Audience");
+            var key = Environment.GetEnvironmentVariable("JWTSettings:Key");
 
             if (string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(key))
             {
@@ -60,7 +60,7 @@ namespace INBS.Infrastructure.Authentication
             
             if (userIdClaim == null || string.IsNullOrWhiteSpace(userIdClaim.Value))
             {
-                throw new UnauthorizedAccessException("User ID claim not found in token.");
+                throw new UnauthorizedAccessException("You must login first");
             }
 
             if (!Guid.TryParse(userIdClaim.Value, out var userId))

@@ -13,7 +13,7 @@ namespace INBS.Application.DTOs.Authentication.Customer
     {
         public string FullName { get; set; } = string.Empty;
         public IFormFile? NewImage { get; set; }
-        public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
+        public string? ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
         [Required]
         public string PhoneNumber { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;

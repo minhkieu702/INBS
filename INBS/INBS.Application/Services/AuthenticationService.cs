@@ -80,7 +80,7 @@ namespace INBS.Application.Services
         private async Task IsUniquePhoneNumber(string phoneNumber, Guid? userId = null)
         {
             var artist = await _unitOfWork.UserRepository.GetAsync(c => c.ID != userId && c.PhoneNumber == phoneNumber);
-            if (artist != null)
+            if (artist.Any())
             {
                 throw new Exception("Phone number already exists");
             }
@@ -98,7 +98,7 @@ namespace INBS.Application.Services
             user.IsVerified = false;
             user.OtpCode = otpCode;
             user.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
-            await _smsService.SendOtpSmsAsync(user.PhoneNumber ?? string.Empty, otpCode);
+            //await _smsService.SendOtpSmsAsync(user.PhoneNumber ?? string.Empty, otpCode);
             return user;
         }
 
@@ -121,6 +121,10 @@ namespace INBS.Application.Services
                 newUser.Role = (int)Role.Customer;
 
                 newUser = await SendOtp(newUser);
+
+                var customer = new Customer { ID = newUser.ID };
+
+                await _unitOfWork.CustomerRepository.InsertAsync(customer);
 
                 await _unitOfWork.UserRepository.InsertAsync(newUser);
 

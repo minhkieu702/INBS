@@ -12,6 +12,7 @@ using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Artist.ArtistAvailability;
+using INBS.Application.DTOs.User.Customer;
 using INBS.Application.DTOs.User.User;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
@@ -111,6 +112,11 @@ namespace INBS.Application.Mappers
             CreateMap<RegisterRequest, User>().AfterMap((source, dest) => { dest.ImageUrl = source.ImageUrl != null ? source.ImageUrl : Constants.DEFAULT_IMAGE_URL; });
             CreateMap<UserRequest, User>().AfterMap((source, dest) => { dest.ImageUrl = source.ImageUrl != null ? source.ImageUrl : Constants.DEFAULT_IMAGE_URL; });
             CreateMap<User, UserResponse>();
+            #endregion
+
+            #region Customer
+            CreateMap<CustomerRequest, Customer>();
+            CreateMap<Customer, CustomerResponse>();
             #endregion
 
             #region Artist
