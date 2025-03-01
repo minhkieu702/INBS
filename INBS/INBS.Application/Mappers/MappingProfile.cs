@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using INBS.Application.DTOs.Authentication.Customer;
+using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.CustomNailDesign;
