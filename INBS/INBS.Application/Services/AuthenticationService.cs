@@ -1,22 +1,17 @@
 ﻿using AutoMapper;
 using INBS.Application.Common.Enum;
 using INBS.Application.DTOs.Authentication;
-using INBS.Application.DTOs.Authentication.Customer;
+using INBS.Application.DTOs.User.User;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace INBS.Application.Services
 {
-    public class AuthenticationService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper, IAuthentication _authentication, ISMSService _smsService) : IAuthenticationService
+    public class AuthenticationService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper, IAuthentication _authentication, ISMSService _smsService, IHttpContextAccessor _contextAccesstor) : IAuthenticationService
     {
         public async Task<LoginResponse> LoginCustomer(string phone, string password)
         {
@@ -98,23 +93,54 @@ namespace INBS.Application.Services
             user.IsVerified = false;
             user.OtpCode = otpCode;
             user.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
-            //await _smsService.SendOtpSmsAsync(user.PhoneNumber ?? string.Empty, otpCode);
+            await _smsService.SendOtpSmsAsync(user.PhoneNumber ?? string.Empty, otpCode);
             return user;
         }
 
-        public async Task RegisterCustomer(RegisterRequest requestModel)
+        public async Task ChangeProfile(UserRequest requestModel)
         {
             try
             {
                 _unitOfWork.BeginTransaction();
                 
-                IsPasswordMatching(requestModel.Password, requestModel.ConfirmPassword);
+                var userId = _authentication.GetUserIdFromHttpContext(_contextAccesstor.HttpContext);
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+                
+                if (user == null)
+                    throw new Exception("User not found");
+
+                _mapper.Map(requestModel, user);
+
+                if (requestModel.NewImage != null)
+                    user.ImageUrl = await _firebaseService.UploadFileAsync(requestModel.NewImage);
+                
+                await _unitOfWork.UserRepository.UpdateAsync(user);
+
+                if (await _unitOfWork.SaveAsync() == 0)
+                    throw new Exception("Profile update failed");
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
+        public async Task RegisterCustomer(UserRequest requestModel, string password, string confirmPassword)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                
+                IsPasswordMatching(password, confirmPassword);
 
                 await IsUniquePhoneNumber(requestModel.PhoneNumber);
 
                 var newUser = _mapper.Map<User>(requestModel);
 
-                newUser.PasswordHash = _authentication.HashedPassword(newUser, requestModel.Password);
+                newUser.PasswordHash = _authentication.HashedPassword(newUser, password);
 
                 newUser.ImageUrl = requestModel.NewImage != null ? await _firebaseService.UploadFileAsync(requestModel.NewImage) : Constants.DEFAULT_IMAGE_URL;
 

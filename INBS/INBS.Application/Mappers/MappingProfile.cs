@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using INBS.Application.DTOs.Authentication.Customer;
-using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.CustomNailDesign;
@@ -28,8 +26,7 @@ namespace INBS.Application.Mappers
             CreateMap<AccessoryRequest, Accessory>()
              .AfterMap((source, dest) =>
              {
-                 dest.ImageUrl = source.ImageUrl != null ?
-                 source.ImageUrl : Constants.DEFAULT_IMAGE_URL;
+                 dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
              });
             CreateMap<Accessory, AccessoryResponse>();
             #endregion
@@ -43,8 +40,7 @@ namespace INBS.Application.Mappers
             CreateMap<ServiceRequest, Service>()
                 .AfterMap((source, dest) =>
             {
-                dest.ImageUrl = source.ImageUrl != null ?
-                source.ImageUrl : Constants.DEFAULT_IMAGE_URL;
+                dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
             }); 
             CreateMap<Service, ServiceResponse>();
             #endregion
@@ -60,8 +56,7 @@ namespace INBS.Application.Mappers
             CreateMap<StoreRequest, Store>()
                 .AfterMap((source, dest) =>
                 {
-                    dest.ImageUrl = source.ImageUrl != null ?
-                    source.ImageUrl : Constants.DEFAULT_IMAGE_URL;
+                    dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
                 }); 
             CreateMap<Store, StoreResponse>()
                 .AfterMap((src, dest) =>
@@ -82,8 +77,7 @@ namespace INBS.Application.Mappers
             CreateMap<ImageRequest, Image>()
                 .AfterMap((source, dest) =>
                 {
-                    dest.ImageUrl = source.ImageUrl != null ?
-                    source.ImageUrl : Constants.DEFAULT_IMAGE_URL;
+                    dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
                 });
             CreateMap<Image, ImageResponse>();
             
@@ -92,8 +86,7 @@ namespace INBS.Application.Mappers
             CreateMap<NailDesignRequest, NailDesign>()
                 .AfterMap((source, dest) => 
                 { 
-                    dest.ImageUrl = source.ImageUrl != null ? 
-                    source.ImageUrl : Constants.DEFAULT_IMAGE_URL; 
+                    dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL; 
                 });
             CreateMap<NailDesign, NailDesignResponse>();
             #endregion
@@ -110,8 +103,7 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region User
-            CreateMap<RegisterRequest, User>().AfterMap((source, dest) => { dest.ImageUrl = source.ImageUrl != null ? source.ImageUrl : Constants.DEFAULT_IMAGE_URL; });
-            CreateMap<UserRequest, User>().AfterMap((source, dest) => { dest.ImageUrl = source.ImageUrl != null ? source.ImageUrl : Constants.DEFAULT_IMAGE_URL; });
+            CreateMap<UserRequest, User>().AfterMap((source, dest) => { dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL; });
             CreateMap<User, UserResponse>();
             #endregion
 

@@ -1,29 +1,48 @@
-﻿using INBS.Application.DTOs.Authentication.Customer;
-using INBS.Application.Interfaces;
+﻿using INBS.Application.DTOs.User.User;
 using INBS.Application.IServices;
-using INBS.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace INBS.API.Controllers
 {
     /// <summary>
-    /// Controller for handling authenticaion.
+    /// Controller for handling authentication.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthenticationController(IAuthenticationService service) : ControllerBase
     {
         /// <summary>
-        /// Registers a new customer.
+        /// Changes the profile of a user.
         /// </summary>
-        /// <param name="request">The user registration request model.</param>
-        /// <returns>The registered user details.</returns>
-        [HttpPost("customer/register")]
-        public async Task<IActionResult> Register([FromForm] RegisterRequest request)
+        /// <param name="request">The user request model containing profile details.</param>
+        /// <returns>An IActionResult indicating the result of the operation.</returns>
+        [HttpPost("changeProfile")]
+        public async Task<IActionResult> ChangeProfile([FromForm] UserRequest request)
         {
             try
             {
-                await service.RegisterCustomer(request);
+                await service.ChangeProfile(request);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Registers a new customer.
+        /// </summary>
+        /// <param name="request">The user registration request model.</param>
+        /// <param name="confirmPassword">The confirmation of the password.</param>
+        /// <param name="password">The password.</param>
+        /// <returns>The registered user details.</returns>
+        [HttpPost("customer/register")]
+        public async Task<IActionResult> Register([FromForm] UserRequest request, [FromForm] string password, [FromForm] string confirmPassword)
+        {
+            try
+            {
+                await service.RegisterCustomer(request, password, confirmPassword);
                 return Ok();
             }
             catch (Exception ex)
@@ -94,8 +113,7 @@ namespace INBS.API.Controllers
 
             }
 
-        }
-
+        }
         /// <summary>
         /// Resets the password for a artist.
         /// </summary>
