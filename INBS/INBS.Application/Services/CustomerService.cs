@@ -43,5 +43,21 @@ namespace INBS.Application.Services
                 throw;
             }
         }
+        public async Task<string> GetPreferencesAsync(Guid customerId)
+        {
+            try
+            {
+                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
+                if (customer == null)
+                    throw new KeyNotFoundException("Customer not found");
+
+                return customer.Preferences;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
     }
 }

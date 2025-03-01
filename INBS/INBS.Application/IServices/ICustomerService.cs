@@ -11,5 +11,6 @@ namespace INBS.Application.IServices
     public interface ICustomerService
     {
         Task<Customer> UpdatePreferencesAsync(Guid customerId, PreferencesRequest request);
+        Task<string> GetPreferencesAsync(Guid customerId);
     }
 }

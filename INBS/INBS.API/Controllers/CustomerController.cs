@@ -31,6 +31,29 @@ namespace INBS.API.Controllers
                 return new BadRequestObjectResult(ex.Message);
             }
         }
-    }
 
+        /// <summary>
+        /// Gets the preferences of the authenticated customer.
+        /// </summary>
+        /// <returns>Customer preferences.</returns>
+        [HttpGet("preferences")]
+        public async Task<IActionResult> GetPreferences()
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var customerId))
+                {
+                    return BadRequest("Invalid or missing customer ID.");
+                }
+
+                var result = await service.GetPreferencesAsync(customerId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
+    }
 }
