@@ -94,7 +94,8 @@ namespace INBS.API.Controllers
 
             }
 
-        }
+        }
+
         /// <summary>
         /// Resets the password for a artist.
         /// </summary>

@@ -33,6 +33,7 @@ namespace INBS.Application.DependencyInjection
             services.AddScoped<IDesignService, DesignService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IStoreService, StoreService>();
+            services.AddScoped<ICustomerService, CustomerService>();
 
             services.AddScoped<ISMSService, SMSService>();
 
