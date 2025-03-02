@@ -7,6 +7,7 @@ using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class CustomDesignService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper) : ICustomDesignService
+    public class CustomDesignService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : ICustomDesignService
     {
         public async Task Delete(Guid id)
         {
@@ -47,7 +48,10 @@ namespace INBS.Application.Services
                 .ThenInclude(c => c.AccessoryCustomNailDesigns)
                     .ThenInclude(c => c.Accessory)
             .Include(c => c.Design)
-            //.Include(c => c.Customer)
+                .ThenInclude(c => c!.NailDesigns)
+            .Include(c => c.Customer)
+                .ThenInclude(c => c!.User)
+            .AsNoTracking()
             );
 
             return _mapper.Map<IEnumerable<CustomDesignResponse>>(customDesigns);
@@ -67,13 +71,7 @@ namespace INBS.Application.Services
             return result.Price;
         }
 
-        private Guid GetCustomerId(ClaimsPrincipal claims)
-        {
-            //var cusId = claims.FindFirst(ClaimTypes.NameIdentifier) ?? throw new Exception("You must login first");
-            return Guid.Parse(/*cusId.Value*/"E492D8F4-43EE-4AE2-BE26-6128E2D8C582");
-        }
-
-        public async Task Create(ClaimsPrincipal claims, CustomDesignRequest request, IList<CustomNailDesignRequest> customNailDesignRequests)
+        public async Task Create(CustomDesignRequest request, IList<CustomNailDesignRequest> customNailDesignRequests)
         {
             try
             {
@@ -88,9 +86,11 @@ namespace INBS.Application.Services
                     totalPrice += await ValidateAccessories(customNailDesignRequest.Acessories.Select(c => c.AccessoryId));
                 }
 
+                newEntity.CreatedAt = DateTime.Now;
+
                 newEntity.Price = totalPrice;
 
-                newEntity.CustomerID = GetCustomerId(claims);
+                newEntity.CustomerID = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
                 await _unitOfWork.CustomDesignRepository.InsertAsync(newEntity);
 
@@ -159,7 +159,7 @@ namespace INBS.Application.Services
             _unitOfWork.CustomNailDesignRepository.DeleteRange(existedCustomNailDesigns);
         }
 
-        public async Task Update(ClaimsPrincipal claims, Guid id, CustomDesignRequest request, IList<CustomNailDesignRequest> customNailDesignRequests)
+        public async Task Update(Guid id, CustomDesignRequest request, IList<CustomNailDesignRequest> customNailDesignRequests)
         {
             try
             {
@@ -183,7 +183,7 @@ namespace INBS.Application.Services
 
                 existedEntity.Price = totalPrice;
 
-                existedEntity.CustomerID = GetCustomerId(claims);
+                existedEntity.CustomerID = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
                 await _unitOfWork.CustomDesignRepository.UpdateAsync(existedEntity);
 
