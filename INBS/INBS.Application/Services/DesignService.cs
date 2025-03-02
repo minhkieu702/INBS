@@ -153,11 +153,17 @@ namespace INBS.Application.Services
                 .Include(d => d.Images.OrderBy(i => i.NumerialOrder))
                 .Include(d => d.DesignPreferences)
                 .Include(d => d.NailDesigns)
-                //.Include(d => d.CustomDesigns.Where(cd => cd.Design != null && !cd.Design.IsDeleted))
-                //    .ThenInclude(cd => cd.AccessoryCustomDesigns.Where(cd => cd.Accessory != null && !cd.Accessory.IsDeleted))
-                //        .ThenInclude(acd => acd.Accessory)
-                //.Include(d => d.CustomDesigns.Where(cd => cd.Design != null && !cd.Design.IsDeleted))
-                //    .ThenInclude(cd => cd.Customer)
+                .Include(d => d.CustomDesigns.Where(cd => !cd.IsDeleted && !cd.Customer!.User!.IsDeleted))
+                    .ThenInclude(cd => cd.Customer)
+                        .ThenInclude(c => c!.User)
+                .Include(d => d.CustomDesigns.Where(cd => !cd.IsDeleted))
+                    .ThenInclude(cd => cd.CustomNailDesigns)
+                        .ThenInclude(cnd => cnd.AccessoryCustomNailDesigns)
+                            .ThenInclude(acnd => acnd.Accessory)
+                .Include(d => d.ArtistDesigns.Where(ad => !ad.Artist!.User!.IsDeleted))
+                    .ThenInclude(ad => ad.Artist)
+                        .ThenInclude(a => a!.User)
+                .AsNoTracking()
                 );
 
             var response = _mapper.Map<IEnumerable<DesignResponse>>(designs);
