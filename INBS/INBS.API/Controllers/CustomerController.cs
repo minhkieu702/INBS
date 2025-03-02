@@ -33,7 +33,7 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Gets the preferences of the authenticated customer.
+        /// Gets customers.
         /// </summary>
         /// <returns>Customer preferences.</returns>
         [HttpGet]
