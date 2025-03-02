@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Customer;
+using INBS.Application.DTOs.User.Customer;
 using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -12,5 +13,6 @@ namespace INBS.Application.IServices
     {
         Task<Customer> UpdatePreferencesAsync(Guid customerId, PreferencesRequest request);
         Task<string> GetPreferencesAsync(Guid customerId);
+        Task<IEnumerable<CustomerResponse>> Get();
     }
 }
