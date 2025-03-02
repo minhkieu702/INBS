@@ -100,6 +100,8 @@ namespace INBS.Application.Services
 
                 user.IsVerified = true;
 
+                user.CreatedAt = DateTime.Now;
+
                 if (userRequest.NewImage != null)
                     user.ImageUrl = await _firebaseService.UploadFileAsync(userRequest.NewImage);
 

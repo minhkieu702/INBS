@@ -32,6 +32,8 @@ namespace INBS.Application.Services
 
                 var artistAvailability = _mapper.Map<ArtistAvailability>(requestModel);
 
+                artistAvailability.CreatedAt = DateTime.Now;
+
                 await _unitOfWork.ArtistAvailabilityRepository.InsertAsync(artistAvailability);
 
                 if (await _unitOfWork.SaveAsync() <= 0)

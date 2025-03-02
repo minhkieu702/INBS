@@ -39,6 +39,8 @@ namespace INBS.Application.Services
 
                 var entity = _mapper.Map<CustomCombo>(request);
 
+                entity.CreatedAt = DateTime.Now;
+
                 entity.CustomerID = cusId;
 
                 await _unitOfWork.CustomComboRepository.InsertAsync(entity);

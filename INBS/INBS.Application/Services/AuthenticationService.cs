@@ -140,9 +140,12 @@ namespace INBS.Application.Services
 
                 var newUser = _mapper.Map<User>(requestModel);
 
+                newUser.CreatedAt = DateTime.Now;
+
                 newUser.PasswordHash = _authentication.HashedPassword(newUser, password);
 
-                newUser.ImageUrl = requestModel.NewImage != null ? await _firebaseService.UploadFileAsync(requestModel.NewImage) : Constants.DEFAULT_IMAGE_URL;
+                if (requestModel.NewImage != null)
+                    await _firebaseService.UploadFileAsync(requestModel.NewImage);
 
                 newUser.Role = (int)Role.Customer;
 
