@@ -1,6 +1,7 @@
 ﻿using INBS.Application.DTOs.Customer;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using System.Security.Claims;
 
 namespace INBS.API.Controllers
@@ -22,9 +23,8 @@ namespace INBS.API.Controllers
         {
             try
             {
-                var customerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                var result = await service.UpdatePreferencesAsync(customerId, request);
-                return Ok(result);
+                await service.UpdatePreferencesAsync(request);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -36,19 +36,14 @@ namespace INBS.API.Controllers
         /// Gets the preferences of the authenticated customer.
         /// </summary>
         /// <returns>Customer preferences.</returns>
-        [HttpGet("preferences")]
+        [HttpGet]
+        [EnableQuery]
         public async Task<IActionResult> GetPreferences()
         {
             try
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var customerId))
-                {
-                    return BadRequest("Invalid or missing customer ID.");
-                }
-
-                var result = await service.GetPreferencesAsync(customerId);
-                return Ok(result);
+                var result = await service.Get();
+                return Ok(result.AsQueryable());
             }
             catch (Exception ex)
             {

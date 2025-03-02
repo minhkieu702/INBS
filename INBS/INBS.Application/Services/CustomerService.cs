@@ -2,9 +2,12 @@
 using INBS.Application.Common;
 using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.User.Customer;
+using INBS.Application.DTOs.User.User;
+using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,57 +17,70 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class CustomerService : ICustomerService
+    public class CustomerService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : ICustomerService
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-
-        public CustomerService(IUnitOfWork unitOfWork, IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
-        }
-
-        public async Task<Customer> UpdatePreferencesAsync(Guid customerId, PreferencesRequest request)
+        public async Task UpdatePreferencesAsync(PreferencesRequest request)
         {
             try
             {
-                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
+                unitOfWork.BeginTransaction();
 
-                if (customer == null)
-                    throw new KeyNotFoundException("Customer not found");
+                var id = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
-                customer.Preferences = request.Preferences;
+                var preferences = await unitOfWork.CustomerPreferenceRepository.GetAsync(c => c.CustomerId == id);
 
-                await _unitOfWork.CustomerRepository.UpdateAsync(customer);
-                await _unitOfWork.SaveAsync();
+                if (preferences.Any()) unitOfWork.CustomerPreferenceRepository.DeleteRange(preferences);
 
-                return customer;
+                unitOfWork.CustomerPreferenceRepository.InsertRange(await Mapping(id, request));
+
+                if (await unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
+
+                unitOfWork.CommitTransaction();
             }
             catch (Exception)
             {
+                unitOfWork.RollBack();
                 throw;
             }
         }
-        public async Task<string> GetPreferencesAsync(Guid customerId)
+
+        private async Task<IList<CustomerPreference>> Mapping(Guid cusId, PreferencesRequest request)
         {
-            try
-            {
-                var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(customerId);
-                if (customer == null)
-                    throw new KeyNotFoundException("Customer not found");
+            var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
 
-                if (customer.Preferences == null)
-                {
-                    return string.Empty;
-                }
+            var preferences = new List<CustomerPreference>();
 
-                return customer.Preferences;
-            }
-            catch (Exception)
+            preferences.AddRange(request.ColorIds.Where(c => colors.Select(c => c.ID).Contains(c))
+                .Select(c => new CustomerPreference
+                    {
+                        CustomerId = cusId,
+                        PreferenceId = c,
+                        PreferenceType = "Color"
+                    }
+                ));
+
+            preferences.AddRange(request.OccasionIds.Where(c => occasions.Select(c => c.ID).Contains(c)).Select(c => new CustomerPreference
             {
-                throw;
-            }
+                CustomerId = cusId,
+                PreferenceId = c,
+                PreferenceType = "Occasion"
+            }));
+
+            preferences.AddRange(request.PaintTypeIds.Where(c => paintTypes.Select(c => c.ID).Contains(c)).Select(c => new CustomerPreference
+            {
+                CustomerId = cusId,
+                PreferenceId = c,
+                PreferenceType = "PaintType"
+            }));
+
+            preferences.AddRange(request.SkintoneIds.Where(c => skintones.Select(c => c.ID).Contains(c)).Select(c => new CustomerPreference
+            {
+                CustomerId = cusId,
+                PreferenceId = c,
+                PreferenceType = "Skintone"
+            }));
+
+            return preferences;
         }
 
         public async Task<IEnumerable<CustomerResponse>> Get()
@@ -73,7 +89,7 @@ namespace INBS.Application.Services
             {
                 var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
 
-                var result = await _unitOfWork.CustomerRepository.GetAsync(include: query => query
+                var result = await unitOfWork.CustomerRepository.GetAsync(include: query => query
                     .Where(u => !u.User!.IsDeleted)
                     .Include(c => c.User)
                         .ThenInclude(c => c!.Notifications.Where(n => !n.IsDeleted))
@@ -88,7 +104,7 @@ namespace INBS.Application.Services
                     .Include(c => c.DeviceTokens)
                 );
 
-                var responses = _mapper.Map<IEnumerable<CustomerResponse>>(result);
+                var responses = mapper.Map<IEnumerable<CustomerResponse>>(result);
                 foreach (var response in responses)
                 {
                     foreach (var preference in response.CustomerPreferences)
