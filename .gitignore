@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 INBS/INBS.API/appsettings.json
 INBS/INBS.API/Properties/launchSettings.json
+response.txt

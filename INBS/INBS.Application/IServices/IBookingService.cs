@@ -8,5 +8,6 @@ namespace INBS.Application.IService
 {
     public interface IBookingService
     {
+
     }
 }
