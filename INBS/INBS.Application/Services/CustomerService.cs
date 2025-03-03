@@ -17,29 +17,29 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class CustomerService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : ICustomerService
+    public class CustomerService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : ICustomerService
     {
         public async Task UpdatePreferencesAsync(PreferencesRequest request)
         {
             try
             {
-                unitOfWork.BeginTransaction();
+                _unitOfWork.BeginTransaction();
 
                 var id = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
-                var preferences = await unitOfWork.CustomerPreferenceRepository.GetAsync(c => c.CustomerId == id);
+                var preferences = await _unitOfWork.CustomerPreferenceRepository.GetAsync(c => c.CustomerId == id);
 
-                if (preferences.Any()) unitOfWork.CustomerPreferenceRepository.DeleteRange(preferences);
+                if (preferences.Any()) _unitOfWork.CustomerPreferenceRepository.DeleteRange(preferences);
 
-                unitOfWork.CustomerPreferenceRepository.InsertRange(await Mapping(id, request));
+                _unitOfWork.CustomerPreferenceRepository.InsertRange(await Mapping(id, request));
 
-                if (await unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
+                if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
-                unitOfWork.CommitTransaction();
+                _unitOfWork.CommitTransaction();
             }
             catch (Exception)
             {
-                unitOfWork.RollBack();
+                _unitOfWork.RollBack();
                 throw;
             }
         }
@@ -89,7 +89,7 @@ namespace INBS.Application.Services
             {
                 var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
 
-                var result = await unitOfWork.CustomerRepository.GetAsync(include: query => query
+                var result = await _unitOfWork.CustomerRepository.GetAsync(include: query => query
                     .Where(u => !u.User!.IsDeleted)
                     .Include(c => c.User)
                         .ThenInclude(c => c!.Notifications.Where(n => !n.IsDeleted))
@@ -104,7 +104,7 @@ namespace INBS.Application.Services
                     .Include(c => c.DeviceTokens)
                 );
 
-                var responses = mapper.Map<IEnumerable<CustomerResponse>>(result);
+                var responses = _mapper.Map<IEnumerable<CustomerResponse>>(result);
                 foreach (var response in responses)
                 {
                     foreach (var preference in response.CustomerPreferences)

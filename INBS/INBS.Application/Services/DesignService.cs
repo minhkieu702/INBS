@@ -156,7 +156,7 @@ namespace INBS.Application.Services
                 .Include(d => d.CustomDesigns.Where(cd => !cd.IsDeleted && !cd.Customer!.User!.IsDeleted))
                     .ThenInclude(cd => cd.Customer)
                         .ThenInclude(c => c!.User)
-                .Include(d => d.CustomDesigns.Where(cd => !cd.IsDeleted))
+                .Include(d => d.CustomDesigns)
                     .ThenInclude(cd => cd.CustomNailDesigns)
                         .ThenInclude(cnd => cnd.AccessoryCustomNailDesigns)
                             .ThenInclude(acnd => acnd.Accessory)
