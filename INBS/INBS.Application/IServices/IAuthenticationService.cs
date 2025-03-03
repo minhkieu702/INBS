@@ -12,5 +12,6 @@ namespace INBS.Application.IServices
         Task<string> ResetPasswordCustomer(string phone, string newPassword, string confirmPassword);
         Task<LoginResponse> VerifyOtpAsync(string phoneNumber, string otp);
         Task ChangeProfile(UserRequest requestModel);
+        Task Delete(Guid? id);
     }
 }

@@ -155,5 +155,19 @@ namespace INBS.API.Controllers
                 return new BadRequestObjectResult(ex.Message);
             }
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromQuery] Guid? id)
+        {
+            try
+            {
+                await service.Delete(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
     }
 }

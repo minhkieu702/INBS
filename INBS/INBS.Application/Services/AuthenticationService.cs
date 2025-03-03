@@ -247,5 +247,28 @@ namespace INBS.Application.Services
                 RefreshToken = await _authentication.GenerateRefreshTokenAsync(existingUser)
             };
         }
+
+        public async Task Delete(Guid? id)
+        {
+            try
+            {
+                if (id == null)
+                {
+                    id = _authentication.GetUserIdFromHttpContext(_contextAccesstor.HttpContext);
+                }
+
+                var result = await _unitOfWork.UserRepository.GetByIdAsync(id) ?? throw new Exception("This user not found");
+
+                await _unitOfWork.UserRepository.DeleteAsync(id);
+
+                if (await _unitOfWork.SaveAsync() <= 0)
+                    throw new Exception("Action failed");
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 }

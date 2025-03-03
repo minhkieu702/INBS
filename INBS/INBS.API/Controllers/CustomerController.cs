@@ -38,7 +38,7 @@ namespace INBS.API.Controllers
         /// <returns>Customer preferences.</returns>
         [HttpGet]
         [EnableQuery]
-        public async Task<IActionResult> GetPreferences()
+        public async Task<IActionResult> Get()
         {
             try
             {
