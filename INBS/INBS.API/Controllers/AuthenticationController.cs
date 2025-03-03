@@ -156,6 +156,11 @@ namespace INBS.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a user.
+        /// </summary>
+        /// <param name="id">để null khi người dùng tự xóa chính mình (đã đăng nhập)</param>
+        /// <returns></returns>
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery] Guid? id)
         {
