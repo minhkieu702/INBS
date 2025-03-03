@@ -71,7 +71,7 @@ namespace INBS.Application.Services
             return result.Price;
         }
 
-        public async Task Create(CustomDesignRequest request, IList<CustomNailDesignRequest> customNailDesignRequests)
+        public async Task<Guid> Create(CustomDesignRequest request, IList<CustomNailDesignRequest> customNailDesignRequests)
         {
             try
             {
@@ -99,6 +99,8 @@ namespace INBS.Application.Services
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
                 _unitOfWork.CommitTransaction();
+
+                return newEntity.ID;
             }
             catch (Exception)
             {

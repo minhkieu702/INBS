@@ -13,7 +13,7 @@ namespace INBS.Application.IServices
     {
         Task<IEnumerable<CustomDesignResponse>> Get();
 
-        Task Create(CustomDesignRequest request, IList<CustomNailDesignRequest> customNailDesignRequests);
+        Task<Guid> Create(CustomDesignRequest request, IList<CustomNailDesignRequest> customNailDesignRequests);
 
         Task Delete(Guid id);
 

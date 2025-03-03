@@ -43,8 +43,8 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await service.Create(customDesign, customNailDesigns);
-                return Ok();
+                var result = await service.Create(customDesign, customNailDesigns);
+                return Ok(result);
             }
             catch (Exception ex)
             {
