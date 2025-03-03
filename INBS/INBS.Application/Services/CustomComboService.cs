@@ -26,7 +26,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task Create(CustomComboRequest request,
+        public async Task<Guid> Create(CustomComboRequest request,
             IList<Guid> serviceCustomCombos)
         {
             try
@@ -52,6 +52,8 @@ namespace INBS.Application.Services
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
                 _unitOfWork.CommitTransaction();
+
+                return entity.ID;
             }
             catch (Exception)
             {
