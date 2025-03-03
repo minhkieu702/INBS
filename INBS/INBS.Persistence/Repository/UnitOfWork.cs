@@ -392,13 +392,13 @@ namespace INBS.Persistence.Repository
         #endregion
 
         #region SkinTone
-        private IGenericRepository<SkinTone>? _skinToneRepository;
+        private IGenericRepository<Skintone>? _skinToneRepository;
 
-        public IGenericRepository<SkinTone> SkinToneRepository
+        public IGenericRepository<Skintone> SkinToneRepository
         {
             get
             {
-                _skinToneRepository ??= new GenericRepository<SkinTone>(_context);
+                _skinToneRepository ??= new GenericRepository<Skintone>(_context);
                 return _skinToneRepository;
             }
         }

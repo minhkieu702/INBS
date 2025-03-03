@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class SkinTone
+    public class Skintone
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

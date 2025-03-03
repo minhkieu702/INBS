@@ -28,7 +28,7 @@ namespace INBS.Application.Services
             return await Utils.GetPaintTypes();
         }
 
-        public async Task<IEnumerable<SkinTone>> GetSkinTone()
+        public async Task<IEnumerable<Skintone>> GetSkinTone()
         {
             return await Utils.GetSkinTones();
         }

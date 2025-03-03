@@ -61,7 +61,7 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<ServiceCustomCombo> ServiceCustomComboRepository { get; }
 
-        public IGenericRepository<SkinTone> SkinToneRepository { get; }
+        public IGenericRepository<Skintone> SkinToneRepository { get; }
 
         public IGenericRepository<Store> StoreRepository { get; }
 
