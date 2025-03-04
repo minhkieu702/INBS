@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using INBS.Application.Common.Enum;
+using INBS.Domain.Enums;
 using INBS.Application.DTOs.Authentication;
 using INBS.Application.DTOs.User.User;
 using INBS.Application.Interfaces;

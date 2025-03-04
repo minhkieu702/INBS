@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using INBS.Application.Common;
-using INBS.Application.Common.Enum;
+using INBS.Domain.Enums;
 using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.DTOs.User.Customer;
 using INBS.Application.Interfaces;

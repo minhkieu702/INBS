@@ -19,6 +19,7 @@ namespace INBS.Domain.Entities
             CustomDesigns = [];
             Preferences = [];
             DeviceTokens = [];
+            Feedbacks = [];
             Description = string.Empty;
         }
         [Key]

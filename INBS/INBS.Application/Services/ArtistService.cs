@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using INBS.Application.Common;
-using INBS.Application.Common.Enum;
+using INBS.Domain.Enums;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Artist.ArtistAvailability;
 using INBS.Application.DTOs.User.User;
