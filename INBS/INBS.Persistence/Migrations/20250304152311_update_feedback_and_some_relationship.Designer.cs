@@ -4,6 +4,7 @@ using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    partial class INBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250304152311_update_feedback_and_some_relationship")]
+    partial class update_feedback_and_some_relationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,7 +175,7 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ArtistId")
+                    b.Property<Guid>("ArtistAvailabilityId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -213,7 +216,7 @@ namespace INBS.Persistence.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ArtistId");
+                    b.HasIndex("ArtistAvailabilityId");
 
                     b.HasIndex("CustomComboId");
 
@@ -450,15 +453,15 @@ namespace INBS.Persistence.Migrations
                     b.Property<Guid?>("ArtistId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("DesignId")
                         .HasColumnType("uniqueidentifier");
@@ -485,7 +488,7 @@ namespace INBS.Persistence.Migrations
 
                     b.HasIndex("ArtistId");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("BookingId");
 
                     b.HasIndex("DesignId");
 
@@ -861,9 +864,9 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Booking", b =>
                 {
-                    b.HasOne("INBS.Domain.Entities.Artist", "Artist")
+                    b.HasOne("INBS.Domain.Entities.ArtistAvailability", "ArtistAvailability")
                         .WithMany("Bookings")
-                        .HasForeignKey("ArtistId")
+                        .HasForeignKey("ArtistAvailabilityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -879,7 +882,7 @@ namespace INBS.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Artist");
+                    b.Navigation("ArtistAvailability");
 
                     b.Navigation("CustomCombo");
 
@@ -996,9 +999,9 @@ namespace INBS.Persistence.Migrations
                         .WithMany("Feedbacks")
                         .HasForeignKey("ArtistId");
 
-                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
+                    b.HasOne("INBS.Domain.Entities.Booking", "Booking")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1012,7 +1015,7 @@ namespace INBS.Persistence.Migrations
 
                     b.Navigation("Artist");
 
-                    b.Navigation("Customer");
+                    b.Navigation("Booking");
 
                     b.Navigation("Design");
 
@@ -1128,14 +1131,19 @@ namespace INBS.Persistence.Migrations
 
                     b.Navigation("ArtistServices");
 
-                    b.Navigation("Bookings");
-
                     b.Navigation("Feedbacks");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.ArtistAvailability", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Booking", b =>
                 {
                     b.Navigation("Cancellation");
+
+                    b.Navigation("Feedbacks");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.CustomCombo", b =>
@@ -1164,8 +1172,6 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("CustomDesigns");
 
                     b.Navigation("DeviceTokens");
-
-                    b.Navigation("Feedbacks");
 
                     b.Navigation("Preferences");
 
