@@ -16,6 +16,7 @@ namespace INBS.Domain.Entities
             Artists = [];
             Address = string.Empty;
             ImageUrl = string.Empty;
+            Feedbacks = [];
         }
 
         public string Address { get; set; }
@@ -33,5 +34,8 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(AdminId))]
         [InverseProperty(nameof(Admin.Stores))]
         public virtual Admin? Admin { get; set; }
+
+        [InverseProperty(nameof(Feedback.Store))]
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }

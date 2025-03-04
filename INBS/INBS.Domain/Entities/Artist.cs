@@ -17,6 +17,7 @@ namespace INBS.Domain.Entities
             ArtistServices = [];
             ArtistAvailabilities = [];
             ArtistDesigns = [];
+            Feedbacks = [];
         }
         [Key]
         public Guid ID { get; set; }
@@ -40,5 +41,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(ArtistDesign.Artist))]
         public virtual ICollection<ArtistDesign> ArtistDesigns { get; set; }
+
+        [InverseProperty(nameof(Feedback.Artist))]
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }

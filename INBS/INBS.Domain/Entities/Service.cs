@@ -18,6 +18,7 @@ namespace INBS.Domain.Entities
             ServiceCustomCombos = [];
             CategoryServices = [];
             ArtistServices = [];
+            FeedbackServices = [];
         }
 
         public string Name { get; set; }
@@ -38,5 +39,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(ArtistService.Service))]
         public virtual ICollection<ArtistService> ArtistServices { get; set; }
+
+        [InverseProperty(nameof(FeedbackService.Service))]
+        public virtual ICollection<FeedbackService> FeedbackServices { get; set; }
     }
 }
