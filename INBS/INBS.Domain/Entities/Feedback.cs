@@ -15,16 +15,15 @@ namespace INBS.Domain.Entities
         {
             Rating = 5;
             Content = string.Empty;
-            FeedbackServices = [];
         }
         public Guid TypeId { get; set; }
         public int Type { get; set; }
         public int Rating { get; set; }
         public string Content { get; set; }
-        public Guid BookingId { get; set; }
-        [ForeignKey(nameof(BookingId))]
-        [InverseProperty(nameof(Booking.Feedbacks))]
-        public virtual Booking? Booking { get; set; }
+        public Guid CustomerId { get; set; }
+        [ForeignKey(nameof(CustomerId))]
+        [InverseProperty(nameof(Customer.Feedbacks))]
+        public virtual Customer? Customer { get; set; }
 
         public Guid? StoreId { get; set; }
         [ForeignKey(nameof(StoreId))]
@@ -40,8 +39,5 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(DesignId))]
         [InverseProperty(nameof(Design.Feedbacks))]
         public virtual Design? Design { get; set; }
-
-        [InverseProperty(nameof(FeedbackService.Feedback))]
-        public virtual ICollection<FeedbackService> FeedbackServices { get; set; }
     }
 }

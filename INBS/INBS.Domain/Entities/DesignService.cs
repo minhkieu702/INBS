@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class FeedbackService
+    public class DesignService
     {
-        public Guid FeedbackId { get; set; }
-        [ForeignKey(nameof(FeedbackId))]
-        [InverseProperty(nameof(Feedback.FeedbackServices))]
-        public virtual Feedback? Feedback { get; set; }
+        public Guid DesignId { get; set; }
+        [ForeignKey(nameof(DesignId))]
+        [InverseProperty(nameof(Design.DesignServices))]
+        public virtual Design? Design { get; set; }
 
         public Guid ServiceId { get; set; }
         [ForeignKey(nameof(ServiceId))]
-        [InverseProperty(nameof(Service.FeedbackServices))]
+        [InverseProperty(nameof(Service.DesignServices))]
         public virtual Service? Service { get; set; }
     }
 }
