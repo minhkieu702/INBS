@@ -120,7 +120,6 @@ namespace INBS.Application.Mappers
             CreateMap<ArtistRequest, Artist>();
             CreateMap<Artist, ArtistResponse>();
             CreateMap<ArtistService, ArtistServiceResponse>();
-            CreateMap<ArtistDesign, ArtistDesignResponse>();
             #endregion
 
             #region ArtistAvailability
