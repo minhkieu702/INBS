@@ -14,18 +14,19 @@ namespace INBS.Domain.Entities
     {
         public Booking() : base()
         {
-            ServiceDate = DateTime.Now;
             Feedbacks = [];
         }
-        public DateTime ServiceDate { get; set; }
+        public DateOnly ServiceDate { get; set; }
+
+        public TimeOnly ServiceTime { get; set; }
 
         public long Duration { get; set; }
 
-        public int Status { get; set; } //isWating (-1), isBooked (0), isCompleted (1), isCancelled (2)
+        public int Status { get; set; } 
 
         public long TotalAmount { get; set; }
 
-        public int PaymentMethod { get; set; } //Cash (0), Card (1)
+        public int? PaymentMethod { get; set; } //Cash (0), Card (1)
 
         public string? Preferences { get; set; }
 
