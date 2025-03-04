@@ -42,7 +42,7 @@ namespace INBS.Application.Services
                     await HandleUpdateNailDesign(nailDesigns.OrderBy(c => (c.NailPosition, c.IsLeft)), newEntity.ID, []);
                 }
 
-                //await HandleUpdatePreference(preferenceRequest, newEntity.ID);
+                await HandleUpdatePreference(preferenceRequest, newEntity.ID);
 
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
