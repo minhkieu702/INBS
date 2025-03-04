@@ -79,15 +79,15 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region ArtistDesign
-        private IGenericRepository<ArtistDesign>? _artistDesignRepository;
+        #region DesignService
+        private IGenericRepository<DesignService>? _designServiceRepository;
 
-        public IGenericRepository<ArtistDesign> ArtistDesignRepository
+        public IGenericRepository<DesignService> DesignServiceRepository
         {
             get
             {
-                _artistDesignRepository ??= new GenericRepository<ArtistDesign>(_context);
-                return _artistDesignRepository;
+                _designServiceRepository ??= new GenericRepository<DesignService>(_context);
+                return _designServiceRepository;
             }
         }
         #endregion
