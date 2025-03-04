@@ -1,8 +1,7 @@
-﻿using INBS.Application.DTOs.Customer;
+﻿using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
-using System.Security.Claims;
 
 namespace INBS.API.Controllers
 {
@@ -19,7 +18,7 @@ namespace INBS.API.Controllers
         /// <param name="request">Preferences request.</param>
         /// <returns>Updated customer entity.</returns>
         [HttpPost("preferences")]
-        public async Task<IActionResult> UpdatePreferences([FromBody] PreferencesRequest request)
+        public async Task<IActionResult> UpdatePreferences([FromBody] PreferenceRequest request)
         {
             try
             {

@@ -39,11 +39,9 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Customer> CustomerRepository { get; }
 
-        public IGenericRepository<CustomerPreference> CustomerPreferenceRepository { get; }
-
         public IGenericRepository<Design> DesignRepository { get; }
 
-        public IGenericRepository<DesignPreference> DesignPreferenceRepository { get; }
+        public IGenericRepository<Preference> PreferenceRepository { get; }
 
         public IGenericRepository<DeviceToken> DeviceTokenRepository { get; }
 

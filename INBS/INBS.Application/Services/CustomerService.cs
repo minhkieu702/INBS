@@ -1,25 +1,20 @@
 ﻿using AutoMapper;
 using INBS.Application.Common;
-using INBS.Application.DTOs.Customer;
+using INBS.Application.Common.Enum;
+using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.DTOs.User.Customer;
-using INBS.Application.DTOs.User.User;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
     public class CustomerService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : ICustomerService
     {
-        public async Task UpdatePreferencesAsync(PreferencesRequest request)
+        public async Task UpdatePreferencesAsync(PreferenceRequest request)
         {
             try
             {
@@ -27,11 +22,11 @@ namespace INBS.Application.Services
 
                 var id = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
-                var preferences = await _unitOfWork.CustomerPreferenceRepository.GetAsync(c => c.CustomerId == id);
+                var preferences = await _unitOfWork.PreferenceRepository.GetAsync(c => c.CustomerId == id);
 
-                if (preferences.Any()) _unitOfWork.CustomerPreferenceRepository.DeleteRange(preferences);
+                if (preferences.Any()) _unitOfWork.PreferenceRepository.DeleteRange(preferences);
 
-                _unitOfWork.CustomerPreferenceRepository.InsertRange(await Mapping(id, request));
+                _unitOfWork.PreferenceRepository.InsertRange(await Mapping(id, request));
 
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
@@ -44,41 +39,37 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task<IList<CustomerPreference>> Mapping(Guid cusId, PreferencesRequest request)
+        private async Task<IList<Preference>> Mapping(Guid cusId, PreferenceRequest request)
         {
             var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
 
-            var preferences = new List<CustomerPreference>();
+            var colorIds = colors.Select(c => c.ID).ToHashSet();
+            var occasionIds = occasions.Select(c => c.ID).ToHashSet();
+            var paintTypeIds = paintTypes.Select(c => c.ID).ToHashSet();
+            var skintoneIds = skintones.Select(c => c.ID).ToHashSet();
 
-            preferences.AddRange(request.ColorIds.Where(c => colors.Select(c => c.ID).Contains(c))
-                .Select(c => new CustomerPreference
-                    {
-                        CustomerId = cusId,
-                        PreferenceId = c,
-                        PreferenceType = "Color"
-                    }
-                ));
+            var preferences = new List<Preference>();
 
-            preferences.AddRange(request.OccasionIds.Where(c => occasions.Select(c => c.ID).Contains(c)).Select(c => new CustomerPreference
+            // Hàm helper để thêm dữ liệu tránh lặp code
+            void AddPreferences(IEnumerable<int> ids, PreferenceType type, HashSet<int> validIds)
             {
-                CustomerId = cusId,
-                PreferenceId = c,
-                PreferenceType = "Occasion"
-            }));
+                preferences.AddRange(
+                    ids.Distinct()
+                       .Where(validIds.Contains) // Kiểm tra hợp lệ nhanh hơn
+                       .Select(id => new Preference
+                       {
+                           CustomerId = cusId,
+                           PreferenceId = id,
+                           PreferenceType = (int)type
+                       })
+                );
+            }
 
-            preferences.AddRange(request.PaintTypeIds.Where(c => paintTypes.Select(c => c.ID).Contains(c)).Select(c => new CustomerPreference
-            {
-                CustomerId = cusId,
-                PreferenceId = c,
-                PreferenceType = "PaintType"
-            }));
-
-            preferences.AddRange(request.SkintoneIds.Where(c => skintones.Select(c => c.ID).Contains(c)).Select(c => new CustomerPreference
-            {
-                CustomerId = cusId,
-                PreferenceId = c,
-                PreferenceType = "Skintone"
-            }));
+            // Áp dụng cho từng loại preference
+            AddPreferences(request.ColorIds, PreferenceType.Color, colorIds);
+            AddPreferences(request.OccasionIds, PreferenceType.Occasion, occasionIds);
+            AddPreferences(request.PaintTypeIds, PreferenceType.PaintType, paintTypeIds);
+            AddPreferences(request.SkintoneIds, PreferenceType.SkinTone, skintoneIds);
 
             return preferences;
         }
@@ -100,35 +91,29 @@ namespace INBS.Application.Services
                     .Include(c => c.CustomCombos.Where(n => !n.IsDeleted))
                         .ThenInclude(c => c.ServiceCustomCombos)
                             .ThenInclude(c => c.Service)
-                    .Include(c => c.CustomerPreferences)
+                    .Include(c => c.Preferences)
                     .Include(c => c.DeviceTokens)
                 );
 
                 var responses = _mapper.Map<IEnumerable<CustomerResponse>>(result);
                 foreach (var response in responses)
                 {
+                    var preferenceActions = new Dictionary<PreferenceType, Action<PreferenceResponse>>()
+                    {
+                        [PreferenceType.Color] = prefer => prefer.Data = colors.FirstOrDefault(c => c.ID == prefer.PreferenceId),
+
+                        [PreferenceType.Occasion] = prefer => prefer.Data = occasions.FirstOrDefault(c => c.ID == prefer.PreferenceId),
+
+                        [PreferenceType.PaintType] = prefer => prefer.Data = paintTypes.FirstOrDefault(c => c.ID == prefer.PreferenceId),
+
+                        [PreferenceType.SkinTone] = prefer => prefer.Data = skintones.FirstOrDefault(c => c.ID == prefer.PreferenceId)
+                    };
+
                     foreach (var preference in response.CustomerPreferences)
                     {
-                        switch (preference.PreferenceType)
+                        if (Enum.TryParse(preference.PreferenceType, out PreferenceType type) && preferenceActions.TryGetValue(type, out var action))
                         {
-                            case "Color":
-                                preference.Data = colors.FirstOrDefault(c => c.ID == preference.PreferenceId);
-                                break;
-
-                            case "Occasion":
-                                preference.Data = occasions.FirstOrDefault(c => c.ID == preference.PreferenceId);
-                                break;
-
-                            case "Skintone":
-                                preference.Data = skintones.FirstOrDefault(c => c.ID == preference.PreferenceId);
-                                break;
-
-                            case "PaintType":
-                                preference.Data = paintTypes.FirstOrDefault(c => c.ID == preference.PreferenceId);
-                                break;
-
-                            default:
-                                break;
+                            action(preference);
                         }
                     }
                 }

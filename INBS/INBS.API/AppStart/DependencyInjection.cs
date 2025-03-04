@@ -1,11 +1,11 @@
 ﻿using INBS.Application.DependencyInjection;
+using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.CustomNailDesign;
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
-using INBS.Application.DTOs.Design.Preference;
 using INBS.Application.DTOs.Service.CustomCombo;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Store;
@@ -74,11 +74,11 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<CustomComboResponse>(nameof(CustomCombo));
                     odataBuilder.EntitySet<CustomDesignResponse>(nameof(CustomDesign));
                     odataBuilder.EntitySet<CustomerResponse>(nameof(Customer));
-                    odataBuilder.EntitySet<CustomerPreferenceResponse>(nameof(CustomerPreference));
+                    odataBuilder.EntitySet<PreferenceResponse>(nameof(Preference));
                     odataBuilder.EntitySet<CustomNailDesignResponse>(nameof(CustomNailDesign));
 
                     odataBuilder.EntitySet<DesignResponse>(nameof(Design));
-                    odataBuilder.EntitySet<DesignPreferenceResponse>(nameof(DesignPreference));
+                    odataBuilder.EntitySet<PreferenceResponse>(nameof(Preference));
                     odataBuilder.EntitySet<ImageResponse>(nameof(Image));
                     odataBuilder.EntitySet<NailDesignResponse>(nameof(NailDesign));
 

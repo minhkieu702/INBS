@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Customer
+namespace INBS.Application.DTOs.Common.Preference
 {
-    public class PreferencesRequest
+    public class PreferenceRequest
     {
         public IList<int> ColorIds { get; set; } = [];
 

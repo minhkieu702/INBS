@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.Design.Design;
+﻿using INBS.Application.DTOs.Common.Preference;
+using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Service;
@@ -14,10 +15,10 @@ namespace INBS.Application.IService
     {
         Task<IEnumerable<DesignResponse>> Get();
 
-        Task Create(DesignRequest modelRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns);
+        Task Create(DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns);
 
         Task Delete(Guid designId);
 
-        Task Update(Guid id, DesignRequest designReq, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns);
+        Task Update(Guid id, DesignRequest designReq, PreferenceRequest preferenceRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns);
     }
 }

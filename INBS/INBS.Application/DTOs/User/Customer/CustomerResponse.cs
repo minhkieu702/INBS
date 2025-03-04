@@ -1,12 +1,8 @@
-﻿using INBS.Application.DTOs.Design.CustomDesign;
+﻿using INBS.Application.DTOs.Common.Preference;
+using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Service.CustomCombo;
 using INBS.Application.DTOs.User.User;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.User.Customer
 {
@@ -23,7 +19,7 @@ namespace INBS.Application.DTOs.User.Customer
 
         public ICollection<CustomComboResponse> CustomCombos { get; set; } = [];
 
-        public ICollection<CustomerPreferenceResponse> CustomerPreferences { get; set; } = [];
+        public ICollection<PreferenceResponse> CustomerPreferences { get; set; } = [];
 
         public ICollection<DeviceTokenResponse> DeviceTokens { get; set; } = [];
     }

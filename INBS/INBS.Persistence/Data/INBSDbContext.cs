@@ -43,13 +43,11 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Customer> Customers { get; set; }
 
-        public virtual DbSet<CustomerPreference> CustomerPreferences { get; set; }
+        public virtual DbSet<Preference> Preferences { get; set; }
 
         public virtual DbSet<CustomNailDesign> CustomNailDesigns { get; set; }
 
         public virtual DbSet<Design> Designs { get; set; }
-
-        public virtual DbSet<DesignPreference> DesignPreferences { get; set; }
 
         public virtual DbSet<DeviceToken> DeviceTokens { get; set; }
 
@@ -78,11 +76,10 @@ namespace INBS.Persistence.Data
             modelBuilder.Entity<ArtistDesign>().HasKey(c => new { c.ArtistId, c.DesignId });
             modelBuilder.Entity<ArtistService>().HasKey(c => new { c.ArtistId, c.ServiceId });
             modelBuilder.Entity<ServiceCustomCombo>().HasKey(c => new { c.ServiceId, c.CustomComboId });
-            modelBuilder.Entity<DesignPreference>().HasKey(c => new { c.DesignId, c.PreferenceId, c.PreferenceType });
-            modelBuilder.Entity<CustomerPreference>().HasKey(c => new { c.CustomerId, c.PreferenceId, c.PreferenceType });
             modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
             modelBuilder.Entity<NailDesign>().HasKey(c => new { c.DesignId, c.NailPosition, c.IsLeft });
             modelBuilder.Entity<Image>().HasKey(c => new { c.DesignId, c.NumerialOrder });
+            modelBuilder.Entity<FeedbackService>().HasKey(c => new { c.FeedbackId, c.ServiceId });
 
             //modelBuilder.ConfigureRestrictOneToOne<Admin, User>(a => a.User, u => u.Admin, a => a.UserId);
 
@@ -134,7 +131,7 @@ namespace INBS.Persistence.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
-            //optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBS; TrustServerCertificate=True");
+            optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBS; TrustServerCertificate=True");
         }
 
     }

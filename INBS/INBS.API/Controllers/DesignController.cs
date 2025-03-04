@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.Design.Design;
+﻿using INBS.Application.DTOs.Common.Preference;
+using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Service.Service;
@@ -46,13 +47,14 @@ namespace INBS.API.Controllers
         /// <param name="design">The design creation request.</param>
         /// <param name="images">The list of image requests.</param>
         /// <param name="nailDesigns">The list of nail design requests.</param>
+        /// <param name="preference">The preference of design</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] DesignRequest design, [FromForm] IList<ImageRequest> images, [FromForm] IList<NailDesignRequest> nailDesigns)
+        public async Task<IActionResult> Create([FromForm] DesignRequest design, [FromForm] PreferenceRequest preference, [FromForm] IList<ImageRequest> images, [FromForm] IList<NailDesignRequest> nailDesigns)
         {
             try
             {
-                await service.Create(design, images, nailDesigns);
+                await service.Create(design, preference, images, nailDesigns);
                 return Ok();
             }
             catch (Exception ex)
@@ -66,15 +68,17 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="id">The design ID.</param>
         /// <param name="design">The design update request.</param>
+        /// <param name="preference">The preference of design</param>
         /// <param name="images">The list of image requests.</param>
         /// <param name="nailDesigns">The list of nail design requests.</param>
         /// <returns>An action result.</returns>
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] DesignRequest design, [FromForm] IList<ImageRequest> images, [FromForm] IList<NailDesignRequest> nailDesigns)
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] DesignRequest design,
+[FromForm] PreferenceRequest preference, [FromForm] IList<ImageRequest> images, [FromForm] IList<NailDesignRequest> nailDesigns)
         {
             try
             {
-                await service.Update(id, design, images, nailDesigns);
+                await service.Update(id, design, preference, images, nailDesigns);
                 return Ok();
             }
             catch (Exception ex)

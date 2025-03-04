@@ -1,13 +1,7 @@
 ﻿using INBS.Application.DTOs.Common;
+using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
-using INBS.Application.DTOs.Design.Preference;
-using INBS.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.Design.Design
 {
@@ -23,7 +17,7 @@ namespace INBS.Application.DTOs.Design.Design
 
         public ICollection<ImageResponse> Images { get; set; } = [];
 
-        public ICollection<DesignPreferenceResponse> DesignPreferences { get; set; } = [];
+        public ICollection<PreferenceResponse> Preferences { get; set; } = [];
 
         public ICollection<NailDesignResponse> NailDesigns { get; set; } = [];
     }

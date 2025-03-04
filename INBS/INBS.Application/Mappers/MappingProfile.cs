@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
+using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.CustomNailDesign;
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
-using INBS.Application.DTOs.Design.Preference;
 using INBS.Application.DTOs.Service.CustomCombo;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Store;
@@ -80,8 +80,6 @@ namespace INBS.Application.Mappers
                     dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
                 });
             CreateMap<Image, ImageResponse>();
-            
-            CreateMap<DesignPreference, DesignPreferenceResponse>();
 
             CreateMap<NailDesignRequest, NailDesign>()
                 .AfterMap((source, dest) => 
@@ -103,13 +101,19 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region User
-            CreateMap<UserRequest, User>().AfterMap((source, dest) => { dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL; });
+            CreateMap<UserRequest, User>().AfterMap((source, dest) => dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL);
             CreateMap<User, UserResponse>();
             #endregion
 
             #region Customer
             CreateMap<CustomerRequest, Customer>();
             CreateMap<Customer, CustomerResponse>();
+            #endregion
+
+            #region Preference
+            CreateMap<PreferenceRequest, Preference>();
+            CreateMap<Preference, PreferenceResponse>()
+                .AfterMap((source, dest) => dest.PreferenceType = source.PreferenceType.ToString());
             #endregion
 
             #region Artist

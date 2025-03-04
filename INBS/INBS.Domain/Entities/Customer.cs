@@ -17,16 +17,16 @@ namespace INBS.Domain.Entities
             Recommendations = [];
             CustomCombos = [];
             CustomDesigns = [];
-            CustomerPreferences = [];
+            Preferences = [];
             DeviceTokens = [];
-            Preferences = string.Empty;
+            Description = string.Empty;
         }
         [Key]
         public Guid ID { get; set; }
         [ForeignKey(nameof(ID))]
         [InverseProperty(nameof(User.Customer))]
         public virtual User? User { get; set; }
-        public string? Preferences { get; set; }
+        public string? Description { get; set; }
 
         [InverseProperty(nameof(Recommendation.Customer))]
         public virtual ICollection<Recommendation> Recommendations { get; set; }
@@ -37,8 +37,8 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(CustomDesign.Customer))]
         public virtual ICollection<CustomDesign> CustomDesigns { get; set; }
 
-        [InverseProperty(nameof(CustomerPreference.Customer))]
-        public virtual ICollection<CustomerPreference> CustomerPreferences { get; set; }
+        [InverseProperty(nameof(Preference.Customer))]
+        public virtual ICollection<Preference> Preferences { get; set; }
             
         [InverseProperty(nameof(DeviceToken.Customer))]
         public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
