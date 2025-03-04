@@ -72,7 +72,6 @@ namespace INBS.Application.Services
                 var result = await _unitOfWork.ArtistAvailabilityRepository.GetAsync(include: query => 
                     query
                     .Include(aa => aa.Artist).ThenInclude(a => a!.User)
-                    .Include(aa => aa.Bookings)
                     .Where(aa => !aa.IsDeleted && !aa.Artist!.User!.IsDeleted)
                     );
                 return _mapper.Map<IEnumerable<ArtistAvailabilityResponse>>(result);

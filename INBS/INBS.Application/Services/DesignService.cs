@@ -138,9 +138,8 @@ namespace INBS.Application.Services
                     .ThenInclude(cd => cd.CustomNailDesigns)
                         .ThenInclude(cnd => cnd.AccessoryCustomNailDesigns)
                             .ThenInclude(acnd => acnd.Accessory)
-                .Include(d => d.ArtistDesigns.Where(ad => !ad.Artist!.User!.IsDeleted))
-                    .ThenInclude(ad => ad.Artist)
-                        .ThenInclude(a => a!.User)
+                .Include(d => d.DesignServices.Where(ad => !ad.Service!.IsDeleted))
+                    .ThenInclude(ad => ad.Service)
                 .AsNoTracking()
                 );
 
@@ -166,6 +165,8 @@ namespace INBS.Application.Services
                         action(preference);
                     }
                 }
+
+                response.AverageDuration = response.NailDesigns.Sum(c => c.AverageDuration);
             }
 
             return responses;

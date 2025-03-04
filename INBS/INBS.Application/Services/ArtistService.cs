@@ -50,26 +50,6 @@ namespace INBS.Application.Services
             await _unitOfWork.ArtistServiceRepository.InsertRangeAsync(newServices);
         }
 
-        private async Task AssignDesign(Guid artistId, IList<Guid> designIds)
-        {
-            var oldDesigns = await _unitOfWork.ArtistDesignRepository.GetAsync(c => c.ArtistId == artistId);
-
-            if (oldDesigns.Any()) _unitOfWork.ArtistDesignRepository.DeleteRange(oldDesigns);
-
-            var newDesigns = new List<ArtistDesign>();
-            
-            foreach (var designId in designIds)
-            {
-                newDesigns.Add(new ArtistDesign
-                {
-                    ArtistId = artistId,
-                    DesignId = designId
-                });
-            }
-            
-            await _unitOfWork.ArtistDesignRepository.InsertRangeAsync(newDesigns);
-        }
-
         private async Task IsStoreExisting(Guid storeId)
         {
             _ = await _unitOfWork.StoreRepository.GetByIdAsync(storeId) ?? throw new Exception("Store not found");
@@ -130,8 +110,6 @@ namespace INBS.Application.Services
 
                 artist.ID = user.ID;
 
-                await AssignDesign(artist.ID, artistRequestModel.DesignIds);
-
                 await AssignService(artist.ID, artistRequestModel.ServiceIds);
 
                 await _unitOfWork.ArtistRepository.InsertAsync(artist);
@@ -181,8 +159,6 @@ namespace INBS.Application.Services
                     .Include(c => c.User)
                     .Include(c => c.Store)
                     .Include(c => c.ArtistAvailabilities.Where(c => !c.IsDeleted))
-                    .Include(c => c.ArtistDesigns.Where(c => c.Design != null && !c.Design.IsDeleted))
-                        .ThenInclude(c => c.Design)
                     .Include(c => c.ArtistServices.Where(c => c.Service != null && !c.Service.IsDeleted))
                         .ThenInclude(c => c.Service)
                     .Include(c => c.ArtistAvailabilities.Where(c => !c.IsDeleted))
@@ -207,8 +183,6 @@ namespace INBS.Application.Services
                 await IsStoreExisting(artistRequest.StoreId);
 
                 await UpdateUser(id, userRequest);
-
-                await AssignDesign(artist.ID, artistRequest.DesignIds);
 
                 await AssignService(artist.ID, artistRequest.ServiceIds);
 

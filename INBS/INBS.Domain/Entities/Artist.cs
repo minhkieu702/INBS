@@ -16,7 +16,6 @@ namespace INBS.Domain.Entities
         {
             ArtistServices = [];
             ArtistAvailabilities = [];
-            ArtistDesigns = [];
             Feedbacks = [];
         }
         [Key]
@@ -39,10 +38,10 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(ArtistService.Artist))]
         public virtual ICollection<ArtistService> ArtistServices { get; set; }
 
-        [InverseProperty(nameof(ArtistDesign.Artist))]
-        public virtual ICollection<ArtistDesign> ArtistDesigns { get; set; }
-
         [InverseProperty(nameof(Feedback.Artist))]
         public virtual ICollection<Feedback> Feedbacks { get; set; }
+
+        [InverseProperty(nameof(Booking.Artist))]
+        public virtual ICollection<Booking> Bookings { get; set; }
     }
 }
