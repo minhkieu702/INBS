@@ -13,11 +13,13 @@ namespace INBS.Application.DTOs.Booking
 
         public TimeOnly ServiceTime { get; set; }
 
-        public long Duration { get; set; }
-
+        /// <summary>
+        /// isWating = 0,
+        /// isBooked = 1,
+        /// isCompleted = 2,
+        /// isCancelled = -1
+        /// </summary>
         public BookingStatus Status { get; set; }
-
-        public long TotalAmount { get; set; }
 
         public int? PaymentMethod { get; set; }
 

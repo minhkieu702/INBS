@@ -10,6 +10,10 @@ namespace INBS.Application.DTOs.Design.CustomDesign
 {
     public class CustomDesignRequest
     {
+        public TimeOnly? StartAt { get; set; }
+
+        public TimeOnly? FinishAt { get; set; }
+
         public bool IsSave { get; set; } = false;
 
         public string? ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;

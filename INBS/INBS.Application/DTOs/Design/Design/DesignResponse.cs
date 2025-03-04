@@ -15,6 +15,8 @@ namespace INBS.Application.DTOs.Design.Design
 
         public int Price { get; set; }
 
+        public long AverageDuration { get; set; }
+
         public ICollection<ImageResponse> Images { get; set; } = [];
 
         public ICollection<PreferenceResponse> Preferences { get; set; } = [];

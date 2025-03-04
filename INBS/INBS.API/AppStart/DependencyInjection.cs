@@ -4,6 +4,7 @@ using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.CustomNailDesign;
 using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Design.DesignService;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Service.CustomCombo;
@@ -66,7 +67,6 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<ArtistResponse>(nameof(Artist));
                     odataBuilder.EntitySet<ArtistAvailabilityResponse>(nameof(ArtistAvailability));
                     odataBuilder.EntitySet<ArtistServiceResponse>(nameof(ArtistService));
-                    odataBuilder.EntitySet<ArtistDesignResponse>(nameof(ArtistDesign));
                     
                     odataBuilder.EntitySet<Category>(nameof(Category));
                     odataBuilder.EntitySet<CategoryServiceResponse>(nameof(CategoryService));
@@ -78,6 +78,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<CustomNailDesignResponse>(nameof(CustomNailDesign));
 
                     odataBuilder.EntitySet<DesignResponse>(nameof(Design));
+                    odataBuilder.EntitySet<DesignServiceResponse>(nameof(DesignService));
                     odataBuilder.EntitySet<PreferenceResponse>(nameof(Preference));
                     odataBuilder.EntitySet<ImageResponse>(nameof(Image));
                     odataBuilder.EntitySet<NailDesignResponse>(nameof(NailDesign));
