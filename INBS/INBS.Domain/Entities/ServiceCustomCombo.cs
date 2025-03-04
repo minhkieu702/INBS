@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace INBS.Domain.Entities
 {
@@ -18,5 +13,7 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(ServiceId))]
         [InverseProperty(nameof(Service.ServiceCustomCombos))]
         public virtual Service? Service { get; set; }
+
+        public long Duration { get; set; }
     }
 }

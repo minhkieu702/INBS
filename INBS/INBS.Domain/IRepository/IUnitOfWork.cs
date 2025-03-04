@@ -17,8 +17,6 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Artist> ArtistRepository { get; }
 
-        public IGenericRepository<ArtistDesign> ArtistDesignRepository { get; }
-
         public IGenericRepository<ArtistService> ArtistServiceRepository { get; }
 
         public IGenericRepository<ArtistAvailability> ArtistAvailabilityRepository { get; }
@@ -27,11 +25,7 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Cancellation> CancellationRepository { get; }
 
-        public IGenericRepository<Category> CategoryRepository { get; }
-
         public IGenericRepository<CategoryService> CategoryServiceRepository { get; }
-
-        public IGenericRepository<Color> ColorRepository { get; }
 
         public IGenericRepository<CustomCombo> CustomComboRepository { get; }
 
@@ -39,9 +33,11 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Customer> CustomerRepository { get; }
 
+        public IGenericRepository<CustomNailDesign> CustomNailDesignRepository { get; }
+
         public IGenericRepository<Design> DesignRepository { get; }
 
-        public IGenericRepository<Preference> PreferenceRepository { get; }
+        public IGenericRepository<DesignService> DesignServiceRepository { get; }
 
         public IGenericRepository<DeviceToken> DeviceTokenRepository { get; }
 
@@ -49,9 +45,11 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Image> ImageRepository { get; }
 
-        public IGenericRepository<Occasion> OccasionRepository { get; }
+        public IGenericRepository<NailDesign> NailDesignRepository { get; }
 
-        public IGenericRepository<PaintType> PaintTypeRepository { get; }
+        public IGenericRepository<Notification> NotificationRepository { get; }
+
+        public IGenericRepository<Preference> PreferenceRepository { get; }
 
         public IGenericRepository<Recommendation> RecommendationRepository { get; }
 
@@ -59,15 +57,9 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<ServiceCustomCombo> ServiceCustomComboRepository { get; }
 
-        public IGenericRepository<Skintone> SkinToneRepository { get; }
-
         public IGenericRepository<Store> StoreRepository { get; }
 
         public IGenericRepository<User> UserRepository { get; }
-
-        public IGenericRepository<CustomNailDesign> CustomNailDesignRepository { get; }
-
-        public IGenericRepository<NailDesign> NailDesignRepository { get; }
 
         int Save();
         Task<int> SaveAsync();
