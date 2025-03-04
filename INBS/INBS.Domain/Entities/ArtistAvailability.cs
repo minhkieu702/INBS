@@ -13,7 +13,6 @@ namespace INBS.Domain.Entities
     {
         public ArtistAvailability() : base()
         {
-            Bookings = [];
         }
 
         public DateOnly AvailableDate { get; set; }
@@ -30,8 +29,5 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(ArtistId))]
         [InverseProperty(nameof(Artist.ArtistAvailabilities))]
         public virtual Artist? Artist { get; set; }
-
-        [InverseProperty(nameof(Booking.ArtistAvailability))]
-        public virtual ICollection<Booking> Bookings { get; set; }
     }
 }

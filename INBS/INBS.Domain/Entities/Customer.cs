@@ -42,5 +42,8 @@ namespace INBS.Domain.Entities
             
         [InverseProperty(nameof(DeviceToken.Customer))]
         public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
+
+        [InverseProperty(nameof(Feedback.Customer))]
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }
