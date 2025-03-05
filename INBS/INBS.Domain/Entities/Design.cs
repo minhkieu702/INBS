@@ -18,8 +18,9 @@ namespace INBS.Domain.Entities
             Images = [];
             CustomDesigns = [];
             NailDesigns = [];
-            ArtistDesigns = [];
-            DesignPreferences = [];
+            Preferences = [];
+            Feedbacks = [];
+            DesignServices = [];
         }
 
         public string Name { get; set; }
@@ -27,6 +28,8 @@ namespace INBS.Domain.Entities
         public float TrendScore { get; set; }
 
         public string? Description { get; set; }
+
+        public int AverageRating { get; set; }
 
         public int Price { get; set; }
 
@@ -38,10 +41,13 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(NailDesign.Design))]
         public virtual ICollection<NailDesign> NailDesigns { get; set; }
 
-        [InverseProperty(nameof(DesignPreference.Design))]
-        public virtual ICollection<DesignPreference> DesignPreferences { get; set; }
+        [InverseProperty(nameof(Preference.Design))]
+        public virtual ICollection<Preference> Preferences { get; set; }
 
-        [InverseProperty(nameof(ArtistDesign.Design))]
-        public virtual ICollection<ArtistDesign> ArtistDesigns { get; set; }
+        [InverseProperty(nameof(Feedback.Design))]
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
+
+        [InverseProperty(nameof(DesignService.Design))]
+        public virtual ICollection<DesignService> DesignServices { get; set; }
     }
 }

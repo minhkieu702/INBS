@@ -43,8 +43,8 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await service.Create(User, customDesign, customNailDesigns);
-                return Ok();
+                var result = await service.Create(customDesign, customNailDesigns);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -64,7 +64,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await service.Update(User, id, customDesign, customNailDesigns);
+                await service.Update(id, customDesign, customNailDesigns);
                 return Ok();
             }
             catch (Exception ex)

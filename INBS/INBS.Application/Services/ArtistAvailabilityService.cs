@@ -32,6 +32,8 @@ namespace INBS.Application.Services
 
                 var artistAvailability = _mapper.Map<ArtistAvailability>(requestModel);
 
+                artistAvailability.CreatedAt = DateTime.Now;
+
                 await _unitOfWork.ArtistAvailabilityRepository.InsertAsync(artistAvailability);
 
                 if (await _unitOfWork.SaveAsync() <= 0)
@@ -70,7 +72,6 @@ namespace INBS.Application.Services
                 var result = await _unitOfWork.ArtistAvailabilityRepository.GetAsync(include: query => 
                     query
                     .Include(aa => aa.Artist).ThenInclude(a => a!.User)
-                    .Include(aa => aa.Bookings)
                     .Where(aa => !aa.IsDeleted && !aa.Artist!.User!.IsDeleted)
                     );
                 return _mapper.Map<IEnumerable<ArtistAvailabilityResponse>>(result);

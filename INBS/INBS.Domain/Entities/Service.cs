@@ -18,6 +18,7 @@ namespace INBS.Domain.Entities
             ServiceCustomCombos = [];
             CategoryServices = [];
             ArtistServices = [];
+            DesignServices = [];
         }
 
         public string Name { get; set; }
@@ -27,6 +28,8 @@ namespace INBS.Domain.Entities
         public string? ImageUrl { get; set; }
 
         public double Price { get; set; }
+
+        public long AverageDuration { get; set; }
 
         public bool IsAdditional { get; set; }
 
@@ -38,5 +41,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(ArtistService.Service))]
         public virtual ICollection<ArtistService> ArtistServices { get; set; }
+
+        [InverseProperty(nameof(DesignService.Service))]
+        public virtual ICollection<DesignService> DesignServices { get; set; }
     }
 }

@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Booking.CustomDesign
+namespace INBS.Domain.Enums
 {
-    internal class CustomDesignRequest
+    public enum PreferenceType
     {
+        Color,
+        Occasion,
+        PaintType,
+        SkinTone 
     }
 }

@@ -1,16 +1,20 @@
 ﻿using INBS.Application.DependencyInjection;
+using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
+using INBS.Application.DTOs.Design.CustomNailDesign;
 using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Design.DesignService;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
-using INBS.Application.DTOs.Design.Preference;
 using INBS.Application.DTOs.Service.CustomCombo;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Store;
+using INBS.Application.DTOs.User.Admin;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Application.DTOs.User.Artist.ArtistAvailability;
 using INBS.Application.DTOs.User.Customer;
+using INBS.Application.DTOs.User.User;
 using INBS.Domain.Entities;
 using INBS.Persistence.DependencyInjection;
 using Infrastructure.DependencyInjection;
@@ -57,25 +61,39 @@ namespace INBS.API.AppStart
                 {
                     // Define OData Entity Sets
                     var odataBuilder = new ODataConventionModelBuilder();
-                    odataBuilder.EntitySet<AccessoryResponse>("Accessory");
-                    odataBuilder.EntitySet<ArtistResponse>("Artist");
-                    odataBuilder.EntitySet<ArtistAvailabilityResponse>("ArtistAvailability");
-                    odataBuilder.EntitySet<CategoryServiceResponse>("CategoryService");
-                    odataBuilder.EntitySet<ServiceResponse>("Service");
-                    odataBuilder.EntitySet<CustomComboResponse>("CustomCombo");
-                    odataBuilder.EntitySet<ServiceCustomComboResponse>("ServiceCustomCombo");
-                    odataBuilder.EntitySet<DesignResponse>("Design");
-                    odataBuilder.EntitySet<NailDesignResponse>("NailDesign");
-                    odataBuilder.EntitySet<ImageResponse>("Image");
-                    odataBuilder.EntitySet<DesignPreferenceResponse>("DesignPreference");
-                    odataBuilder.EntitySet<ArtistServiceResponse>("ArtistService");
-                    odataBuilder.EntitySet<ArtistDesignResponse>("ArtistDesign");
-                    odataBuilder.EntitySet<StoreResponse>("Store");
-                    odataBuilder.EntitySet<ServiceResponse>("Service");
-                    odataBuilder.EntitySet<Color>("Color");
-                    odataBuilder.EntitySet<Category>("Category");
-                    odataBuilder.EntitySet<CustomDesignResponse>("CustomDesign");
-                    odataBuilder.EntitySet<CustomerResponse>("CustomerResponse");
+                    odataBuilder.EntitySet<AccessoryResponse>(nameof(Accessory));
+                    odataBuilder.EntitySet<AccessoryCustomNailDesignResponse>(nameof(AccessoryCustomNailDesign));
+                    odataBuilder.EntitySet<AdminResponse>(nameof(Admin));
+                    odataBuilder.EntitySet<ArtistResponse>(nameof(Artist));
+                    odataBuilder.EntitySet<ArtistAvailabilityResponse>(nameof(ArtistAvailability));
+                    odataBuilder.EntitySet<ArtistServiceResponse>(nameof(ArtistService));
+                    
+                    odataBuilder.EntitySet<Category>(nameof(Category));
+                    odataBuilder.EntitySet<CategoryServiceResponse>(nameof(CategoryService));
+                    odataBuilder.EntitySet<Color>(nameof(Color));
+                    odataBuilder.EntitySet<CustomComboResponse>(nameof(CustomCombo));
+                    odataBuilder.EntitySet<CustomDesignResponse>(nameof(CustomDesign));
+                    odataBuilder.EntitySet<CustomerResponse>(nameof(Customer));
+                    odataBuilder.EntitySet<PreferenceResponse>(nameof(Preference));
+                    odataBuilder.EntitySet<CustomNailDesignResponse>(nameof(CustomNailDesign));
+
+                    odataBuilder.EntitySet<DesignResponse>(nameof(Design));
+                    odataBuilder.EntitySet<DesignServiceResponse>(nameof(DesignService));
+                    odataBuilder.EntitySet<PreferenceResponse>(nameof(Preference));
+                    odataBuilder.EntitySet<ImageResponse>(nameof(Image));
+                    odataBuilder.EntitySet<NailDesignResponse>(nameof(NailDesign));
+
+                    odataBuilder.EntitySet<Occasion>(nameof(Occasion));
+                    odataBuilder.EntitySet<PaintType>(nameof(PaintType));
+
+                    odataBuilder.EntitySet<ServiceResponse>(nameof(Service));
+                    odataBuilder.EntitySet<ServiceCustomComboResponse>(nameof(ServiceCustomCombo));
+                    odataBuilder.EntitySet<Skintone>(nameof(Skintone));
+                    odataBuilder.EntitySet<StoreResponse>(nameof(Store));
+
+                    odataBuilder.EntitySet<UserResponse>(nameof(User));
+                    
+                    
 
                     // Add OData route components
                     opt.AddRouteComponents("odata", odataBuilder.GetEdmModel())

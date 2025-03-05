@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Design.Preference
+namespace INBS.Application.DTOs.Common.Preference
 {
-    public class DesignPreferenceResponse
+    public class PreferenceResponse
     {
         [Key]
+        public int ID { get; set; }
+        public Guid CustomerId { get; set; }
         public Guid DesignId { get; set; }
-        [Key]
         public int PreferenceId { get; set; }
-        [Key]
         public string PreferenceType { get; set; } = string.Empty;
 
         public object? Data { get; set; }

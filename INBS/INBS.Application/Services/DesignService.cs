@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using INBS.Application.Common;
+using INBS.Domain.Enums;
+using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.DTOs.Design.Design;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
@@ -14,7 +16,7 @@ namespace INBS.Application.Services
 {
     public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService) : IDesignService
     {
-        public async Task Create(DesignRequest modelRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns)
+        public async Task Create(DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns)
         {
             try
             {
@@ -40,7 +42,7 @@ namespace INBS.Application.Services
                     await HandleUpdateNailDesign(nailDesigns.OrderBy(c => (c.NailPosition, c.IsLeft)), newEntity.ID, []);
                 }
 
-                await HandleUpdatePreference(modelRequest, newEntity.ID);
+                await HandleUpdatePreference(preferenceRequest, newEntity.ID);
 
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
@@ -53,76 +55,52 @@ namespace INBS.Application.Services
             }
         }
 
-        private static async Task<List<DesignPreference>> PreferencesList(Guid designID, DesignRequest modelRequest)
+        private static async Task<List<Preference>> PreferencesList(Guid cusId, PreferenceRequest request)
         {
             var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
-            var preferenceEntities = new List<DesignPreference>();
-            //color
-            foreach (var id in modelRequest.ColorIds.Distinct())
-            {
-                if (!colors.Select(c => c.ID).Contains(id)) continue;
 
-                var entity = new DesignPreference
-                {
-                    DesignId = designID,
-                    PreferenceId = id,
-                    PreferenceType = "Color"
-                };
-                preferenceEntities.Add(entity);
-            }
-            //occasion
-            foreach (var id in modelRequest.OccasionIds.Distinct())
-            {
-                if (!occasions.Select(c => c.ID).Contains(id)) continue;
+            var colorIds = colors.Select(c => c.ID).ToHashSet();
+            var occasionIds = occasions.Select(c => c.ID).ToHashSet();
+            var paintTypeIds = paintTypes.Select(c => c.ID).ToHashSet();
+            var skintoneIds = skintones.Select(c => c.ID).ToHashSet();
 
-                var entity = new DesignPreference
-                {
-                    DesignId = designID,
-                    PreferenceId = id,
-                    PreferenceType = "Occasion"
-                };
-                preferenceEntities.Add(entity);
-            }
-            //skintone
-            foreach (var id in modelRequest.SkintoneIds.Distinct())
-            {
-                if (!skintones.Select(c => c.ID).Contains(id)) continue;
+            var preferences = new List<Preference>();
 
-                var entity = new DesignPreference
-                {
-                    DesignId = designID,
-                    PreferenceId = id,
-                    PreferenceType = "Skintone"
-                };
-                preferenceEntities.Add(entity);
-            }
-            //paint type
-            foreach (var id in modelRequest.PaintTypeIds.Distinct())
+            // Hàm helper để thêm dữ liệu tránh lặp code
+            void AddPreferences(IEnumerable<int> ids, PreferenceType type, HashSet<int> validIds)
             {
-                if (!paintTypes.Select(c => c.ID).Contains(id)) continue;
-
-                var entity = new DesignPreference
-                {
-                    DesignId = designID,
-                    PreferenceId = id,
-                    PreferenceType = "PaintType"
-                };
-                preferenceEntities.Add(entity);
+                preferences.AddRange(
+                    ids.Distinct()
+                       .Where(validIds.Contains) // Kiểm tra hợp lệ nhanh hơn
+                .Select(id => new Preference
+                       {
+                           DesignId = cusId,
+                           PreferenceId = id,
+                           PreferenceType = (int)type
+                       })
+                );
             }
-            return preferenceEntities;
+
+            // Áp dụng cho từng loại preference
+            AddPreferences(request.ColorIds, PreferenceType.Color, colorIds);
+            AddPreferences(request.OccasionIds, PreferenceType.Occasion, occasionIds);
+            AddPreferences(request.PaintTypeIds, PreferenceType.PaintType, paintTypeIds);
+            AddPreferences(request.SkintoneIds, PreferenceType.SkinTone, skintoneIds);
+
+            return preferences;
         }
 
-        private async Task HandleUpdatePreference(DesignRequest modelRequest, Guid designID)
+        private async Task HandleUpdatePreference(PreferenceRequest modelRequest, Guid designID)
         {
             var requestList = await PreferencesList(designID, modelRequest);
             
-            var designPreferences = await _unitOfWork.DesignPreferenceRepository.GetAsync(filter: dp => dp.DesignId == designID);
+            var designPreferences = await _unitOfWork.PreferenceRepository.GetAsync(filter: dp => dp.DesignId == designID);
 
             if (designPreferences.Any())
-                _unitOfWork.DesignPreferenceRepository.DeleteRange(designPreferences);
+                _unitOfWork.PreferenceRepository.DeleteRange(designPreferences);
             
             if (requestList.Any())
-                await _unitOfWork.DesignPreferenceRepository.InsertRangeAsync(requestList);
+                await _unitOfWork.PreferenceRepository.InsertRangeAsync(requestList);
         }
 
         public async Task Delete(Guid designId)
@@ -151,46 +129,50 @@ namespace INBS.Application.Services
             var designs = await _unitOfWork.DesignRepository.GetAsync(include: 
                 query => query
                 .Include(d => d.Images.OrderBy(i => i.NumerialOrder))
-                .Include(d => d.DesignPreferences)
+                .Include(d => d.Preferences)
                 .Include(d => d.NailDesigns)
-                //.Include(d => d.CustomDesigns.Where(cd => cd.Design != null && !cd.Design.IsDeleted))
-                //    .ThenInclude(cd => cd.AccessoryCustomDesigns.Where(cd => cd.Accessory != null && !cd.Accessory.IsDeleted))
-                //        .ThenInclude(acd => acd.Accessory)
-                //.Include(d => d.CustomDesigns.Where(cd => cd.Design != null && !cd.Design.IsDeleted))
-                //    .ThenInclude(cd => cd.Customer)
+                .Include(d => d.CustomDesigns.Where(cd => !cd.IsDeleted && !cd.Customer!.User!.IsDeleted))
+                    .ThenInclude(cd => cd.Customer)
+                        .ThenInclude(c => c!.User)
+                .Include(d => d.CustomDesigns)
+                    .ThenInclude(cd => cd.CustomNailDesigns)
+                        .ThenInclude(cnd => cnd.AccessoryCustomNailDesigns)
+                            .ThenInclude(acnd => acnd.Accessory)
+                .Include(d => d.DesignServices.Where(ad => !ad.Service!.IsDeleted))
+                    .ThenInclude(ad => ad.Service)
+                .AsNoTracking()
                 );
 
-            var response = _mapper.Map<IEnumerable<DesignResponse>>(designs);
+            var responses = _mapper.Map<IEnumerable<DesignResponse>>(designs);
 
-            foreach (var design in response)
+            foreach (var response in responses)
             {
-                foreach (var preference in design.DesignPreferences)
+                var preferenceActions = new Dictionary<PreferenceType, Action<PreferenceResponse>>()
                 {
-                    switch (preference.PreferenceType)
+                    [PreferenceType.Color] = prefer => prefer.Data = colors.FirstOrDefault(c => c.ID == prefer.PreferenceId),
+
+                    [PreferenceType.Occasion] = prefer => prefer.Data = occasions.FirstOrDefault(c => c.ID == prefer.PreferenceId),
+
+                    [PreferenceType.PaintType] = prefer => prefer.Data = paintTypes.FirstOrDefault(c => c.ID == prefer.PreferenceId),
+
+                    [PreferenceType.SkinTone] = prefer => prefer.Data = skintones.FirstOrDefault(c => c.ID == prefer.PreferenceId)
+                };
+
+                foreach (var preference in response.Preferences)
+                {
+                    if (Enum.TryParse(preference.PreferenceType, out PreferenceType type) && preferenceActions.TryGetValue(type, out var action))
                     {
-                        case "Color": 
-                            preference.Data = colors.FirstOrDefault(c => c.ID == preference.PreferenceId); 
-                            break;
-
-                        case "Occasion": preference.Data = occasions.FirstOrDefault(c => c.ID == preference.PreferenceId);
-                            break;
-
-                        case "Skintone": preference.Data = skintones.FirstOrDefault(c => c.ID == preference.PreferenceId);
-                            break;
-
-                        case "PaintType": preference.Data = paintTypes.FirstOrDefault(c => c.ID == preference.PreferenceId);
-                            break;
-
-                        default:
-                            break;
+                        action(preference);
                     }
                 }
+
+                response.AverageDuration = response.NailDesigns.Sum(c => c.AverageDuration);
             }
 
-            return response;
+            return responses;
         }
 
-        public async Task Update(Guid designId, DesignRequest modelRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns)
+        public async Task Update(Guid designId, DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns)
         {
             try
             {
@@ -209,7 +191,7 @@ namespace INBS.Application.Services
                     designId,
                     currentImagesList.OrderBy(c => c.NumerialOrder).ToDictionary(c => (c.NumerialOrder)));
 
-                await HandleUpdatePreference(modelRequest, designId);
+                await HandleUpdatePreference(preferenceRequest, designId);
 
                 await HandleUpdateNailDesign(
                     nailDesigns.OrderBy(c => c.NailPosition), 

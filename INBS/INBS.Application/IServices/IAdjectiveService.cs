@@ -12,7 +12,7 @@ namespace INBS.Application.IService
         Task<IEnumerable<Category>> GetCategory();
         Task<IEnumerable<Color>> GetColor();
         Task<IEnumerable<Occasion>> GetOccasions();
-        Task<IEnumerable<SkinTone>> GetSkinTone();
+        Task<IEnumerable<Skintone>> GetSkinTone();
         Task<IEnumerable<PaintType>> GetPaintType();
         //Task Create(CategoryRequest category);
         //Task Update(Guid id, CategoryRequest category);

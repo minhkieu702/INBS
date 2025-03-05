@@ -42,8 +42,8 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await service.Create(customCombo, additionalServiceIds);
-                return Ok();
+                var result = await service.Create(customCombo, additionalServiceIds);
+                return Ok(result);
             }
             catch (Exception ex)
             {

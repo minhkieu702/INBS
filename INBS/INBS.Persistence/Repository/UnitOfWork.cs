@@ -79,15 +79,15 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region ArtistDesign
-        private IGenericRepository<ArtistDesign>? _artistDesignRepository;
+        #region DesignService
+        private IGenericRepository<DesignService>? _designServiceRepository;
 
-        public IGenericRepository<ArtistDesign> ArtistDesignRepository
+        public IGenericRepository<DesignService> DesignServiceRepository
         {
             get
             {
-                _artistDesignRepository ??= new GenericRepository<ArtistDesign>(_context);
-                return _artistDesignRepository;
+                _designServiceRepository ??= new GenericRepository<DesignService>(_context);
+                return _designServiceRepository;
             }
         }
         #endregion
@@ -209,15 +209,15 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region CustomerPreference
-        private IGenericRepository<CustomerPreference>? _customerPreferenceRepository;
+        #region Preference
+        private IGenericRepository<Preference>? _preferenceRepository;
 
-        public IGenericRepository<CustomerPreference> CustomerPreferenceRepository
+        public IGenericRepository<Preference> PreferenceRepository
         {
             get
             {
-                _customerPreferenceRepository ??= new GenericRepository<CustomerPreference>(_context);
-                return _customerPreferenceRepository;
+                _preferenceRepository ??= new GenericRepository<Preference>(_context);
+                return _preferenceRepository;
             }
         }
         #endregion
@@ -244,19 +244,6 @@ namespace INBS.Persistence.Repository
             {
                 _designRepository ??= new GenericRepository<Design>(_context);
                 return _designRepository;
-            }
-        }
-        #endregion
-
-        #region DesignPreference
-        private IGenericRepository<DesignPreference>? _designPreferenceRepository;
-
-        public IGenericRepository<DesignPreference> DesignPreferenceRepository
-        {
-            get
-            {
-                _designPreferenceRepository ??= new GenericRepository<DesignPreference>(_context);
-                return _designPreferenceRepository;
             }
         }
         #endregion
@@ -392,13 +379,13 @@ namespace INBS.Persistence.Repository
         #endregion
 
         #region SkinTone
-        private IGenericRepository<SkinTone>? _skinToneRepository;
+        private IGenericRepository<Skintone>? _skinToneRepository;
 
-        public IGenericRepository<SkinTone> SkinToneRepository
+        public IGenericRepository<Skintone> SkinToneRepository
         {
             get
             {
-                _skinToneRepository ??= new GenericRepository<SkinTone>(_context);
+                _skinToneRepository ??= new GenericRepository<Skintone>(_context);
                 return _skinToneRepository;
             }
         }

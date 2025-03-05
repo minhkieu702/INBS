@@ -18,13 +18,5 @@ namespace INBS.Application.DTOs.Design.Design
         public string? Description { get; set; }
 
         public int Price { get; set; }
-
-        public IList<int> ColorIds { get; set; } = [];
-
-        public IList<int> OccasionIds { get; set; } = [];
-
-        public IList<int> SkintoneIds { get; set; } = [];
-
-        public IList<int> PaintTypeIds { get; set; } = [];
     }
 }

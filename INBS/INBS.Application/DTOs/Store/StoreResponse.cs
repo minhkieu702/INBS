@@ -16,7 +16,8 @@ namespace INBS.Application.DTOs.Store
 
         public string Status { get; set; } = "active";// 0: inactive, 1: active
 
-#warning Add ArtistResponse, AdminResponse
+#warning Add AdminResponse
+        public ArtistResponse? Artist { get; set; }
 
         public ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];
 

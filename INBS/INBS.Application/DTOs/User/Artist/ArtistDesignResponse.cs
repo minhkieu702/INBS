@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.Service.Service;
+﻿using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Service.Service;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,7 +17,7 @@ namespace INBS.Application.DTOs.User.Artist
         public virtual ArtistResponse? Artist { get; set; }
 
         [Key]
-        public Guid ServiceId { get; set; }
-        public virtual ServiceResponse? Service { get; set; }
+        public Guid DesignId { get; set; }
+        public virtual DesignResponse? Design { get; set; }
     }
 }

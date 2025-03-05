@@ -62,12 +62,12 @@ namespace INBS.Application.Common
             return username;
         }
 
-        public static async Task<(List<Color> colors, List<Occasion> occasions, List<PaintType> paintTypes, List<SkinTone> skintones)> GetPreferenceAsync()
+        public static async Task<(List<Color> colors, List<Occasion> occasions, List<PaintType> paintTypes, List<Skintone> skintones)> GetPreferenceAsync()
         {
             List<Color> tempColors = [];
             List<Occasion> tempOccasions = [];
             List<PaintType> tempPaintTypes = [];
-            List<SkinTone> tempSkinTones = [];
+            List<Skintone> tempSkinTones = [];
 
             var colorTask = Task.Run(async () =>
             {
@@ -94,10 +94,10 @@ namespace INBS.Application.Common
             return (tempColors, tempOccasions, tempPaintTypes, tempSkinTones);
         }
 
-        public static Task<List<SkinTone>> GetSkinTones()
+        public static Task<List<Skintone>> GetSkinTones()
         {
             var skintoneJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Skintone.json"));
-            return Task.FromResult(JsonSerializer.Deserialize<List<SkinTone>>(skintoneJson) ?? []);
+            return Task.FromResult(JsonSerializer.Deserialize<List<Skintone>>(skintoneJson) ?? []);
         }
 
         public static Task<List<PaintType>> GetPaintTypes()

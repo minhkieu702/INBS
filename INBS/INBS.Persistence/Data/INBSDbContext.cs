@@ -27,8 +27,6 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<ArtistAvailability> ArtistAvailabilities { get; set; }
 
-        public virtual DbSet<ArtistDesign> ArtistDesigns { get; set; }
-
         public virtual DbSet<ArtistService> ArtistServices { get; set; }
 
         public virtual DbSet<Booking> Bookings { get; set; }
@@ -43,13 +41,13 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Customer> Customers { get; set; }
 
-        public virtual DbSet<CustomerPreference> CustomerPreferences { get; set; }
+        public virtual DbSet<Preference> Preferences { get; set; }
 
         public virtual DbSet<CustomNailDesign> CustomNailDesigns { get; set; }
 
         public virtual DbSet<Design> Designs { get; set; }
 
-        public virtual DbSet<DesignPreference> DesignPreferences { get; set; }
+        public virtual DbSet<DesignService> DesignServices { get; set; }
 
         public virtual DbSet<DeviceToken> DeviceTokens { get; set; }
 
@@ -75,11 +73,9 @@ namespace INBS.Persistence.Data
         {
             //thiết lập superkey cho các bảng trong gian
             modelBuilder.Entity<AccessoryCustomNailDesign>().HasKey(c => new { c.AccessoryId, c.CustomNailDesignId });
-            modelBuilder.Entity<ArtistDesign>().HasKey(c => new { c.ArtistId, c.DesignId });
+            modelBuilder.Entity<DesignService>().HasKey(c => new { c.ServiceId, c.DesignId });
             modelBuilder.Entity<ArtistService>().HasKey(c => new { c.ArtistId, c.ServiceId });
             modelBuilder.Entity<ServiceCustomCombo>().HasKey(c => new { c.ServiceId, c.CustomComboId });
-            modelBuilder.Entity<DesignPreference>().HasKey(c => new { c.DesignId, c.PreferenceId, c.PreferenceType });
-            modelBuilder.Entity<CustomerPreference>().HasKey(c => new { c.CustomerId, c.PreferenceId, c.PreferenceType });
             modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
             modelBuilder.Entity<NailDesign>().HasKey(c => new { c.DesignId, c.NailPosition, c.IsLeft });
             modelBuilder.Entity<Image>().HasKey(c => new { c.DesignId, c.NumerialOrder });

@@ -4,6 +4,7 @@ using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    partial class INBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250304054838_update_preference")]
+    partial class update_preference
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,6 +154,21 @@ namespace INBS.Persistence.Migrations
                     b.ToTable("ArtistAvailabilities");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.ArtistDesign", b =>
+                {
+                    b.Property<Guid>("ArtistId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DesignId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ArtistId", "DesignId");
+
+                    b.HasIndex("DesignId");
+
+                    b.ToTable("ArtistDesigns");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.ArtistService", b =>
                 {
                     b.Property<Guid>("ArtistId")
@@ -172,7 +190,7 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ArtistId")
+                    b.Property<Guid>("ArtistAvailabilityId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -213,7 +231,7 @@ namespace INBS.Persistence.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ArtistId");
+                    b.HasIndex("ArtistAvailabilityId");
 
                     b.HasIndex("CustomComboId");
 
@@ -371,9 +389,6 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("AverageRating")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -399,21 +414,6 @@ namespace INBS.Persistence.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("Designs");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.DesignService", b =>
-                {
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DesignId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ServiceId", "DesignId");
-
-                    b.HasIndex("DesignId");
-
-                    b.ToTable("DesignServices");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.DeviceToken", b =>
@@ -450,15 +450,15 @@ namespace INBS.Persistence.Migrations
                     b.Property<Guid?>("ArtistId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("DesignId")
                         .HasColumnType("uniqueidentifier");
@@ -485,13 +485,28 @@ namespace INBS.Persistence.Migrations
 
                     b.HasIndex("ArtistId");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("BookingId");
 
                     b.HasIndex("DesignId");
 
                     b.HasIndex("StoreId");
 
                     b.ToTable("Feedbacks");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.FeedbackService", b =>
+                {
+                    b.Property<Guid>("FeedbackId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("FeedbackId", "ServiceId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("FeedbackService");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Image", b =>
@@ -637,9 +652,6 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("AverageDuration")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -677,9 +689,6 @@ namespace INBS.Persistence.Migrations
 
                     b.Property<Guid>("CustomComboId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("Duration")
-                        .HasColumnType("bigint");
 
                     b.HasKey("ServiceId", "CustomComboId");
 
@@ -840,6 +849,25 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Artist");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.ArtistDesign", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.Artist", "Artist")
+                        .WithMany("ArtistDesigns")
+                        .HasForeignKey("ArtistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("INBS.Domain.Entities.Design", "Design")
+                        .WithMany("ArtistDesigns")
+                        .HasForeignKey("DesignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Artist");
+
+                    b.Navigation("Design");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.ArtistService", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.Artist", "Artist")
@@ -861,9 +889,9 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Booking", b =>
                 {
-                    b.HasOne("INBS.Domain.Entities.Artist", "Artist")
+                    b.HasOne("INBS.Domain.Entities.ArtistAvailability", "ArtistAvailability")
                         .WithMany("Bookings")
-                        .HasForeignKey("ArtistId")
+                        .HasForeignKey("ArtistAvailabilityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -879,7 +907,7 @@ namespace INBS.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Artist");
+                    b.Navigation("ArtistAvailability");
 
                     b.Navigation("CustomCombo");
 
@@ -960,25 +988,6 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.DesignService", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Design", "Design")
-                        .WithMany("DesignServices")
-                        .HasForeignKey("DesignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("INBS.Domain.Entities.Service", "Service")
-                        .WithMany("DesignServices")
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Design");
-
-                    b.Navigation("Service");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.DeviceToken", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.Customer", "Customer")
@@ -996,9 +1005,9 @@ namespace INBS.Persistence.Migrations
                         .WithMany("Feedbacks")
                         .HasForeignKey("ArtistId");
 
-                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
+                    b.HasOne("INBS.Domain.Entities.Booking", "Booking")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1012,11 +1021,30 @@ namespace INBS.Persistence.Migrations
 
                     b.Navigation("Artist");
 
-                    b.Navigation("Customer");
+                    b.Navigation("Booking");
 
                     b.Navigation("Design");
 
                     b.Navigation("Store");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.FeedbackService", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.Feedback", "Feedback")
+                        .WithMany("FeedbackServices")
+                        .HasForeignKey("FeedbackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("INBS.Domain.Entities.Service", "Service")
+                        .WithMany("FeedbackServices")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Feedback");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Image", b =>
@@ -1126,16 +1154,23 @@ namespace INBS.Persistence.Migrations
                 {
                     b.Navigation("ArtistAvailabilities");
 
+                    b.Navigation("ArtistDesigns");
+
                     b.Navigation("ArtistServices");
 
-                    b.Navigation("Bookings");
-
                     b.Navigation("Feedbacks");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.ArtistAvailability", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Booking", b =>
                 {
                     b.Navigation("Cancellation");
+
+                    b.Navigation("Feedbacks");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.CustomCombo", b =>
@@ -1165,8 +1200,6 @@ namespace INBS.Persistence.Migrations
 
                     b.Navigation("DeviceTokens");
 
-                    b.Navigation("Feedbacks");
-
                     b.Navigation("Preferences");
 
                     b.Navigation("Recommendations");
@@ -1174,9 +1207,9 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Design", b =>
                 {
-                    b.Navigation("CustomDesigns");
+                    b.Navigation("ArtistDesigns");
 
-                    b.Navigation("DesignServices");
+                    b.Navigation("CustomDesigns");
 
                     b.Navigation("Feedbacks");
 
@@ -1187,13 +1220,18 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Preferences");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.Feedback", b =>
+                {
+                    b.Navigation("FeedbackServices");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.Service", b =>
                 {
                     b.Navigation("ArtistServices");
 
                     b.Navigation("CategoryServices");
 
-                    b.Navigation("DesignServices");
+                    b.Navigation("FeedbackServices");
 
                     b.Navigation("ServiceCustomCombos");
                 });

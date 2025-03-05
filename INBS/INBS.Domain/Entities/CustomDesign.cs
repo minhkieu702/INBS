@@ -14,7 +14,6 @@ namespace INBS.Domain.Entities
         public CustomDesign() : base()
         {
             IsSave = false;
-            //ImageUrl = string.Empty;
             Bookings = [];
             CustomNailDesigns = [];
         }

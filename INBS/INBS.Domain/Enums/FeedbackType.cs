@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Authentication
+namespace INBS.Domain.Enums
 {
-    public class SignInRequest
+    public enum FeedbackType
     {
+        Service = 1,
+        Design = 2,
+        Store = 3
     }
 }

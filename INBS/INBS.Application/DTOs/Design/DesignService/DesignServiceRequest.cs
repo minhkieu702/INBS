@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Booking.CustomCombo
+namespace INBS.Application.DTOs.Design.DesignService
 {
-    internal class CustomComboRequest
+    public class DesignServiceRequest
     {
     }
 }

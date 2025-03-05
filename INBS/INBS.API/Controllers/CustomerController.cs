@@ -1,7 +1,7 @@
-﻿using INBS.Application.DTOs.Customer;
+﻿using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace INBS.API.Controllers
 {
@@ -18,13 +18,12 @@ namespace INBS.API.Controllers
         /// <param name="request">Preferences request.</param>
         /// <returns>Updated customer entity.</returns>
         [HttpPost("preferences")]
-        public async Task<IActionResult> UpdatePreferences([FromBody] PreferencesRequest request)
+        public async Task<IActionResult> UpdatePreferences([FromBody] PreferenceRequest request)
         {
             try
             {
-                var customerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                var result = await service.UpdatePreferencesAsync(customerId, request);
-                return Ok(result);
+                await service.UpdatePreferencesAsync(request);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -33,22 +32,17 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
-        /// Gets the preferences of the authenticated customer.
+        /// Gets customers.
         /// </summary>
         /// <returns>Customer preferences.</returns>
-        [HttpGet("preferences")]
-        public async Task<IActionResult> GetPreferences()
+        [HttpGet]
+        [EnableQuery]
+        public async Task<IActionResult> Get()
         {
             try
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var customerId))
-                {
-                    return BadRequest("Invalid or missing customer ID.");
-                }
-
-                var result = await service.GetPreferencesAsync(customerId);
-                return Ok(result);
+                var result = await service.Get();
+                return Ok(result.AsQueryable());
             }
             catch (Exception ex)
             {

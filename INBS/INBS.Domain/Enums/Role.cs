@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Domain.Common
+namespace INBS.Domain.Enums
 {
-    internal class Enum
+    public enum Role
     {
+        Customer = 0,
+        Artist = 1,
+        Admin = 2
     }
 }
