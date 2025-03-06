@@ -17,6 +17,7 @@ namespace INBS.Domain.Entities
             ArtistServices = [];
             ArtistAvailabilities = [];
             Feedbacks = [];
+            Bookings = [];
         }
         [Key]
         public Guid ID { get; set; }
@@ -27,6 +28,8 @@ namespace INBS.Domain.Entities
         public int YearsOfExperience { get; set; }
 
         public int Level { get; set; }
+
+        public int AverageRating { get; set; }
 
         public Guid StoreId { get; set; }
         [InverseProperty(nameof(Store.Artists))]

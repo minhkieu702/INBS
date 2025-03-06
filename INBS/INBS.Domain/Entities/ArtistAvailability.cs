@@ -21,9 +21,9 @@ namespace INBS.Domain.Entities
 
         public TimeOnly EndTime { get; set; }
 
-        public int BreakTime { get; set; } //minute
+        public long BreakTime { get; set; } //minute
 
-        public int MaximumBreakTime { get; set; }
+        public long MaximumBreakTime { get; set; }
 
         public Guid ArtistId { get; set; }
         [ForeignKey(nameof(ArtistId))]
