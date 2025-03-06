@@ -47,7 +47,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                await service.Create(store, User);
+                await service.Create(store);
                 return Ok();
             }
             catch (Exception ex)

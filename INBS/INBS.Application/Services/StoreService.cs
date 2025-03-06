@@ -5,6 +5,7 @@ using INBS.Application.IServices;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,9 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class StoreService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService) : IStoreService
+    public class StoreService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : IStoreService
     {
-        public async Task Create(StoreRequest modelRequest, ClaimsPrincipal user)
+        public async Task Create(StoreRequest modelRequest)
         {
             try
             {
@@ -30,8 +31,7 @@ namespace INBS.Application.Services
                     throw new Exception("This address was already used");
                 var newEntity = _mapper.Map<Store>(modelRequest);
 
-                newEntity.AdminId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                    "E492D8F4-43EE-4AE2-BE26-6128E2D8C582");
+                newEntity.AdminId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
                 newEntity.ImageUrl = modelRequest.NewImage != null ? await _firebaseService.UploadFileAsync(modelRequest.NewImage) : Constants.DEFAULT_IMAGE_URL;
 
@@ -81,7 +81,8 @@ namespace INBS.Application.Services
             {
                 var result = await _unitOfWork.StoreRepository.GetAsync(include:
                     query => query.Where(s => !s.IsDeleted)
-                    //.Include(s => s.Artists.Where(a => !a.IsDeleted))
+                    .Include(s => s.Artists.Where(a => !a.User!.IsDeleted))
+                        .ThenInclude(a => a.User)
                     //.Include(s => s.Admin)
                     );
 
@@ -103,9 +104,6 @@ namespace INBS.Application.Services
                 var existingEntity = await _unitOfWork.StoreRepository.GetByIdAsync(id) ?? throw new Exception("Store not found");
 
                 _mapper.Map(request, existingEntity);
-
-                //existingEntity.AdminId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-                    //"7d9e01f9-d23a-403c-b496-097af797de02");
 
                 if (request.NewImage != null)
                 {

@@ -12,7 +12,7 @@ namespace INBS.Application.IServices
     {
         Task<IEnumerable<StoreResponse>> Get();
 
-        Task Create(StoreRequest request, ClaimsPrincipal user);
+        Task Create(StoreRequest request);
 
         Task Delete(Guid id);
 
