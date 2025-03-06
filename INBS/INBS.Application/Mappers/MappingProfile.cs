@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using INBS.Application.DTOs.Booking;
 using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.CustomNailDesign;
 using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Design.DesignService;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Service.CustomCombo;
+using INBS.Application.DTOs.Service.DesignService;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.Artist;
@@ -32,6 +35,11 @@ namespace INBS.Application.Mappers
             CreateMap<Accessory, AccessoryResponse>();
             #endregion
 
+            #region Booking
+            CreateMap<BookingRequest, Booking>();
+            CreateMap<Booking, BookingResponse>();
+            #endregion
+
             #region CategoryService
             //CreateMap<CategoryServiceRequest, CategoryService>();
             CreateMap<CategoryService, CategoryServiceResponse>();
@@ -45,6 +53,12 @@ namespace INBS.Application.Mappers
                 dest.LastModifiedAt = DateTime.Now;
             }); 
             CreateMap<Service, ServiceResponse>();
+            #endregion
+
+            #region DesignService
+            CreateMap<DesignServiceRequest, DesignService>();
+            CreateMap<ServiceDesignRequest, DesignService>();
+            CreateMap<DesignService, DesignServiceResponse>();
             #endregion
 
             #region CustomCombo
