@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using INBS.Application.DTOs.Service.DesignService;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,5 +23,7 @@ namespace INBS.Application.DTOs.Service.Service
         public bool IsAdditional { get; set; }
 
         public IList<int> CategoryIds { get; set; } = [];
+
+        public IList<ServiceDesignRequest> Designs { get; set; } = [];
     }
 }

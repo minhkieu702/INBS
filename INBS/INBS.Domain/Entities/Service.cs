@@ -27,7 +27,7 @@ namespace INBS.Domain.Entities
 
         public string? ImageUrl { get; set; }
 
-        public double Price { get; set; }
+        public long Price { get; set; }
 
         public long AverageDuration { get; set; }
 
