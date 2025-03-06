@@ -29,6 +29,6 @@ namespace INBS.Application.DTOs.Booking
 
         public Guid CustomComboId { get; set; }
 
-        public Guid ArtistAvailabilityId { get; set; }
+        public Guid ArtistId { get; set; }
     }
 }

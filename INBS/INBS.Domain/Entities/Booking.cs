@@ -25,8 +25,6 @@ namespace INBS.Domain.Entities
 
         public long TotalAmount { get; set; }
 
-        public int? PaymentMethod { get; set; } //Cash (0), Card (1)
-
         public string? Preferences { get; set; }
 
         public Guid CustomDesignId { get; set; }
