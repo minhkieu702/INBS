@@ -31,8 +31,6 @@ namespace INBS.Domain.Entities
 
         public int AverageRating { get; set; }
 
-        public int Price { get; set; }
-
         [InverseProperty(nameof(Image.Design))]
         public virtual ICollection<Image> Images { get; set; }
 

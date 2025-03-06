@@ -27,6 +27,7 @@ namespace INBS.Application.Mappers
              .AfterMap((source, dest) =>
              {
                  dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                 dest.LastModifiedAt = DateTime.Now;
              });
             CreateMap<Accessory, AccessoryResponse>();
             #endregion
@@ -41,12 +42,17 @@ namespace INBS.Application.Mappers
                 .AfterMap((source, dest) =>
             {
                 dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                dest.LastModifiedAt = DateTime.Now;
             }); 
             CreateMap<Service, ServiceResponse>();
             #endregion
 
             #region CustomCombo
-            CreateMap<CustomComboRequest, CustomCombo>();
+            CreateMap<CustomComboRequest, CustomCombo>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.LastModifiedAt = DateTime.Now;
+                });
             CreateMap<CustomCombo, CustomComboResponse>();
             CreateMap<ServiceCustomComboRequest, ServiceCustomCombo>();
             CreateMap<ServiceCustomCombo, ServiceCustomComboResponse>();
@@ -57,6 +63,7 @@ namespace INBS.Application.Mappers
                 .AfterMap((source, dest) =>
                 {
                     dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                    dest.LastModifiedAt = DateTime.Now;
                 }); 
             CreateMap<Store, StoreResponse>()
                 .AfterMap((src, dest) =>
@@ -71,7 +78,11 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region Design
-            CreateMap<DesignRequest, Design>();
+            CreateMap<DesignRequest, Design>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.LastModifiedAt = DateTime.Now;
+                });
             CreateMap<Design, DesignResponse>();
 
             CreateMap<ImageRequest, Image>()
@@ -90,7 +101,10 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region CustomDesign
-            CreateMap<CustomDesignRequest, CustomDesign>();
+            CreateMap<CustomDesignRequest, CustomDesign>().AfterMap((source, dest) =>
+            {
+                dest.LastModifiedAt = DateTime.Now;
+            });
             CreateMap<CustomDesign, CustomDesignResponse>();
 
             CreateMap<CustomNailDesignRequest,  CustomNailDesign>();
@@ -101,7 +115,11 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region User
-            CreateMap<UserRequest, User>().AfterMap((source, dest) => dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL);
+            CreateMap<UserRequest, User>().AfterMap((source, dest) =>
+            {
+                dest.LastModifiedAt = DateTime.Now;
+                dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+            });
             CreateMap<User, UserResponse>();
             #endregion
 
@@ -123,7 +141,11 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region ArtistAvailability
-            CreateMap<ArtistAvailabilityRequest, ArtistAvailability>();
+            CreateMap<ArtistAvailabilityRequest, ArtistAvailability>()
+                .AfterMap((source, dest) =>
+            {
+                dest.LastModifiedAt = DateTime.Now;
+            });
             CreateMap<ArtistAvailability, ArtistAvailabilityResponse>();
             #endregion
         }

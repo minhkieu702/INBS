@@ -64,11 +64,10 @@ namespace INBS.Application.Services
             return result.Select(x => x.Price).Sum(x => x);
         }
 
-        private async Task<int> ValidationDesignId(Guid id)
+        private async Task<long> ValidationDesignId(Guid id)
         {
             var result = await _unitOfWork.DesignRepository.GetByIdAsync(id) ?? throw new Exception("This design is not existed");
-
-            return result.Price;
+            return 0;
         }
 
         public async Task<Guid> Create(CustomDesignRequest request, IList<CustomNailDesignRequest> customNailDesignRequests)
