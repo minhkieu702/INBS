@@ -135,11 +135,19 @@ namespace INBS.Application.Services
 
                 var entity = await _unitOfWork.CustomComboRepository.GetByIdAsync(id) ?? throw new Exception($"The entity with {id} is not existed.");
 
+                _mapper.Map(request, entity);
+
+                serviceCustomCombos.Add(request.MainService);
+
+                await _unitOfWork.CustomComboRepository.UpdateAsync(entity);
+
                 await ValidateService(serviceCustomCombos);
 
                 await HandleServiceCustomCombo(id, serviceCustomCombos);
 
-                if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
+                var check = await _unitOfWork.SaveAsync();
+
+                if (check == 0) throw new Exception("This action failed");
 
                 _unitOfWork.CommitTransaction();
             }

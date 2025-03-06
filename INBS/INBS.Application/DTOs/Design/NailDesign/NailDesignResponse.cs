@@ -16,8 +16,6 @@ namespace INBS.Application.DTOs.Design.NailDesign
 
         public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
 
-        public long AverageDuration { get; set; }
-
         [Key]
         public int NailPosition { get; set; } //4, 8, 12, 16, 20
 

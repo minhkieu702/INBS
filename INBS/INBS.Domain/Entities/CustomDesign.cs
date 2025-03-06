@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using INBS.Domain.Entities.Common;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace INBS.Domain.Entities
 {
@@ -19,7 +20,7 @@ namespace INBS.Domain.Entities
         }
         public bool IsSave { get; set; }
 
-        public int Price { get; set; }
+        public long Price { get; set; }
 
         public Guid CustomerID { get; set; }
         [ForeignKey(nameof(CustomerID))]
