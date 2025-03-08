@@ -73,7 +73,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("verify-otp")]
-        public async Task<IActionResult> VerifyOtpForCustomer([FromBody] string phoneNumber, [FromForm] string otp)
+        public async Task<IActionResult> VerifyOtpForCustomer([FromForm] string phoneNumber, [FromForm] string otp)
         {
             try
             {

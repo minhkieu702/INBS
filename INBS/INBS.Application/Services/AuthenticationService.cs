@@ -17,6 +17,7 @@ namespace INBS.Application.Services
         {
             try
             {
+                phone = FormatPhoneNumber(phone);
                 var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phone);
 
                 if (user == null || !user.Any())
@@ -80,7 +81,14 @@ namespace INBS.Application.Services
                 throw new Exception("Phone number already exists");
             }
         }
-
+        private string FormatPhoneNumber(string phone)
+        {
+            if (!string.IsNullOrEmpty(phone) && phone.StartsWith("0"))
+            {
+                return "+84" + phone.Substring(1);
+            }
+            return phone;
+        }
         private void IsPasswordMatching(string password, string confirmPassword)
         {
             if (password != confirmPassword)
@@ -133,7 +141,9 @@ namespace INBS.Application.Services
             try
             {
                 _unitOfWork.BeginTransaction();
-                
+
+                requestModel.PhoneNumber = FormatPhoneNumber(requestModel.PhoneNumber);
+
                 IsPasswordMatching(password, confirmPassword);
 
                 await IsUniquePhoneNumber(requestModel.PhoneNumber);
@@ -174,6 +184,8 @@ namespace INBS.Application.Services
             try
             {
                 IsPasswordMatching(newPassword, confirmPassword);
+
+                phone = FormatPhoneNumber(phone);
 
                 var user = (await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phone)).FirstOrDefault();
 
@@ -223,6 +235,8 @@ namespace INBS.Application.Services
 
         public async Task<LoginResponse> VerifyOtpAsync(string phoneNumber, string otp)
         {
+            phoneNumber = FormatPhoneNumber(phoneNumber);
+
             var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phoneNumber);
 
             if (user == null || !user.Any())
