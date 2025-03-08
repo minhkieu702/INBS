@@ -1,4 +1,6 @@
-﻿using INBS.Domain.Entities;
+﻿using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Service.Service;
+using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,10 +14,10 @@ namespace INBS.Application.DTOs.Design.DesignService
     {
         [Key]
         public Guid DesignId { get; set; }
-        public virtual Domain.Entities.Design? Design { get; set; }
+        public virtual DesignResponse? Design { get; set; }
 
         [Key]
         public Guid ServiceId { get; set; }
-        public virtual Domain.Entities.Service? Service { get; set; }
+        public virtual ServiceResponse? Service { get; set; }
     }
 }

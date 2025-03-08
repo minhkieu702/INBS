@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.Design.Image;
+﻿using INBS.Application.DTOs.Design.DesignService;
+using INBS.Application.DTOs.Design.Image;
 using INBS.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -18,5 +19,7 @@ namespace INBS.Application.DTOs.Design.Design
         public string? Description { get; set; }
 
         public int Price { get; set; }
+
+        public IList<DesignServiceRequest> Services { get; set; } = [];
     }
 }

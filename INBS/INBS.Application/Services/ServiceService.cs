@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using INBS.Application.Common;
+using INBS.Application.DTOs.Service.DesignService;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
@@ -17,11 +18,11 @@ namespace INBS.Application.Services
         private async Task InsertCategoryService(
             Guid serviceId, 
             IList<int> categoryIds, 
-            IEnumerable<Domain.Entities.CategoryService> existedCategoryServices)
+            IEnumerable<CategoryService> existedCategoryServices)
         {
             var existingCategoryIds = existedCategoryServices.Select(cs => cs.CategoryId).ToHashSet();
 
-            var list = new List<Domain.Entities.CategoryService>();
+            var list = new List<CategoryService>();
 
             var categories = await Utils.GetCategories();
 
@@ -34,7 +35,7 @@ namespace INBS.Application.Services
                     var category = categories.FirstOrDefault(c => c.ID == categoryId);
                     if (category != null)
                     {
-                        var categoryService = new Domain.Entities.CategoryService
+                        var categoryService = new CategoryService
                         {
                             CategoryId = categoryId,
                             ServiceId = serviceId
@@ -49,6 +50,41 @@ namespace INBS.Application.Services
             }
 
             await _unitOfWork.CategoryServiceRepository.InsertRangeAsync(list);
+        }
+
+        private async Task UpdateDesignService(Guid serviceId, IList<ServiceDesignRequest> designIds)
+        {
+            if (designIds == null || !designIds.Any())
+                return;
+
+            await ValidateService(designIds.Select(c => c.DesignId));
+
+            var oldDesignServices = await _unitOfWork.DesignServiceRepository.GetAsync(c => c.ServiceId == serviceId);
+            
+            if (oldDesignServices.Any())
+                _unitOfWork.DesignServiceRepository.DeleteRange(oldDesignServices);
+
+            var newDesignServices = new List<Domain.Entities.DesignService>();
+            
+            foreach (var designId in designIds)
+            {
+                newDesignServices.Add(new Domain.Entities.DesignService
+                {
+                    ServiceId = serviceId,
+                    DesignId = designId.DesignId,
+                    ExtraPrice = designId.ExtraPrice,
+                });
+            }
+            await _unitOfWork.DesignServiceRepository.InsertRangeAsync(newDesignServices);
+        }
+
+        private async Task ValidateService(IEnumerable<Guid> designIds)
+        {
+            var designs = await _unitOfWork.DesignRepository.GetAsync(include: query => query.Where(c => !c.IsDeleted && designIds.Contains(c.ID)));
+            if (designs.Count() != designIds.Count())
+            {
+                throw new Exception("Some design is not existed");
+            }
         }
 
         public async Task Create(ServiceRequest modelRequest)
@@ -69,6 +105,8 @@ namespace INBS.Application.Services
                 newService.CreatedAt = DateTime.Now;
 
                 await _unitOfWork.ServiceRepository.InsertAsync(newService);
+
+                await UpdateDesignService(newService.ID, modelRequest.Designs);
 
                 var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(newService.ID));
 
@@ -126,6 +164,8 @@ namespace INBS.Application.Services
                     .ThenInclude(scc => scc.CustomCombo!)
                     .ThenInclude(customCombo => customCombo.Customer!)
                     .ThenInclude(customer => customer.User!)
+                  .Include(service => service.DesignServices.Where(c => !c.Design!.IsDeleted))
+                    .ThenInclude(service => service.Design)
                 ) ?? throw new Exception("Something went wrong!");
 
                 var responses = _mapper.Map<IEnumerable<ServiceResponse>>(services);
@@ -176,14 +216,14 @@ namespace INBS.Application.Services
 
                 if (updatingRequest.NewImage != null)
                 {
-                    //await _firebaseService.DeleteImageAsync(newEntity.ImageUrl);
-
-                    //Push new image to firebase
                     newEntity.ImageUrl = await _firebaseService.UploadFileAsync(updatingRequest.NewImage);
                 }
 
                 if (updatingRequest.CategoryIds != null && updatingRequest.CategoryIds.Any())
                     await HandleCategoryServiceUpdating(id, updatingRequest.CategoryIds);
+
+                if (updatingRequest.Designs != null && updatingRequest.Designs.Any())
+                    await UpdateDesignService(id, updatingRequest.Designs);
 
                 await _unitOfWork.ServiceRepository.UpdateAsync(newEntity);
 

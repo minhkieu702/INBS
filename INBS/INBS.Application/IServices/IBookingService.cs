@@ -11,7 +11,7 @@ namespace INBS.Application.IService
     {
         Task Create(BookingRequest request);
 
-        Task Delete(Guid id);
+        Task CancelBooking(Guid id);
 
         Task Update(Guid id, BookingRequest request);
 

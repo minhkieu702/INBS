@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Design.DesignService
+namespace INBS.Application.DTOs.Service.DesignService
 {
-    public class DesignServiceRequest
+    public class ServiceDesignRequest
     {
-        public Guid ServiceId { get; set; }
+        public Guid DesignId { get; set; }
+
         public long ExtraPrice { get; set; }
     }
 }

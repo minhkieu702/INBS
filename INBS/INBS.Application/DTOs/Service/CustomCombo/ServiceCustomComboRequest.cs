@@ -9,5 +9,7 @@ namespace INBS.Application.DTOs.Service.CustomCombo
     public class ServiceCustomComboRequest
     {
         public Guid AdditionalServiceId { get; set; }
+
+        public long Duration { get; set; }
     }
 }

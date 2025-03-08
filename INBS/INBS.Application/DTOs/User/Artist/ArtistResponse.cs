@@ -20,14 +20,16 @@ namespace INBS.Application.DTOs.User.Artist
 
         public int Level { get; set; }
 
+        public int AverageRating { get; set; }
+
         public Guid StoreId { get; set; }
 
         public virtual StoreResponse? Store { get; set; }
 
-        public virtual ICollection<ArtistDesignResponse> ArtistDesignResponses { get; set; } = [];
+        public virtual ICollection<ArtistDesignResponse> ArtistDesigns { get; set; } = [];
 
-        public virtual ICollection<ArtistServiceResponse> ArtistServiceResponses { get; set; } = [];
+        public virtual ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];
 
-        public virtual ICollection<ArtistAvailabilityResponse> ArtistAvailabilityResponses { get; set; } = [];
+        public virtual ICollection<ArtistAvailabilityResponse> ArtistAvailabilitys { get; set; } = [];
     }
 }

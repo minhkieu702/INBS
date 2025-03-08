@@ -155,12 +155,14 @@ namespace INBS.Application.Services
             try
             {
                 var artist = await _unitOfWork.ArtistRepository.GetAsync(include: query => 
-                query.Where(c => c.User != null && !c.User.IsDeleted)
+                query.Where(c => !c.User!.IsDeleted)
                     .Include(c => c.User)
                     .Include(c => c.Store)
                     .Include(c => c.ArtistAvailabilities.Where(c => !c.IsDeleted))
-                    .Include(c => c.ArtistServices.Where(c => c.Service != null && !c.Service.IsDeleted))
+                    .Include(c => c.ArtistServices.Where(c => !c.Service!.IsDeleted))
                         .ThenInclude(c => c.Service)
+                            .ThenInclude(c => c.DesignServices.Where(c => !c.Design!.IsDeleted))
+                                .ThenInclude(c => c.Design)
                     .Include(c => c.ArtistAvailabilities.Where(c => !c.IsDeleted))
                     );
                 return _mapper.Map<IEnumerable<ArtistResponse>>(artist);

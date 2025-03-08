@@ -11,11 +11,47 @@ using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
+using INBS.Application.DTOs.Design.DesignService;
 
 namespace INBS.Application.Services
 {
     public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService) : IDesignService
     {
+        private async Task UpdateDesignService(Guid designId, IList<DesignServiceRequest> services)
+        {
+            if (services == null || !services.Any())
+                return;
+
+            await ValidateService(services.Select(c => c.ServiceId));
+
+            var oldDesignServices = await _unitOfWork.DesignServiceRepository.GetAsync(c => c.ServiceId == designId);
+
+            if (oldDesignServices.Any())
+                _unitOfWork.DesignServiceRepository.DeleteRange(oldDesignServices);
+
+            var newDesignServices = new List<Domain.Entities.DesignService>();
+
+            foreach (var service in services)
+            {
+                newDesignServices.Add(new Domain.Entities.DesignService
+                {
+                    ServiceId = service.ServiceId,
+                    DesignId = designId,
+                    ExtraPrice = service.ExtraPrice
+                });
+            }
+            await _unitOfWork.DesignServiceRepository.InsertRangeAsync(newDesignServices);
+        }
+
+        private async Task ValidateService(IEnumerable<Guid> serviceIds)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetAsync(include: query => query.Where(c => !c.IsDeleted && serviceIds.Contains(c.ID)));
+            if (service.Count() != serviceIds.Count())
+            {
+                throw new Exception("Some design is not existed");
+            }
+        }
+
         public async Task Create(DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns)
         {
             try
@@ -43,6 +79,8 @@ namespace INBS.Application.Services
                 }
 
                 await HandleUpdatePreference(preferenceRequest, newEntity.ID);
+
+                await UpdateDesignService(newEntity.ID, modelRequest.Services);
 
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
@@ -140,6 +178,9 @@ namespace INBS.Application.Services
                             .ThenInclude(acnd => acnd.Accessory)
                 .Include(d => d.DesignServices.Where(ad => !ad.Service!.IsDeleted))
                     .ThenInclude(ad => ad.Service)
+                        .ThenInclude(s => s!.ArtistServices.Where(c => !c.Artist!.User!.IsDeleted))
+                            .ThenInclude(asr => asr.Artist)
+                                .ThenInclude(a => a!.User)
                 .AsNoTracking()
                 );
 
@@ -165,8 +206,6 @@ namespace INBS.Application.Services
                         action(preference);
                     }
                 }
-
-                response.AverageDuration = response.NailDesigns.Sum(c => c.AverageDuration);
             }
 
             return responses;
@@ -197,6 +236,8 @@ namespace INBS.Application.Services
                     nailDesigns.OrderBy(c => c.NailPosition), 
                     designId,
                     currentNailDesignList.OrderBy(c => c.NailPosition).ToDictionary(c => (c.NailPosition, c.IsLeft)));
+
+                await UpdateDesignService(designId, modelRequest.Services);
 
                 await _unitOfWork.DesignRepository.UpdateAsync(existedEntity);
 

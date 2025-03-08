@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using INBS.Application.DTOs.Booking;
 using INBS.Application.DTOs.Common.Preference;
 using INBS.Application.DTOs.Design.Accessory;
 using INBS.Application.DTOs.Design.CustomDesign;
 using INBS.Application.DTOs.Design.CustomNailDesign;
 using INBS.Application.DTOs.Design.Design;
+using INBS.Application.DTOs.Design.DesignService;
 using INBS.Application.DTOs.Design.Image;
 using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.DTOs.Service.CustomCombo;
+using INBS.Application.DTOs.Service.DesignService;
 using INBS.Application.DTOs.Service.Service;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.Artist;
@@ -27,8 +30,14 @@ namespace INBS.Application.Mappers
              .AfterMap((source, dest) =>
              {
                  dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                 dest.LastModifiedAt = DateTime.Now;
              });
             CreateMap<Accessory, AccessoryResponse>();
+            #endregion
+
+            #region Booking
+            CreateMap<BookingRequest, Booking>();
+            CreateMap<Booking, BookingResponse>();
             #endregion
 
             #region CategoryService
@@ -41,12 +50,23 @@ namespace INBS.Application.Mappers
                 .AfterMap((source, dest) =>
             {
                 dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                dest.LastModifiedAt = DateTime.Now;
             }); 
             CreateMap<Service, ServiceResponse>();
             #endregion
 
+            #region DesignService
+            CreateMap<DesignServiceRequest, DesignService>();
+            CreateMap<ServiceDesignRequest, DesignService>();
+            CreateMap<DesignService, DesignServiceResponse>();
+            #endregion
+
             #region CustomCombo
-            CreateMap<CustomComboRequest, CustomCombo>();
+            CreateMap<CustomComboRequest, CustomCombo>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.LastModifiedAt = DateTime.Now;
+                });
             CreateMap<CustomCombo, CustomComboResponse>();
             CreateMap<ServiceCustomComboRequest, ServiceCustomCombo>();
             CreateMap<ServiceCustomCombo, ServiceCustomComboResponse>();
@@ -57,6 +77,7 @@ namespace INBS.Application.Mappers
                 .AfterMap((source, dest) =>
                 {
                     dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                    dest.LastModifiedAt = DateTime.Now;
                 }); 
             CreateMap<Store, StoreResponse>()
                 .AfterMap((src, dest) =>
@@ -71,7 +92,11 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region Design
-            CreateMap<DesignRequest, Design>();
+            CreateMap<DesignRequest, Design>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.LastModifiedAt = DateTime.Now;
+                });
             CreateMap<Design, DesignResponse>();
 
             CreateMap<ImageRequest, Image>()
@@ -90,7 +115,10 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region CustomDesign
-            CreateMap<CustomDesignRequest, CustomDesign>();
+            CreateMap<CustomDesignRequest, CustomDesign>().AfterMap((source, dest) =>
+            {
+                dest.LastModifiedAt = DateTime.Now;
+            });
             CreateMap<CustomDesign, CustomDesignResponse>();
 
             CreateMap<CustomNailDesignRequest,  CustomNailDesign>();
@@ -101,7 +129,11 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region User
-            CreateMap<UserRequest, User>().AfterMap((source, dest) => dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL);
+            CreateMap<UserRequest, User>().AfterMap((source, dest) =>
+            {
+                dest.LastModifiedAt = DateTime.Now;
+                dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+            });
             CreateMap<User, UserResponse>();
             #endregion
 
@@ -123,7 +155,11 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region ArtistAvailability
-            CreateMap<ArtistAvailabilityRequest, ArtistAvailability>();
+            CreateMap<ArtistAvailabilityRequest, ArtistAvailability>()
+                .AfterMap((source, dest) =>
+            {
+                dest.LastModifiedAt = DateTime.Now;
+            });
             CreateMap<ArtistAvailability, ArtistAvailabilityResponse>();
             #endregion
         }

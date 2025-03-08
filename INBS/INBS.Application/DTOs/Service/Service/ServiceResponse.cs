@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Common;
+using INBS.Application.DTOs.Design.DesignService;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User.Artist;
 using INBS.Domain.Common;
@@ -24,8 +25,12 @@ namespace INBS.Application.DTOs.Service.Service
 
         public bool IsAdditional { get; set; }
 
+        public long AverageDuration { get; set; }
+
         public ICollection<CategoryServiceResponse> CategoryServices { get; set; } = [];
 
         public ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];
+
+        public ICollection<DesignServiceResponse> DesignServices { get; set; } = [];
     }
 }
