@@ -262,6 +262,26 @@ namespace INBS.Application.Services
             };
         }
 
+        public async Task ResendOtpAsync(string phoneNumber)
+        {
+            phoneNumber = FormatPhoneNumber(phoneNumber);
+
+            var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phoneNumber);
+
+            if (user == null || !user.Any())
+                throw new Exception("Phone number is not registered");
+
+            var existingUser = user.First();
+
+            if (existingUser.OtpExpiry >= DateTime.UtcNow)
+                throw new Exception("OTP is still valid, please use the existing OTP");
+
+            existingUser = await SendOtp(existingUser);
+
+            await _unitOfWork.UserRepository.UpdateAsync(existingUser);
+            await _unitOfWork.SaveAsync();
+        }
+
         public async Task Delete(Guid? id)
         {
             try

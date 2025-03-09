@@ -86,6 +86,24 @@ namespace INBS.API.Controllers
             }
         }
         /// <summary>
+        /// Gửi lại OTP nếu OTP đã hết hạn
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("resend-otp")]
+        public async Task<IActionResult> ResendOtpForCustomer([FromForm] string phoneNumber)
+        {
+            try
+            {
+                await service.ResendOtpAsync(phoneNumber);
+                return Ok("OTP has been Resend successfully");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Login for staff members.
         /// </summary>
         /// <param name="username">The username of the staff member.</param>
