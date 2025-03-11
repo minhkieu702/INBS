@@ -282,6 +282,23 @@ namespace INBS.Application.Services
             await _unitOfWork.SaveAsync();
         }
 
+        public async Task<bool> CheckPhoneNumberVerified(string phoneNumber)
+        {
+            phoneNumber = FormatPhoneNumber(phoneNumber);
+
+            var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phoneNumber);
+
+            if (user == null || !user.Any())
+                throw new Exception("Phone number is not registered");
+
+            var existingUser = user.First();
+
+            if (!existingUser.IsVerified)
+                throw new Exception("Phone number has not been verified");
+
+            return true;
+        }
+
         public async Task Delete(Guid? id)
         {
             try

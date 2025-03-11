@@ -104,6 +104,24 @@ namespace INBS.API.Controllers
         }
 
         /// <summary>
+        /// Check sdt đã Verified hay chưa
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("checkPhone")]
+        public async Task<IActionResult> CheckPhoneNumberVerifiedForCustomer([FromQuery] string phoneNumber)
+        {
+            try
+            {
+                var isVerified = await service.CheckPhoneNumberVerified(phoneNumber);
+                return Ok(isVerified);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Login for staff members.
         /// </summary>
         /// <param name="username">The username of the staff member.</param>
