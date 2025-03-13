@@ -20,7 +20,7 @@ namespace INBS.Domain.Entities
 
         public Guid BookingId { get; set; }
         [ForeignKey(nameof(BookingId))]
-        [InverseProperty(nameof(Booking.Cancellation))]
+        [InverseProperty(nameof(Booking.Cancellations))]
         public virtual Booking? Booking { get; set; }
     }
 }
