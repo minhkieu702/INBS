@@ -10,27 +10,27 @@ namespace INBS.Application.Services
     {
         public async Task<IEnumerable<Category>> GetCategory()
         {
-            return await Utils.GetCategories();
+            return await Utils.GetCategoriesAsync();
         }
 
         public async Task<IEnumerable<Color>> GetColor()
         {
-            return await Utils.GetColors();
+            return await Utils.GetColorsAsync();
         }
 
         public async Task<IEnumerable<Occasion>> GetOccasions()
         {
-            return await Utils.GetOccasions();
+            return await Utils.GetOccasionsAsync();
         }
 
         public async Task<IEnumerable<PaintType>> GetPaintType()
         {
-            return await Utils.GetPaintTypes();
+            return await Utils.GetPaintTypesAsync();
         }
 
         public async Task<IEnumerable<Skintone>> GetSkinTone()
         {
-            return await Utils.GetSkinTones();
+            return await Utils.GetSkinTonesAsync();
         }
     }
 }

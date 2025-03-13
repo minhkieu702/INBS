@@ -20,7 +20,7 @@ namespace INBS.Application.Services
         {
             try
             {
-                var check = await unitOfWork.UserRepository.GetAsync(x => x.Username == "admin" && x.Role == (int)Role.Admin);
+                var check = await unitOfWork.UserRepository.GetAsync(x => x.Where(x => x.Role == (int)Role.Admin));
 
                 if (check.Any())
                 {
@@ -28,11 +28,15 @@ namespace INBS.Application.Services
                 }
                 var user = new User
                 {
-                    Username = "admin",
                     Role = (int)Role.Admin,
                     CreatedAt = DateTime.Now,
-                    IsVerified = true,
                     DateOfBirth = new DateOnly(1990, 1, 1)
+                };
+
+                var admin = new Admin
+                {
+                    ID = user.ID,
+                    Username = "admin"
                 };
 
                 user.PasswordHash = authentication.HashedPassword(user, "admin");
@@ -63,11 +67,13 @@ namespace INBS.Application.Services
         {
             try
             {
-                var user = await unitOfWork.UserRepository.GetAsync(x => x.Username == username && x.Role == (int)Role.Admin);
+                var admin = await unitOfWork.AdminRepository.GetAsync(x => x.Where(x => x.Username == username));
 
-                if (!user.Any() || user.First() == null)
+                var user = await unitOfWork.UserRepository.GetAsync(x => x.Where(x => x.Role == (int)Role.Admin));
+
+                if (user.First() == null || admin.First() == null)
                 {
-                    throw new Exception("This username not found");
+                    throw new Exception("Admin not found");
                 }
 
                 if (!authentication.VerifyPassword(user.First(), password))
