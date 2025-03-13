@@ -1,20 +1,15 @@
 ﻿using AutoMapper;
 using INBS.Application.Common;
-using INBS.Domain.Enums;
-using INBS.Application.DTOs.User.Artist;
-using INBS.Application.DTOs.User.Artist.ArtistAvailability;
-using INBS.Application.DTOs.User.User;
+using INBS.Application.DTOs.Artist;
+using INBS.Application.DTOs.ArtistService;
+using INBS.Application.DTOs.ArtistStore;
+using INBS.Application.DTOs.User;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
-using INBS.Domain.Common;
 using INBS.Domain.Entities;
+using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
@@ -23,7 +18,7 @@ namespace INBS.Application.Services
 
         private async Task IsUniquePhoneNumber(string phoneNumber, Guid? userId = null)
         {
-            var artist = await _unitOfWork.UserRepository.GetAsync(c => c.ID != userId && c.PhoneNumber == phoneNumber);
+            var artist = await _unitOfWork.UserRepository.GetAsync(query => query.Where(c => c.ID != userId && c.PhoneNumber == phoneNumber));
             if (artist.Any())
             {
                 throw new Exception("Phone number already exists");
@@ -32,7 +27,7 @@ namespace INBS.Application.Services
 
         private async Task AssignService(Guid artistId, IList<Guid> serviceIds)
         {
-            var oldServices = await _unitOfWork.ArtistServiceRepository.GetAsync(c => c.ArtistId == artistId);
+            var oldServices = await _unitOfWork.ArtistServiceRepository.GetAsync(query => query.Where(c => c.ArtistId == artistId));
             
             if(oldServices.Any()) _unitOfWork.ArtistServiceRepository.DeleteRange(oldServices);
 
@@ -50,16 +45,105 @@ namespace INBS.Application.Services
             await _unitOfWork.ArtistServiceRepository.InsertRangeAsync(newServices);
         }
 
-        private async Task IsStoreExisting(Guid storeId)
+        private async Task AssignStore(Guid artistId, IList<ArtistStoreRequest> aSRs)
         {
-            _ = await _unitOfWork.StoreRepository.GetByIdAsync(storeId) ?? throw new Exception("Store not found");
+            await ValidateTime(artistId, aSRs);
+
+            var storeIds = aSRs.Select(c => c.StoreId).ToList();
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var minDateAllowed = today.AddDays(1); // Chỉ cho phép đổi lịch từ ngày mai trở đi
+
+            // Lấy danh sách lịch làm cũ
+            var oldArtistStores = await _unitOfWork.ArtistStoreRepository.GetAsync(query =>
+                query.Where(c => c.ArtistId == artistId && storeIds.Contains(c.StoreId) && c.WorkingDate >= minDateAllowed));
+
+            var newArtistStores = _mapper.Map<List<ArtistStore>>(aSRs);
+
+            foreach (var old in oldArtistStores.OrderBy(c => c.WorkingDate).ThenBy(c => c.StartTime))
+            {
+                var matchingNew = newArtistStores.FirstOrDefault(newAS =>
+                    newAS.StoreId == old.StoreId && newAS.WorkingDate == old.WorkingDate);
+
+                if (matchingNew != null)
+                {
+                    // Nếu lịch mới trùng ngày & Store → Cập nhật StartTime, EndTime và đánh dấu không bị xóa
+                    old.StartTime = matchingNew.StartTime;
+                    old.EndTime = matchingNew.EndTime;
+                    old.IsDeleted = false;
+
+                    // Xóa khỏi danh sách mới để tránh chèn trùng
+                    newArtistStores.Remove(matchingNew);
+                }
+                else
+                {
+                    // Nếu lịch cũ không còn khớp với lịch mới nào → Đánh dấu xóa
+                    old.IsDeleted = true;
+                }
+            }
+
+            // Cập nhật các lịch cũ bị thay đổi (nếu có)
+            if (oldArtistStores.Any())
+            {
+                _unitOfWork.ArtistStoreRepository.UpdateRange(oldArtistStores.ToList());
+            }
+
+            // Thêm mới nếu có lịch mới chưa tồn tại trong DB
+            if (newArtistStores.Count != 0)
+            {
+                newArtistStores.ForEach(c => c.ArtistId = artistId);
+                await _unitOfWork.ArtistStoreRepository.InsertRangeAsync(newArtistStores);
+            }
+        }
+
+        private async Task ValidateStore(IEnumerable<Guid> ids)
+        {
+            var stores = await _unitOfWork.StoreRepository.GetAsync( query => query.Where(c => !c.IsDeleted && ids.Contains(c.ID)));
+            if (stores.Count() != ids.Count())
+            {
+                throw new Exception("Some store is not existed");
+            }
+        }
+        
+        private async Task ValidateTime(Guid artistId, IEnumerable<ArtistStoreRequest> aSR)
+        {
+            var changeDate = aSR.Select(c => c.WorkingDate).Distinct().Min();
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var minDateAllowed = today.AddDays(1);
+
+            if (changeDate < minDateAllowed)
+                throw new Exception("You can only change the working date at least 1 day before");
+
+            var bookings = await _unitOfWork.BookingRepository.GetAsync( query => query
+            .Include(c => c.ArtistStore)
+            .Where(c => c.ServiceDate >= minDateAllowed && c!.ArtistStore!.ArtistId == artistId && aSR.Select(c => c.StoreId).Contains(c!.ArtistStore!.StoreId))
+            );
+
+            foreach (var booking in bookings)
+            {
+                foreach (var a in aSR)
+                {
+                    if (booking.ServiceDate == a.WorkingDate)
+                    {
+                        throw new Exception("You can not change this date because this date is already booked");
+                    }
+                }
+            }
+        }
+
+        private async Task ValidateService(IEnumerable<Guid> serviceIds)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetAsync( query => query.Where(c => !c.IsDeleted && serviceIds.Contains(c.ID)));
+            if (service.Count() != serviceIds.Count())
+            {
+                throw new Exception("Some design is not existed");
+            }
         }
 
         private async Task<string> GetUsername(string fullname)
         {
             var username = Utils.TransToUsername(fullname);
             
-            var users = await _unitOfWork.UserRepository.GetAsync(c => c.Username.Equals(username));
+            var users = await _unitOfWork.ArtistRepository.GetAsync(c => c.Where(c => c.Username.Equals(username)));
 
             return users.Any() ? username += users.Count() : username;
         }
@@ -72,13 +156,9 @@ namespace INBS.Application.Services
 
                 var user = _mapper.Map<User>(userRequest);
 
-                user.Username = await GetUsername(userRequest.FullName);
-
                 user.PasswordHash = _authentication.HashedPassword(user, "password123!@#");
 
                 user.Role = (int)Role.Artist;
-
-                user.IsVerified = true;
 
                 user.CreatedAt = DateTime.Now;
 
@@ -96,21 +176,31 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<ArtistResponse> Create(ArtistRequest artistRequestModel, UserRequest userRequestModel)
+        public async Task<ArtistResponse> Create(ArtistRequest artistRequest, UserRequest userRequest, IList<ArtistServiceRequest> artistServiceRequest, IList<ArtistStoreRequest> artistStoreRequest)
         {
             try
             {
                 _unitOfWork.BeginTransaction();
 
-                await IsStoreExisting(artistRequestModel.StoreId);
-                
-                var user = await CreateUser(userRequestModel);
+                if (artistStoreRequest.Count != 0) 
+                    await ValidateStore(artistStoreRequest.Select(c => c.StoreId));
 
-                var artist = _mapper.Map<Artist>(artistRequestModel);
+                if(artistServiceRequest.Count != 0) 
+                    await ValidateService(artistServiceRequest.Select(c => c.ServiceId));
+
+                var user = await CreateUser(userRequest);
+
+                var artist = _mapper.Map<Artist>(artistRequest);
 
                 artist.ID = user.ID;
 
-                await AssignService(artist.ID, artistRequestModel.ServiceIds);
+                artist.Username = await GetUsername(userRequest.FullName);
+
+                await AssignStore(artist.ID, artistStoreRequest);
+
+                if (artistServiceRequest.Count != 0)
+                    await ValidateService(artistServiceRequest.Select(c => c.ServiceId));
+
 
                 await _unitOfWork.ArtistRepository.InsertAsync(artist);
 
@@ -154,16 +244,13 @@ namespace INBS.Application.Services
         {
             try
             {
-                var artist = await _unitOfWork.ArtistRepository.GetAsync(include: query => 
+                var artist = await _unitOfWork.ArtistRepository.GetAsync(query => 
                 query.Where(c => !c.User!.IsDeleted)
                     .Include(c => c.User)
-                    .Include(c => c.Store)
-                    .Include(c => c.ArtistAvailabilities.Where(c => !c.IsDeleted))
+                    .Include(c => c.ArtistStores.Where(c => !c.IsDeleted && !c.Store!.IsDeleted))
+                        .ThenInclude(c => c.Store)
                     .Include(c => c.ArtistServices.Where(c => !c.Service!.IsDeleted))
                         .ThenInclude(c => c.Service)
-                            .ThenInclude(c => c.DesignServices.Where(c => !c.Design!.IsDeleted))
-                                .ThenInclude(c => c.Design)
-                    .Include(c => c.ArtistAvailabilities.Where(c => !c.IsDeleted))
                     );
                 return _mapper.Map<IEnumerable<ArtistResponse>>(artist);
             }
@@ -174,7 +261,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task Update(Guid id, ArtistRequest artistRequest, UserRequest userRequest)
+        public async Task Update(Guid id, ArtistRequest artistRequest, UserRequest userRequest, IList<ArtistServiceRequest> artistServiceRequest, IList<ArtistStoreRequest> artistStoreRequest)
         {
             try
             {
@@ -182,11 +269,19 @@ namespace INBS.Application.Services
 
                 var artist = await _unitOfWork.ArtistRepository.GetByIdAsync(id) ?? throw new Exception("This artist not found");
 
-                await IsStoreExisting(artistRequest.StoreId);
+                if (artistStoreRequest.Count != 0)
+                    await ValidateStore(artistStoreRequest.Select(c => c.StoreId));
+
+                if (artistServiceRequest.Count != 0)
+                    await ValidateService(artistServiceRequest.Select(c => c.ServiceId));
 
                 await UpdateUser(id, userRequest);
 
-                await AssignService(artist.ID, artistRequest.ServiceIds);
+                await _unitOfWork.ArtistRepository.UpdateAsync(_mapper.Map(artistRequest, artist));
+
+                await AssignService(artist.ID, artistServiceRequest.Select(c => c.ServiceId).ToList());
+
+                await AssignStore(artist.ID, artistStoreRequest);
 
                 _mapper.Map(artistRequest, artist);
 
