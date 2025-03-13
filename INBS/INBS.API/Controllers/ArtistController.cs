@@ -1,5 +1,7 @@
-﻿using INBS.Application.DTOs.User.Artist;
-using INBS.Application.DTOs.User.User;
+﻿using INBS.Application.DTOs.Artist;
+using INBS.Application.DTOs.ArtistService;
+using INBS.Application.DTOs.ArtistStore;
+using INBS.Application.DTOs.User;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -38,15 +40,15 @@ namespace INBS.API.Controllers
         /// <summary>
         /// Creates a new artist.
         /// </summary>
-        /// <param name="artistRequest">The artist request.</param>
-        /// <param name="userRequest">The user request.</param>
+        /// <param name="artist">The artist request.</param>
+        /// <param name="user">The user request.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] ArtistRequest artistRequest, [FromForm] UserRequest userRequest)
+        public async Task<IActionResult> Create([FromForm] ArtistRequest artist, [FromForm] UserRequest user, [FromForm] IList<ArtistServiceRequest> artistServices, [FromForm] IList<ArtistStoreRequest> artistStores)
         {
             try
             {
-                await service.Create(artistRequest, userRequest);
+                await service.Create(artist, user, artistServices, artistStores);
                 return new OkResult();
             }
             catch (Exception ex)
@@ -59,15 +61,15 @@ namespace INBS.API.Controllers
         /// Updates an existing artist.
         /// </summary>
         /// <param name="id">The artist ID.</param>
-        /// <param name="artistRequest">The artist request.</param>
-        /// <param name="userRequest">The user request.</param>
+        /// <param name="artist">The artist request.</param>
+        /// <param name="user">The user request.</param>
         /// <returns>An action result.</returns>
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ArtistRequest artistRequest, [FromForm] UserRequest userRequest)
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ArtistRequest artist, [FromForm] UserRequest user,  [FromForm] IList<ArtistServiceRequest> artistServices, [FromForm] IList<ArtistStoreRequest> artistStores)
         {
             try
             {
-                await service.Update(id, artistRequest, userRequest);
+                await service.Update(id, artist, user, artistServices, artistStores);
                 return Ok();
             }
             catch (Exception ex)
