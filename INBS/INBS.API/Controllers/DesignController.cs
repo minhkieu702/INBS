@@ -1,12 +1,11 @@
-﻿using INBS.Application.DTOs.Common.Preference;
-using INBS.Application.DTOs.Design.Design;
-using INBS.Application.DTOs.Design.Image;
-using INBS.Application.DTOs.Design.NailDesign;
-using INBS.Application.DTOs.Service.Service;
+﻿using INBS.Application.DTOs.Design;
+using INBS.Application.DTOs.Image;
+using INBS.Application.DTOs.NailDesign;
+using INBS.Application.DTOs.Preference;
 using INBS.Application.IService;
-using INBS.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace INBS.API.Controllers
 {
@@ -19,7 +18,7 @@ namespace INBS.API.Controllers
     /// <param name="service">The design service.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class DesignController(IDesignService service) : ControllerBase
+    public class DesignController(IDesignService service) : ODataController
     {
 
         /// <summary>
@@ -45,16 +44,16 @@ namespace INBS.API.Controllers
         /// Creates a new design.
         /// </summary>
         /// <param name="design">The design creation request.</param>
-        /// <param name="images">The list of image requests.</param>
+        /// <param name="medias">The list of media requests.</param>
         /// <param name="nailDesigns">The list of nail design requests.</param>
         /// <param name="preference">The preference of design</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] DesignRequest design, [FromForm] PreferenceRequest preference, [FromForm] IList<ImageRequest> images, [FromForm] IList<NailDesignRequest> nailDesigns)
+        public async Task<IActionResult> Create([FromForm] DesignRequest design, [FromForm] PreferenceRequest preference, [FromForm] IList<MediaRequest> medias, [FromForm] IList<NailDesignRequest> nailDesigns)
         {
             try
             {
-                await service.Create(design, preference, images, nailDesigns);
+                await service.Create(design, preference, medias, nailDesigns);
                 return Ok();
             }
             catch (Exception ex)
@@ -69,16 +68,16 @@ namespace INBS.API.Controllers
         /// <param name="id">The design ID.</param>
         /// <param name="design">The design update request.</param>
         /// <param name="preference">The preference of design</param>
-        /// <param name="images">The list of image requests.</param>
+        /// <param name="medias">The list of media requests.</param>
         /// <param name="nailDesigns">The list of nail design requests.</param>
         /// <returns>An action result.</returns>
         [HttpPut]
         public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] DesignRequest design,
-[FromForm] PreferenceRequest preference, [FromForm] IList<ImageRequest> images, [FromForm] IList<NailDesignRequest> nailDesigns)
+[FromForm] PreferenceRequest preference, [FromForm] IList<MediaRequest> medias, [FromForm] IList<NailDesignRequest> nailDesigns)
         {
             try
             {
-                await service.Update(id, design, preference, images, nailDesigns);
+                await service.Update(id, design, preference, medias, nailDesigns);
                 return Ok();
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.Common.Preference;
+﻿using INBS.Application.DTOs.Customer;
+using INBS.Application.DTOs.Preference;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -37,17 +38,9 @@ namespace INBS.API.Controllers
         /// <returns>Customer preferences.</returns>
         [HttpGet]
         [EnableQuery]
-        public async Task<IActionResult> Get()
+        public IQueryable<CustomerResponse> Get()
         {
-            try
-            {
-                var result = await service.Get();
-                return Ok(result.AsQueryable());
-            }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(ex.Message);
-            }
+            return service.Get();
         }
     }
 }
