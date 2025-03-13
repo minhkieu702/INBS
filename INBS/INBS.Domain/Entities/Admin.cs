@@ -12,17 +12,12 @@ namespace INBS.Domain.Entities
 {
     public class Admin
     {
-        public Admin()
-        {
-            Stores = [];
-        }
+        public string Username { get; set; } = string.Empty;
+
         [Key]
         public Guid ID { get; set; }
         [ForeignKey(nameof(ID))]
         [InverseProperty(nameof(User.Admin))]
         public virtual User? User { get; set; }
-
-        [InverseProperty(nameof(Store.Admin))]
-        public virtual ICollection<Store> Stores { get; set; }
     }
 }
