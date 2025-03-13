@@ -1,4 +1,4 @@
-﻿using INBS.Application.DTOs.Service.DesignService;
+﻿using INBS.Application.DTOs.ServiceDesign;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.Service.Service
+namespace INBS.Application.DTOs.Service
 {
     public class ServiceRequest
     {
@@ -14,7 +14,7 @@ namespace INBS.Application.DTOs.Service.Service
 
         public string? Description { get; set; }
 
-        public double Price { get; set; }
+        public long Price { get; set; }
 
         public string? ImageUrl { get; set; }
 
@@ -23,7 +23,5 @@ namespace INBS.Application.DTOs.Service.Service
         public bool IsAdditional { get; set; }
 
         public IList<int> CategoryIds { get; set; } = [];
-
-        public IList<ServiceDesignRequest> Designs { get; set; } = [];
     }
 }
