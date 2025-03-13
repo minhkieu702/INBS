@@ -14,32 +14,6 @@ namespace INBS.Persistence.Repository
         private readonly INBSDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
         private bool disposed = false;
 
-        #region Accessory
-        private IGenericRepository<Accessory>? _accessoryRepository;
-
-        public IGenericRepository<Accessory> AccessoryRepository
-        {
-            get
-            {
-                _accessoryRepository ??= new GenericRepository<Accessory>(_context);
-                return _accessoryRepository;
-            }
-        }
-        #endregion
-
-        #region AccessoryCustomNailDesign
-        private IGenericRepository<AccessoryCustomNailDesign>? _accessoryCustomNailDesignRepository;
-
-        public IGenericRepository<AccessoryCustomNailDesign> AccessoryCustomNailDesignRepository
-        {
-            get
-            {
-                _accessoryCustomNailDesignRepository ??= new GenericRepository<AccessoryCustomNailDesign>(_context);
-                return _accessoryCustomNailDesignRepository;
-            }
-        }
-        #endregion
-        
         #region Admin
         private IGenericRepository<Admin>? _adminRepository;
 
@@ -66,27 +40,27 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region ArtistAvailability
-        private IGenericRepository<ArtistAvailability>? _artistAvailability;
+        #region ArtistStore
+        private IGenericRepository<ArtistStore>? _artistStore;
 
-        public IGenericRepository<ArtistAvailability> ArtistAvailabilityRepository
+        public IGenericRepository<ArtistStore> ArtistStoreRepository
         {
             get
             {
-                _artistAvailability ??= new GenericRepository<ArtistAvailability>(_context);
-                return _artistAvailability;
+                _artistStore ??= new GenericRepository<ArtistStore>(_context);
+                return _artistStore;
             }
         }
         #endregion
 
-        #region DesignService
-        private IGenericRepository<DesignService>? _designServiceRepository;
+        #region NailDesignService
+        private IGenericRepository<NailDesignService>? _designServiceRepository;
 
-        public IGenericRepository<DesignService> DesignServiceRepository
+        public IGenericRepository<NailDesignService> NailDesignServiceRepository
         {
             get
             {
-                _designServiceRepository ??= new GenericRepository<DesignService>(_context);
+                _designServiceRepository ??= new GenericRepository<NailDesignService>(_context);
                 return _designServiceRepository;
             }
         }
@@ -171,27 +145,14 @@ namespace INBS.Persistence.Repository
         #endregion
 
         #region CustomCombo
-        private IGenericRepository<CustomCombo>? _customComboRepository;
+        private IGenericRepository<CustomerSelected>? _customerSelectedRepository;
 
-        public IGenericRepository<CustomCombo> CustomComboRepository
+        public IGenericRepository<CustomerSelected> CustomerSelectedRepository
         {
             get
             {
-                _customComboRepository ??= new GenericRepository<CustomCombo>(_context);
-                return _customComboRepository;
-            }
-        }
-        #endregion
-
-        #region CustomDesign
-        private IGenericRepository<CustomDesign>? _customDesignRepository;
-
-        public IGenericRepository<CustomDesign> CustomDesignRepository
-        {
-            get
-            {
-                _customDesignRepository ??= new GenericRepository<CustomDesign>(_context);
-                return _customDesignRepository;
+                _customerSelectedRepository ??= new GenericRepository<CustomerSelected>(_context);
+                return _customerSelectedRepository;
             }
         }
         #endregion
@@ -222,15 +183,15 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region CustomNailDesign
-        private IGenericRepository<CustomNailDesign>? _customNailDesignRepository;
+        #region NailDesignServiceSelected
+        private IGenericRepository<NailDesignServiceSelected>? _nailDesignServiceSelectedRepository;
 
-        public IGenericRepository<CustomNailDesign> CustomNailDesignRepository
+        public IGenericRepository<NailDesignServiceSelected> NailDesignServiceSelectedRepository
         {
             get 
             {
-                _customNailDesignRepository ??= new GenericRepository<CustomNailDesign>(_context);
-                return _customNailDesignRepository; 
+                _nailDesignServiceSelectedRepository ??= new GenericRepository<NailDesignServiceSelected>(_context);
+                return _nailDesignServiceSelectedRepository; 
             }
         }
         #endregion
@@ -275,13 +236,13 @@ namespace INBS.Persistence.Repository
         #endregion
         
         #region Image
-        private IGenericRepository<Image>? _imageRepository;
+        private IGenericRepository<Media>? _imageRepository;
 
-        public IGenericRepository<Image> ImageRepository
+        public IGenericRepository<Media> MediaRepository
         {
             get
             {
-                _imageRepository ??= new GenericRepository<Image>(_context);
+                _imageRepository ??= new GenericRepository<Media>(_context);
                 return _imageRepository;
             }
         }
@@ -366,13 +327,13 @@ namespace INBS.Persistence.Repository
         #endregion
 
         #region ServiceCustomCombo
-        private IGenericRepository<ServiceCustomCombo>? _serviceCustomComboRepository;
+        private IGenericRepository<NailDesignServiceSelected>? _serviceCustomComboRepository;
 
-        public IGenericRepository<ServiceCustomCombo> ServiceCustomComboRepository
+        public IGenericRepository<NailDesignServiceSelected> ServiceCustomComboRepository
         {
             get
             {
-                _serviceCustomComboRepository ??= new GenericRepository<ServiceCustomCombo>(_context);
+                _serviceCustomComboRepository ??= new GenericRepository<NailDesignServiceSelected>(_context);
                 return _serviceCustomComboRepository;
             }
         }
