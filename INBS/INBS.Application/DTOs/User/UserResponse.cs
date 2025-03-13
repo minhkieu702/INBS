@@ -1,8 +1,8 @@
-﻿using INBS.Application.DTOs.Common;
-using INBS.Application.DTOs.User.Admin;
-using INBS.Application.DTOs.User.Artist;
-using INBS.Application.DTOs.User.Customer;
-using INBS.Application.DTOs.User.Notification;
+﻿using INBS.Application.DTOs.Admin;
+using INBS.Application.DTOs.Artist;
+using INBS.Application.DTOs.Common;
+using INBS.Application.DTOs.Customer;
+using INBS.Application.DTOs.Notification;
 using INBS.Domain.Common;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.User.User
+namespace INBS.Application.DTOs.User
 {
     public class UserResponse : BaseEntity
     {

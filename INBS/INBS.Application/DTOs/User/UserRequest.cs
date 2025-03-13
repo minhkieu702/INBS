@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.User.User
+namespace INBS.Application.DTOs.User
 {
     public class UserRequest
     {
