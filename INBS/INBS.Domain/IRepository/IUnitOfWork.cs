@@ -9,17 +9,13 @@ namespace INBS.Domain.IRepository
 {
     public interface IUnitOfWork : IDisposable
     {
-        public IGenericRepository<Accessory> AccessoryRepository { get; }
-
-        public IGenericRepository<AccessoryCustomNailDesign> AccessoryCustomNailDesignRepository { get; }
-
         public IGenericRepository<Admin> AdminRepository { get; }
 
         public IGenericRepository<Artist> ArtistRepository { get; }
 
         public IGenericRepository<ArtistService> ArtistServiceRepository { get; }
 
-        public IGenericRepository<ArtistAvailability> ArtistAvailabilityRepository { get; }
+        public IGenericRepository<ArtistStore> ArtistStoreRepository { get; }
 
         public IGenericRepository<Booking> BookingRepository { get; }
 
@@ -27,25 +23,23 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<CategoryService> CategoryServiceRepository { get; }
 
-        public IGenericRepository<CustomCombo> CustomComboRepository { get; }
-
-        public IGenericRepository<CustomDesign> CustomDesignRepository { get; }
-
         public IGenericRepository<Customer> CustomerRepository { get; }
 
-        public IGenericRepository<CustomNailDesign> CustomNailDesignRepository { get; }
+        public IGenericRepository<CustomerSelected> CustomerSelectedRepository { get; }
 
         public IGenericRepository<Design> DesignRepository { get; }
-
-        public IGenericRepository<DesignService> DesignServiceRepository { get; }
 
         public IGenericRepository<DeviceToken> DeviceTokenRepository { get; }
 
         public IGenericRepository<Feedback> FeedbackRepository { get; }
 
-        public IGenericRepository<Image> ImageRepository { get; }
+        public IGenericRepository<Media> MediaRepository { get; }
 
         public IGenericRepository<NailDesign> NailDesignRepository { get; }
+
+        public IGenericRepository<NailDesignService> NailDesignServiceRepository { get; }
+
+        public IGenericRepository<NailDesignServiceSelected> NailDesignServiceSelectedRepository { get; }
 
         public IGenericRepository<Notification> NotificationRepository { get; }
 
@@ -54,8 +48,6 @@ namespace INBS.Domain.IRepository
         public IGenericRepository<Recommendation> RecommendationRepository { get; }
 
         public IGenericRepository<Service> ServiceRepository { get; }
-
-        public IGenericRepository<ServiceCustomCombo> ServiceCustomComboRepository { get; }
 
         public IGenericRepository<Store> StoreRepository { get; }
 

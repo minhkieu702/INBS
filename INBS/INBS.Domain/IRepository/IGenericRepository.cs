@@ -10,7 +10,7 @@ namespace INBS.Domain.IRepository
     public interface IGenericRepository<TEntity> where TEntity : class
     {
         // query
-        IQueryable<TEntity> Entities { get; }
+        IQueryable<TEntity> Query();
 
         //non async
         IEnumerable<TEntity> Get(
@@ -40,7 +40,6 @@ namespace INBS.Domain.IRepository
         Task DeleteAsync(object id);
         Task SaveAsync();
         Task<IEnumerable<TEntity>> GetAsync(
-            Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
 
         Task<int> CountAsync();
