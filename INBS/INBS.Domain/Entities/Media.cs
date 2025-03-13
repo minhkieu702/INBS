@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Image
+    public class Media
     {
-        public Image()
+        public Media()
         {
             ImageUrl = Constants.DEFAULT_IMAGE_URL;
         }
@@ -20,9 +20,11 @@ namespace INBS.Domain.Entities
 
         public string ImageUrl { get; set; }
 
+        public int MediaType { get; set; }
+
         public Guid DesignId { get; set; }
         [ForeignKey(nameof(DesignId))]
-        [InverseProperty(nameof(Design.Images))]
+        [InverseProperty(nameof(Design.Medias))]
         public virtual Design? Design { get; set; }
     }
 }
