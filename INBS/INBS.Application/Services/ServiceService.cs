@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using INBS.Application.Common;
-using INBS.Application.DTOs.Service.DesignService;
-using INBS.Application.DTOs.Service.Service;
+using INBS.Application.DTOs.Service;
+using INBS.Application.DTOs.ServiceDesign;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Common;
@@ -24,7 +24,7 @@ namespace INBS.Application.Services
 
             var list = new List<CategoryService>();
 
-            var categories = await Utils.GetCategories();
+            var categories = await Utils.GetCategoriesAsync();
 
             foreach (var categoryId in categoryIds.Distinct())
             {
@@ -52,48 +52,47 @@ namespace INBS.Application.Services
             await _unitOfWork.CategoryServiceRepository.InsertRangeAsync(list);
         }
 
-        private async Task UpdateDesignService(Guid serviceId, IList<ServiceDesignRequest> designIds)
+        private async Task UpdateDesignService(Guid serviceId, IList<ServiceNailDesignRequest> designIds)
         {
             if (designIds == null || !designIds.Any())
                 return;
 
             await ValidateService(designIds.Select(c => c.DesignId));
 
-            var oldDesignServices = await _unitOfWork.DesignServiceRepository.GetAsync(c => c.ServiceId == serviceId);
+            var oldDesignServices = await _unitOfWork.NailDesignServiceRepository.GetAsync(c => c.Where(c => c.ServiceId == serviceId));
             
             if (oldDesignServices.Any())
-                _unitOfWork.DesignServiceRepository.DeleteRange(oldDesignServices);
+                _unitOfWork.NailDesignServiceRepository.DeleteRange(oldDesignServices);
 
-            var newDesignServices = new List<Domain.Entities.DesignService>();
+            var newDesignServices = new List<NailDesignService>();
             
             foreach (var designId in designIds)
             {
-                newDesignServices.Add(new Domain.Entities.DesignService
-                {
-                    ServiceId = serviceId,
-                    DesignId = designId.DesignId,
-                    ExtraPrice = designId.ExtraPrice,
-                });
+                var nailDesign = _mapper.Map<NailDesignService>(designId);
+                
+                nailDesign.ServiceId = serviceId;
+
+                newDesignServices.Add(nailDesign);
             }
-            await _unitOfWork.DesignServiceRepository.InsertRangeAsync(newDesignServices);
+            await _unitOfWork.NailDesignServiceRepository.InsertRangeAsync(newDesignServices);
         }
 
         private async Task ValidateService(IEnumerable<Guid> designIds)
         {
-            var designs = await _unitOfWork.DesignRepository.GetAsync(include: query => query.Where(c => !c.IsDeleted && designIds.Contains(c.ID)));
+            var designs = await _unitOfWork.DesignRepository.GetAsync( query => query.Where(c => !c.IsDeleted && designIds.Contains(c.ID)));
             if (designs.Count() != designIds.Count())
             {
                 throw new Exception("Some design is not existed");
             }
         }
 
-        public async Task Create(ServiceRequest modelRequest)
+        public async Task Create(ServiceRequest modelRequest, IList<ServiceNailDesignRequest> serviceNailDesignRequests)
         {
             try
             {
                 _unitOfWork.BeginTransaction();
 
-                var existedEntity = await _unitOfWork.ServiceRepository.GetAsync(x => x.Name == modelRequest.Name);
+                var existedEntity = await _unitOfWork.ServiceRepository.GetAsync(c => c.Where(x => x.Name == modelRequest.Name));
 
                 if (existedEntity != null && existedEntity.Any())
                     throw new Exception("Service already exists");
@@ -106,9 +105,9 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.ServiceRepository.InsertAsync(newService);
 
-                await UpdateDesignService(newService.ID, modelRequest.Designs);
+                await UpdateDesignService(newService.ID, serviceNailDesignRequests);
 
-                var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(newService.ID));
+                var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(c => c.Where(cs => cs.ServiceId.Equals(newService.ID)));
 
                 await InsertCategoryService(newService.ID, modelRequest.CategoryIds, categoryServices);
 
@@ -157,22 +156,21 @@ namespace INBS.Application.Services
         {
             try
             {
-                var services = await _unitOfWork.ServiceRepository.GetAsync(include: s => s.Where(service => !service.IsDeleted)
+                var services = await _unitOfWork.ServiceRepository.GetAsync( s => s.Where(service => !service.IsDeleted)
                   .Include(service => service.CategoryServices)
-                  .Include(service => service.ServiceCustomCombos
-                    .Where(scc => !scc.CustomCombo!.IsDeleted && !scc.CustomCombo.Customer!.User!.IsDeleted))
-                    .ThenInclude(scc => scc.CustomCombo!)
-                    .ThenInclude(customCombo => customCombo.Customer!)
-                    .ThenInclude(customer => customer.User!)
-                  .Include(service => service.DesignServices.Where(c => !c.Design!.IsDeleted))
-                    .ThenInclude(service => service.Design)
+                  .Include(service => service.ArtistServices.Where(c => !c.Artist!.User!.IsDeleted))
+                    .ThenInclude(service => service.Artist)
+                        .ThenInclude(Artist => Artist!.User)
+                   .Include(service => service.NailDesignServices.Where(c => !c.NailDesign!.Design!.IsDeleted))
+                    .ThenInclude(service => service.NailDesign)
+                        .ThenInclude(service => service!.Design)
                 ) ?? throw new Exception("Something went wrong!");
 
                 var responses = _mapper.Map<IEnumerable<ServiceResponse>>(services);
 
                 if (responses.Any())
                 {
-                    var categories = await Utils.GetCategories();
+                    var categories = await Utils.GetCategoriesAsync();
                     foreach (var service in responses)
                     {
                         foreach (var cateService in service.CategoryServices)
@@ -192,20 +190,20 @@ namespace INBS.Application.Services
 
         private async Task HandleCategoryServiceUpdating(Guid serviceId, IList<int> categoryIds)
         {
-            var existedCategoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(cs => cs.ServiceId.Equals(serviceId));
+            var existedCategoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(c => c.Where(cs => cs.ServiceId.Equals(serviceId)));
 
             DeleteCategoryService(existedCategoryServices.Where(cs => !categoryIds.Contains(cs.CategoryId)));
 
             await InsertCategoryService(serviceId, categoryIds, existedCategoryServices);
         }
 
-        public async Task Update(Guid id, ServiceRequest updatingRequest)
+        public async Task Update(Guid id, ServiceRequest updatingRequest, IList<ServiceNailDesignRequest> serviceNailDesignRequests)
         {
             try
             {
                 var existedEntity = await _unitOfWork.ServiceRepository.GetByIdAsync(id) ?? throw new Exception("Service not found");
 
-                var existedEntityName = await _unitOfWork.ServiceRepository.GetAsync(filter: x => x.Name.Equals(updatingRequest.Name));
+                var existedEntityName = await _unitOfWork.ServiceRepository.GetAsync(c=> c.Where(x => x.Name.Equals(updatingRequest.Name)));
 
                 if (existedEntityName != null && existedEntityName.Any() && existedEntityName.First().ID != id)
                     throw new Exception("Service already exists");
@@ -222,8 +220,8 @@ namespace INBS.Application.Services
                 if (updatingRequest.CategoryIds != null && updatingRequest.CategoryIds.Any())
                     await HandleCategoryServiceUpdating(id, updatingRequest.CategoryIds);
 
-                if (updatingRequest.Designs != null && updatingRequest.Designs.Any())
-                    await UpdateDesignService(id, updatingRequest.Designs);
+                if (serviceNailDesignRequests != null && serviceNailDesignRequests.Any())
+                    await UpdateDesignService(id, serviceNailDesignRequests);
 
                 await _unitOfWork.ServiceRepository.UpdateAsync(newEntity);
 

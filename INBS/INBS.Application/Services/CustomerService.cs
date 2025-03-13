@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using INBS.Application.Common;
-using INBS.Domain.Enums;
-using INBS.Application.DTOs.Common.Preference;
-using INBS.Application.DTOs.User.Customer;
+using INBS.Application.DTOs.Customer;
+using INBS.Application.DTOs.Preference;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;
+using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 
 namespace INBS.Application.Services
 {
@@ -22,7 +22,7 @@ namespace INBS.Application.Services
 
                 var id = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
-                var preferences = await _unitOfWork.PreferenceRepository.GetAsync(c => c.CustomerId == id);
+                var preferences = await _unitOfWork.PreferenceRepository.GetAsync(c => c.Where(c => c.CustomerId == id));
 
                 if (preferences.Any()) _unitOfWork.PreferenceRepository.DeleteRange(preferences);
 
@@ -74,51 +74,11 @@ namespace INBS.Application.Services
             return preferences;
         }
 
-        public async Task<IEnumerable<CustomerResponse>> Get()
+        public IQueryable<CustomerResponse> Get()
         {
             try
             {
-                var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
-
-                var result = await _unitOfWork.CustomerRepository.GetAsync(include: query => query
-                    .Where(u => !u.User!.IsDeleted)
-                    .Include(c => c.User)
-                        .ThenInclude(c => c!.Notifications.Where(n => !n.IsDeleted))
-                    .Include(c => c.CustomDesigns.Where(n => !n.IsDeleted))
-                        .ThenInclude(c => c.CustomNailDesigns)
-                            .ThenInclude(c => c.AccessoryCustomNailDesigns)
-                                .ThenInclude(c => c.Accessory)
-                    .Include(c => c.CustomCombos.Where(n => !n.IsDeleted))
-                        .ThenInclude(c => c.ServiceCustomCombos)
-                            .ThenInclude(c => c.Service)
-                    .Include(c => c.Preferences)
-                    .Include(c => c.DeviceTokens)
-                );
-
-                var responses = _mapper.Map<IEnumerable<CustomerResponse>>(result);
-                foreach (var response in responses)
-                {
-                    var preferenceActions = new Dictionary<PreferenceType, Action<PreferenceResponse>>()
-                    {
-                        [PreferenceType.Color] = prefer => prefer.Data = colors.FirstOrDefault(c => c.ID == prefer.PreferenceId),
-
-                        [PreferenceType.Occasion] = prefer => prefer.Data = occasions.FirstOrDefault(c => c.ID == prefer.PreferenceId),
-
-                        [PreferenceType.PaintType] = prefer => prefer.Data = paintTypes.FirstOrDefault(c => c.ID == prefer.PreferenceId),
-
-                        [PreferenceType.SkinTone] = prefer => prefer.Data = skintones.FirstOrDefault(c => c.ID == prefer.PreferenceId)
-                    };
-
-                    foreach (var preference in response.CustomerPreferences)
-                    {
-                        if (Enum.TryParse(preference.PreferenceType, out PreferenceType type) && preferenceActions.TryGetValue(type, out var action))
-                        {
-                            action(preference);
-                        }
-                    }
-                }
-
-                return responses;
+                return _unitOfWork.CustomerRepository.Query().ProjectTo<CustomerResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
