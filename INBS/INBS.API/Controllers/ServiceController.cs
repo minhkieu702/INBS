@@ -1,4 +1,4 @@
-﻿using INBS.Application.DTOs.Service.Service;
+﻿using INBS.Application.DTOs.Service;
 using INBS.Application.IService;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
@@ -43,13 +43,14 @@ namespace INBS.API.Controllers
         /// Creates a new service, bắt buộc để imageUrl là null, còn nếu để Image là null thì sẽ tự động lấy ảnh mặc định có sẵn
         /// </summary>
         /// <param name="service">The service creation request.</param>
+        /// <param name="serviceNailDesigns">The list of service nail design requests.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] ServiceRequest service)
+        public async Task<IActionResult> Create([FromForm] ServiceRequest service, [FromForm] IList<ServiceNailDesignRequest> serviceNailDesigns)
         {
             try
             {
-                await _service.Create(service);
+                await _service.Create(service, serviceNailDesigns);
                 return Ok();
             }
             catch (Exception ex)
@@ -63,13 +64,14 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="id">The service ID.</param>
         /// <param name="service">The service update request.</param>
+        /// <param name="serviceNailDesigns">The list of service nail design requests.</param>
         /// <returns>An action result.</returns>
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ServiceRequest service)
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ServiceRequest service, [FromForm] IList<ServiceNailDesignRequest> serviceNailDesigns)
         {
             try
             {
-                await _service.Update(id, service);
+                await _service.Update(id, service, serviceNailDesigns);
                 return Ok();
             }
             catch (Exception ex)
