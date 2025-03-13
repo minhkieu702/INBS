@@ -1,5 +1,5 @@
 ﻿using INBS.Application.DTOs.Authentication;
-using INBS.Application.DTOs.User.User;
+using INBS.Application.DTOs.User;
 
 namespace INBS.Application.IServices
 {
