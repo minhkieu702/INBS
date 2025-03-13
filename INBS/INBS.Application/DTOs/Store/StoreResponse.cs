@@ -1,7 +1,9 @@
 ﻿
 
+using INBS.Application.DTOs.Artist;
+using INBS.Application.DTOs.ArtistService;
+using INBS.Application.DTOs.ArtistStore;
 using INBS.Application.DTOs.Common;
-using INBS.Application.DTOs.User.Artist;
 using INBS.Domain.Common;
 
 namespace INBS.Application.DTOs.Store
@@ -18,12 +20,6 @@ namespace INBS.Application.DTOs.Store
 
         public int AverageRating { get; set; }
 
-#warning Add AdminResponse
-        public ArtistResponse? Artist { get; set; }
-
-        public ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];
-
-        public ICollection<ArtistDesignResponse> ArtistDesigns { get; set; } = [];
-
+        public virtual ICollection<ArtistStoreResponse> ArtistStores { get; set; } = [];
     }
 }
