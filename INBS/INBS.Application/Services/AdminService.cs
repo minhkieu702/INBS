@@ -71,7 +71,7 @@ namespace INBS.Application.Services
 
                 var user = await unitOfWork.UserRepository.GetAsync(x => x.Where(x => x.Role == (int)Role.Admin));
 
-                if (user.First() == null || admin.First() == null)
+                if (user.FirstOrDefault() == null || admin.FirstOrDefault() == null)
                 {
                     throw new Exception("Admin not found");
                 }
