@@ -163,13 +163,13 @@ namespace INBS.Application.Services
 
                 newUser.Role = (int)Role.Customer;
 
-                var otpCode = await SendOtp(newUser);
+                //var otpCode = await SendOtp(newUser);
 
                 var customer = new Customer 
                 {
                     ID = newUser.ID,
-                    IsVerified = false,
-                    OtpCode = otpCode,
+                    IsVerified = true,
+                    //OtpCode = otpCode,
                     OtpExpiry = DateTime.UtcNow.AddMinutes(5)
                 };
 
