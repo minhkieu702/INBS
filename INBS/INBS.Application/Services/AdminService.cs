@@ -39,22 +39,21 @@ namespace INBS.Application.Services
                     Username = "admin"
                 };
 
-                user.PasswordHash = authentication.HashedPassword(user, "admin");
+                var password = "admin";
+
+                user.PasswordHash = authentication.HashedPassword(user, password);
 
                 await unitOfWork.UserRepository.InsertAsync(user);
 
-                 await unitOfWork.AdminRepository.InsertAsync(new Admin
-                {
-                    ID = user.ID
-                });
+                 await unitOfWork.AdminRepository.InsertAsync(admin);
 
                 if (unitOfWork.Save() == 0)
                     throw new Exception("Create admin failed");
 
                 return new
                 {
-                    username = "admin",
-                    password = "admin"
+                    username = admin.Username,
+                    password
                 };
             }
             catch (Exception)
