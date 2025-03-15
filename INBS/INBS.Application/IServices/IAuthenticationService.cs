@@ -5,6 +5,7 @@ namespace INBS.Application.IServices
 {
     public interface IAuthenticationService
     {
+        Task<bool> CheckPhoneNumberVerified(string phoneNumber);
         Task<LoginResponse> LoginCustomer(string phone, string password);
         Task<LoginResponse> LoginStaff(string username, string password);
         Task RegisterCustomer(UserRequest request, string password, string confirmPassword);
