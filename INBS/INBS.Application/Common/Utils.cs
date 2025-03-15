@@ -38,7 +38,7 @@ namespace INBS.Application.Common
         private static string RemoveDiacritics(string text)
         {
             string normalizedString = text.Normalize(NormalizationForm.FormD);
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
             foreach (char c in normalizedString)
             {
@@ -54,7 +54,7 @@ namespace INBS.Application.Common
         public static string TransToUsername(string fullname)
         {
             var partOfName = RemoveDiacritics(fullname).ToLower().Split(" ");
-            var username = partOfName[partOfName.Length - 1];
+            var username = partOfName[^1];
             for (int i = 0; i < partOfName.Length - 2; i++)
             {
                 username += partOfName[i][0];
@@ -71,22 +71,22 @@ namespace INBS.Application.Common
 
             var colorTask = Task.Run(async () =>
             {
-                tempColors = await GetColors();
+                tempColors = await GetColorsAsync();
             });
 
             var occasionTask = Task.Run(async () =>
             {
-                tempOccasions = await GetOccasions();
+                tempOccasions = await GetOccasionsAsync();
             });
 
             var paintTypeTask = Task.Run(async () =>
             {
-                tempPaintTypes = await GetPaintTypes();
+                tempPaintTypes = await GetPaintTypesAsync();
             });
 
             var skintoneTask = Task.Run(async () =>
             {
-                tempSkinTones = await GetSkinTones();
+                tempSkinTones = await GetSkinTonesAsync();
             });
 
             await Task.WhenAll(colorTask, occasionTask, paintTypeTask, skintoneTask);
@@ -94,34 +94,64 @@ namespace INBS.Application.Common
             return (tempColors, tempOccasions, tempPaintTypes, tempSkinTones);
         }
 
-        public static Task<List<Skintone>> GetSkinTones()
+        public static Task<List<Skintone>> GetSkinTonesAsync()
         {
             var skintoneJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Skintone.json"));
             return Task.FromResult(JsonSerializer.Deserialize<List<Skintone>>(skintoneJson) ?? []);
         }
 
-        public static Task<List<PaintType>> GetPaintTypes()
+        public static Task<List<PaintType>> GetPaintTypesAsync()
         {
             var paintTypeJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "PaintType.json"));
             return Task.FromResult(JsonSerializer.Deserialize<List<PaintType>>(paintTypeJson) ?? []);
         }
 
-        public static Task<List<Occasion>> GetOccasions()
+        public static Task<List<Occasion>> GetOccasionsAsync()
         {
             var occasionJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Occasion.json"));
             return Task.FromResult(JsonSerializer.Deserialize<List<Occasion>>(occasionJson) ?? []);
         }
 
-        public static Task<List<Color>> GetColors()
+        public static Task<List<Color>> GetColorsAsync()
         {
             var colorJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Color.json"));
             return Task.FromResult(JsonSerializer.Deserialize<List<Color>>(colorJson) ?? []);
         }
 
-        public static Task<List<Category>> GetCategories()
+        public static Task<List<Category>> GetCategoriesAsync()
         {
             var categoryJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "ServiceCategory.json"));
-            return Task.FromResult(JsonSerializer.Deserialize<List<Category>>(categoryJson) ?? []);            
+            return Task.FromResult(JsonSerializer.Deserialize<List<Category>>(categoryJson) ?? []);
+        }
+
+        public static List<Skintone> GetSkinTones()
+        {
+            var skintoneJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Skintone.json"));
+            return JsonSerializer.Deserialize<List<Skintone>>(skintoneJson) ?? [];
+        }
+
+        public static List<PaintType> GetPaintTypes()
+        {
+            var paintTypeJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "PaintType.json"));
+            return JsonSerializer.Deserialize<List<PaintType>>(paintTypeJson) ?? [];
+        }
+
+        public static List<Occasion> GetOccasions()
+        {
+            var occasionJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Occasion.json"));
+            return JsonSerializer.Deserialize<List<Occasion>>(occasionJson) ?? [];
+        }
+
+        public static List<Color> GetColors()
+        {
+            var colorJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Color.json"));
+            return JsonSerializer.Deserialize<List<Color>>(colorJson) ?? [];
+        }
+
+        public static List<Category> GetCategories()
+        {
+            var categoryJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "ServiceCategory.json"));
+            return JsonSerializer.Deserialize<List<Category>>(categoryJson) ?? [];
         }
     }
 }

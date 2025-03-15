@@ -9,17 +9,12 @@ using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
-    public class Recommendation : BaseEntity
+    public class Recommendation
     {
-        public Recommendation() : base()
-        {
-        }
-
-        public string? RecommendedDesigns { get; set; }
-
-        public string? RecommendedTimeSlots { get; set; }
-
-        public string? Artists { get; set; }
+        public Guid DesignId { get; set; }
+        [ForeignKey(nameof(DesignId))]
+        [InverseProperty(nameof(Design.Recommendations))]
+        public virtual Design? Design { get; set; }
 
         public DateTime GenerateAt { get; set; }
 

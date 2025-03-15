@@ -1,23 +1,25 @@
 ﻿using AutoMapper;
+using INBS.Application.Common;
+using INBS.Application.DTOs.Admin;
+using INBS.Application.DTOs.Artist;
+using INBS.Application.DTOs.ArtistService;
+using INBS.Application.DTOs.ArtistStore;
 using INBS.Application.DTOs.Booking;
-using INBS.Application.DTOs.Common.Preference;
-using INBS.Application.DTOs.Design.Accessory;
-using INBS.Application.DTOs.Design.CustomDesign;
-using INBS.Application.DTOs.Design.CustomNailDesign;
-using INBS.Application.DTOs.Design.Design;
-using INBS.Application.DTOs.Design.DesignService;
-using INBS.Application.DTOs.Design.Image;
-using INBS.Application.DTOs.Design.NailDesign;
-using INBS.Application.DTOs.Service.CustomCombo;
-using INBS.Application.DTOs.Service.DesignService;
-using INBS.Application.DTOs.Service.Service;
+using INBS.Application.DTOs.CategoryService;
+using INBS.Application.DTOs.Customer;
+using INBS.Application.DTOs.CustomerSelected;
+using INBS.Application.DTOs.Design;
+using INBS.Application.DTOs.DesignService;
+using INBS.Application.DTOs.Image;
+using INBS.Application.DTOs.NailDesign;
+using INBS.Application.DTOs.NailDesignServiceSelected;
+using INBS.Application.DTOs.Preference;
+using INBS.Application.DTOs.Service;
 using INBS.Application.DTOs.Store;
-using INBS.Application.DTOs.User.Artist;
-using INBS.Application.DTOs.User.Artist.ArtistAvailability;
-using INBS.Application.DTOs.User.Customer;
-using INBS.Application.DTOs.User.User;
+using INBS.Application.DTOs.User;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
+using INBS.Domain.Enums;
 
 namespace INBS.Application.Mappers
 {
@@ -25,14 +27,24 @@ namespace INBS.Application.Mappers
     {
         public MappingProfile()
         {
-            #region Accessory
-            CreateMap<AccessoryRequest, Accessory>()
-             .AfterMap((source, dest) =>
-             {
-                 dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
-                 dest.LastModifiedAt = DateTime.Now;
-             });
-            CreateMap<Accessory, AccessoryResponse>();
+            #region Admin
+            CreateMap<AdminRequest, Admin>();
+            CreateMap<Admin, AdminResponse>();
+            #endregion
+
+            #region Artist
+            CreateMap<ArtistRequest, Artist>();
+            CreateMap<Artist, ArtistResponse>();
+            #endregion
+
+            #region ArtistService
+            CreateMap<ArtistServiceRequest, ArtistService>();
+            CreateMap<ArtistService, ArtistServiceResponse>();
+            #endregion
+
+            #region ArtistStore
+            CreateMap<ArtistStoreRequest, ArtistStore>();
+            CreateMap<ArtistStore, ArtistStoreResponse>();
             #endregion
 
             #region Booking
@@ -45,6 +57,91 @@ namespace INBS.Application.Mappers
             CreateMap<CategoryService, CategoryServiceResponse>();
             #endregion
 
+            #region Customer
+            CreateMap<CustomerRequest, Customer>();
+            CreateMap<Customer, CustomerResponse>();
+            #endregion
+
+            #region CustomerSelected
+            CreateMap<CustomerSelectedRequest, CustomerSelected>();
+            CreateMap<CustomerSelected, CustomerSelectedResponse>();
+            #endregion
+
+            #region Design
+            CreateMap<DesignRequest, Design>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.LastModifiedAt = DateTime.Now;
+                });
+            CreateMap<Design, DesignResponse>();
+            #endregion
+
+            #region DeviceToken
+
+            #endregion
+
+            #region Feedback
+
+            #endregion
+
+            #region Media
+            CreateMap<MediaRequest, Media>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                });
+            CreateMap<Media, MediaResponse>();
+            #endregion
+
+            #region NailDesign
+            CreateMap<NailDesignRequest, NailDesign>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                });
+            CreateMap<NailDesign, NailDesignResponse>();
+            #endregion
+
+            #region NailDesignService
+            CreateMap<NailDesignServiceRequest, NailDesignService>();
+            CreateMap<ServiceNailDesignRequest, NailDesignService>();
+            CreateMap<NailDesignService, NailDesignServiceResponse>();
+            #endregion
+
+            #region NailDesignServiceSelected
+            CreateMap<NailDesignServiceSelectedRequest, NailDesignServiceSelected>();
+            CreateMap<NailDesignServiceSelected, NailDesignServiceSelectedResponse>();
+            #endregion
+
+            #region Notification
+
+            #endregion
+
+            #region Preference
+            CreateMap<PreferenceRequest, Preference>();
+            CreateMap<Preference, PreferenceResponse>()
+                .AfterMap((source, dest) =>
+                {
+                     dest.PreferenceType = source.PreferenceType switch
+                     {
+                         (int)PreferenceType.Color => PreferenceType.Color.ToString(),
+                         (int)PreferenceType.Occasion => PreferenceType.Occasion.ToString(),
+                         (int)PreferenceType.PaintType => PreferenceType.PaintType.ToString(),
+                         (int)PreferenceType.SkinTone => PreferenceType.SkinTone.ToString(),
+                         _ => "No Info"
+                     };
+
+                    dest.Data = source.PreferenceType switch
+                    {
+                        (int)PreferenceType.Color => Utils.GetColors().FirstOrDefault(c => c.ID == source.PreferenceId),
+                        (int)PreferenceType.Occasion => Utils.GetOccasions().FirstOrDefault(c => c.ID == source.PreferenceId),
+                        (int)PreferenceType.PaintType => Utils.GetPaintTypes().FirstOrDefault(c => c.ID == source.PreferenceId),
+                        (int)PreferenceType.SkinTone => Utils.GetSkinTones().FirstOrDefault(c => c.ID == source.PreferenceId),
+                        _ => null
+                    };
+                });
+            #endregion
+
             #region Service
             CreateMap<ServiceRequest, Service>()
                 .AfterMap((source, dest) =>
@@ -53,23 +150,6 @@ namespace INBS.Application.Mappers
                 dest.LastModifiedAt = DateTime.Now;
             }); 
             CreateMap<Service, ServiceResponse>();
-            #endregion
-
-            #region DesignService
-            CreateMap<DesignServiceRequest, DesignService>();
-            CreateMap<ServiceDesignRequest, DesignService>();
-            CreateMap<DesignService, DesignServiceResponse>();
-            #endregion
-
-            #region CustomCombo
-            CreateMap<CustomComboRequest, CustomCombo>()
-                .AfterMap((source, dest) =>
-                {
-                    dest.LastModifiedAt = DateTime.Now;
-                });
-            CreateMap<CustomCombo, CustomComboResponse>();
-            CreateMap<ServiceCustomComboRequest, ServiceCustomCombo>();
-            CreateMap<ServiceCustomCombo, ServiceCustomComboResponse>();
             #endregion
 
             #region Store
@@ -91,43 +171,6 @@ namespace INBS.Application.Mappers
                 });
             #endregion
 
-            #region Design
-            CreateMap<DesignRequest, Design>()
-                .AfterMap((source, dest) =>
-                {
-                    dest.LastModifiedAt = DateTime.Now;
-                });
-            CreateMap<Design, DesignResponse>();
-
-            CreateMap<ImageRequest, Image>()
-                .AfterMap((source, dest) =>
-                {
-                    dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
-                });
-            CreateMap<Image, ImageResponse>();
-
-            CreateMap<NailDesignRequest, NailDesign>()
-                .AfterMap((source, dest) => 
-                { 
-                    dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL; 
-                });
-            CreateMap<NailDesign, NailDesignResponse>();
-            #endregion
-
-            #region CustomDesign
-            CreateMap<CustomDesignRequest, CustomDesign>().AfterMap((source, dest) =>
-            {
-                dest.LastModifiedAt = DateTime.Now;
-            });
-            CreateMap<CustomDesign, CustomDesignResponse>();
-
-            CreateMap<CustomNailDesignRequest,  CustomNailDesign>();
-            CreateMap<CustomNailDesign, CustomNailDesignResponse>();
-
-            CreateMap<AccessoryCustomNailDesignRequest, AccessoryCustomNailDesign>();
-            CreateMap<AccessoryCustomNailDesign, AccessoryCustomNailDesignResponse>();
-            #endregion
-
             #region User
             CreateMap<UserRequest, User>().AfterMap((source, dest) =>
             {
@@ -135,32 +178,6 @@ namespace INBS.Application.Mappers
                 dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
             });
             CreateMap<User, UserResponse>();
-            #endregion
-
-            #region Customer
-            CreateMap<CustomerRequest, Customer>();
-            CreateMap<Customer, CustomerResponse>();
-            #endregion
-
-            #region Preference
-            CreateMap<PreferenceRequest, Preference>();
-            CreateMap<Preference, PreferenceResponse>()
-                .AfterMap((source, dest) => dest.PreferenceType = source.PreferenceType.ToString());
-            #endregion
-
-            #region Artist
-            CreateMap<ArtistRequest, Artist>();
-            CreateMap<Artist, ArtistResponse>();
-            CreateMap<ArtistService, ArtistServiceResponse>();
-            #endregion
-
-            #region ArtistAvailability
-            CreateMap<ArtistAvailabilityRequest, ArtistAvailability>()
-                .AfterMap((source, dest) =>
-            {
-                dest.LastModifiedAt = DateTime.Now;
-            });
-            CreateMap<ArtistAvailability, ArtistAvailabilityResponse>();
             #endregion
         }
     }

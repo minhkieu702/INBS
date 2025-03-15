@@ -1,4 +1,4 @@
-﻿using INBS.Application.DTOs.User.User;
+﻿using INBS.Application.DTOs.User;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 

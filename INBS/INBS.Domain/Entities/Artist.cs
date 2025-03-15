@@ -14,10 +14,9 @@ namespace INBS.Domain.Entities
     {
         public Artist()
         {
+            Username = string.Empty;
             ArtistServices = [];
-            ArtistAvailabilities = [];
-            Feedbacks = [];
-            Bookings = [];
+            ArtistStores = [];
         }
         [Key]
         public Guid ID { get; set; }
@@ -25,26 +24,16 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(User.Artist))]
         public virtual User? User { get; set; }
 
+        public string Username { get; set; }
+
         public int YearsOfExperience { get; set; }
 
         public int Level { get; set; }
 
-        public int AverageRating { get; set; }
-
-        public Guid StoreId { get; set; }
-        [InverseProperty(nameof(Store.Artists))]
-        public virtual Store? Store { get; set; }
-
-        [InverseProperty(nameof(ArtistAvailability.Artist))]
-        public virtual ICollection<ArtistAvailability> ArtistAvailabilities { get; set; }
-
         [InverseProperty(nameof(ArtistService.Artist))]
         public virtual ICollection<ArtistService> ArtistServices { get; set; }
 
-        [InverseProperty(nameof(Feedback.Artist))]
-        public virtual ICollection<Feedback> Feedbacks { get; set; }
-
-        [InverseProperty(nameof(Booking.Artist))]
-        public virtual ICollection<Booking> Bookings { get; set; }
+        [InverseProperty(nameof(ArtistStore.Artist))]
+        public virtual ICollection<ArtistStore> ArtistStores { get; set; }
     }
 }

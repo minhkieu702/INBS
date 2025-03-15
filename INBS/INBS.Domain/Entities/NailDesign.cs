@@ -1,13 +1,7 @@
 ﻿using INBS.Domain.Common;
 using INBS.Domain.Entities.Common;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
@@ -15,9 +9,14 @@ namespace INBS.Domain.Entities
     {
         public NailDesign()
         {
+            ID = Guid.NewGuid();
             ImageUrl = Constants.DEFAULT_IMAGE_URL;
             IsLeft = false;
+            NailDesignServices = [];
         }
+
+        [Key]
+        public Guid ID { get; set; }
 
         public Guid DesignId { get; set; }
         [ForeignKey(nameof(DesignId))]
@@ -30,5 +29,7 @@ namespace INBS.Domain.Entities
 
         public bool IsLeft { get; set; } //true - left, false - right
 
+        [InverseProperty(nameof(NailDesignService.NailDesign))]
+        public virtual ICollection<NailDesignService> NailDesignServices { get; set; }
     }
 }

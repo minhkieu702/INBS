@@ -1,7 +1,5 @@
-﻿using INBS.Application.DTOs.Design.Design;
-using INBS.Application.DTOs.Store;
+﻿using INBS.Application.DTOs.Store;
 using INBS.Application.IServices;
-using INBS.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 

@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class StoreService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : IStoreService
+    public class StoreService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService) : IStoreService
     {
         public async Task Create(StoreRequest modelRequest)
         {
@@ -25,13 +25,11 @@ namespace INBS.Application.Services
             {
                 _unitOfWork.BeginTransaction();
 
-                var existedEntity = await _unitOfWork.StoreRepository.GetAsync(x => x.Address == modelRequest.Address);
+                var existedEntity = await _unitOfWork.StoreRepository.GetAsync(c => c.Where(x => x.Address == modelRequest.Address));
 
                 if (existedEntity != null && existedEntity.Any())
                     throw new Exception("This address was already used");
                 var newEntity = _mapper.Map<Store>(modelRequest);
-
-                newEntity.AdminId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
                 newEntity.ImageUrl = modelRequest.NewImage != null ? await _firebaseService.UploadFileAsync(modelRequest.NewImage) : Constants.DEFAULT_IMAGE_URL;
 
@@ -79,10 +77,11 @@ namespace INBS.Application.Services
         {
             try
             {
-                var result = await _unitOfWork.StoreRepository.GetAsync(include:
+                var result = await _unitOfWork.StoreRepository.GetAsync(
                     query => query.Where(s => !s.IsDeleted)
-                    .Include(s => s.Artists.Where(a => !a.User!.IsDeleted))
-                        .ThenInclude(a => a.User)
+                    .Include(s => s.ArtistStores.Where(a => !a.IsDeleted && !a.Artist!.User!.IsDeleted))
+                        .ThenInclude(a => a.Artist)
+                            .ThenInclude(a => a!.User)
                     //.Include(s => s.Admin)
                     );
 

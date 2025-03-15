@@ -1,4 +1,4 @@
-﻿using INBS.Application.DTOs.Service.Service;
+﻿using INBS.Application.DTOs.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +10,8 @@ namespace INBS.Application.IServices
     public interface IServiceService
     {
         Task<IEnumerable<ServiceResponse>> Get();
-        Task Create(ServiceRequest category);
-        Task Update(Guid id, ServiceRequest category);
+        Task Create(ServiceRequest service, IList<ServiceNailDesignRequest> serviceNailDesignRequests);
+        Task Update(Guid id, ServiceRequest service, IList<ServiceNailDesignRequest> serviceNailDesignRequests);
         Task DeleteById(Guid id);
     }
 }

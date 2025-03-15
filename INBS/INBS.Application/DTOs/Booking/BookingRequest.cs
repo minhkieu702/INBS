@@ -15,7 +15,7 @@ namespace INBS.Application.DTOs.Booking
         [JsonConverter(typeof(DateOnlyJsonConverter))]
         public DateOnly ServiceDate { get; set; }
         [JsonConverter(typeof(TimeOnlyJsonConverter))]
-        public TimeOnly ServiceTime { get; set; }
+        public TimeOnly StartTime { get; set; }
 
         public string? Preferences { get; set; }
 

@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using INBS.Domain.Enums;
 using INBS.Application.DTOs.Authentication;
-using INBS.Application.DTOs.User.User;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Http;
+using INBS.Application.DTOs.User;
+using Microsoft.EntityFrameworkCore;
 
 namespace INBS.Application.Services
 {
@@ -18,14 +19,17 @@ namespace INBS.Application.Services
             try
             {
                 phone = FormatPhoneNumber(phone);
-                var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phone);
+                var user = await _unitOfWork.UserRepository.GetAsync(x => x.Where(x => x.PhoneNumber == phone).Include(c => c.Customer));
 
                 if (user == null || !user.Any())
                     throw new Exception("Invalid phone number or password");
 
                 var existingUser = user.First();
-                if (!existingUser.IsVerified)
+                if (!existingUser.Customer!.IsVerified)
                     throw new Exception("Phone number is not verified. Please verify your OTP first.");
+
+                if (existingUser.IsDeleted)
+                    throw new Exception("This account has been already blocked");
 
                 var verifyPassword = _authentication.VerifyPassword(existingUser, password);
                 if (!verifyPassword)
@@ -46,14 +50,17 @@ namespace INBS.Application.Services
         {
             try
             {
-                var user = await _unitOfWork.UserRepository.GetAsync(x => x.Username == username);
+                var user = await _unitOfWork.UserRepository.GetAsync(x => x
+                    .Include(x => x.Artist)
+                    .Where(x => x.Artist!.Username == username));
 
                 if(user == null || !user.Any())
                     throw new Exception("Invalid username or password");
 
                 var existingUser = user.First();
-                if (!existingUser.IsVerified)
-                    throw new Exception("Username is not verified. Please verify your OTP first.");
+
+                if (existingUser.IsDeleted)
+                    throw new Exception("This account has been already blocked");
 
                 var verifyPassword = _authentication.VerifyPassword(existingUser, password);
 
@@ -75,7 +82,7 @@ namespace INBS.Application.Services
 
         private async Task IsUniquePhoneNumber(string phoneNumber, Guid? userId = null)
         {
-            var artist = await _unitOfWork.UserRepository.GetAsync(c => c.ID != userId && c.PhoneNumber == phoneNumber);
+            var artist = await _unitOfWork.UserRepository.GetAsync(c => c.Where(c => c.ID != userId && c.PhoneNumber == phoneNumber));
             if (artist.Any())
             {
                 throw new Exception("Phone number already exists");
@@ -95,14 +102,11 @@ namespace INBS.Application.Services
                 throw new Exception("Password and confirm password do not match");
         }
 
-        private async Task<User> SendOtp(User user)
+        private async Task<string> SendOtp(User user)
         {
             var otpCode = _smsService.GenerateOtp();
-            user.IsVerified = false;
-            user.OtpCode = otpCode;
-            user.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
             await _smsService.SendOtpSmsAsync(user.PhoneNumber ?? string.Empty, otpCode);
-            return user;
+            return otpCode;
         }
 
         public async Task ChangeProfile(UserRequest requestModel)
@@ -159,9 +163,15 @@ namespace INBS.Application.Services
 
                 newUser.Role = (int)Role.Customer;
 
-                newUser = await SendOtp(newUser);
+                //var otpCode = await SendOtp(newUser);
 
-                var customer = new Customer { ID = newUser.ID };
+                var customer = new Customer 
+                {
+                    ID = newUser.ID,
+                    IsVerified = true,
+                    //OtpCode = otpCode,
+                    OtpExpiry = DateTime.UtcNow.AddMinutes(5)
+                };
 
                 await _unitOfWork.CustomerRepository.InsertAsync(customer);
 
@@ -187,14 +197,18 @@ namespace INBS.Application.Services
 
                 phone = FormatPhoneNumber(phone);
 
-                var user = (await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phone)).FirstOrDefault();
+                var user = (await _unitOfWork.UserRepository.GetAsync(x => x.Where(x => x.PhoneNumber == phone).Include(c => c.Customer))).FirstOrDefault();
 
                 if (user == null)
                     throw new Exception("Phone number is not registered");
 
                 user.PasswordHash = _authentication.HashedPassword(user, newPassword);
 
-                user = await SendOtp(user);
+                var otp = await SendOtp(user);
+
+                var customer = user.Customer ?? throw new Exception("Customer not found");
+                customer.OtpCode = otp;
+                customer.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
 
                 await _unitOfWork.UserRepository.UpdateAsync(user);
 
@@ -213,14 +227,12 @@ namespace INBS.Application.Services
             {
                 IsPasswordMatching(newPassword, confirmPassword);
 
-                var user = (await _unitOfWork.UserRepository.GetAsync(x => x.Username == username)).FirstOrDefault();
-
-                if (user == null)
-                    throw new Exception("Username not found");
-
+                var user = (await _unitOfWork.UserRepository.GetAsync(x => x
+                   .Include(x => x.Artist)
+                   .Where(x => x.Artist!.Username == username))).FirstOrDefault() 
+                   ?? throw new Exception("Username not found");
+                
                 user.PasswordHash = _authentication.HashedPassword(user, newPassword);
-
-                user = await SendOtp(user);
 
                 await _unitOfWork.UserRepository.UpdateAsync(user);
 
@@ -237,28 +249,28 @@ namespace INBS.Application.Services
         {
             phoneNumber = FormatPhoneNumber(phoneNumber);
 
-            var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phoneNumber);
+            var user = (await _unitOfWork.UserRepository.GetAsync(query => query
+                .Where(x => x.PhoneNumber == phoneNumber)
+                .Include(x => x.Customer))).FirstOrDefault() 
+                ?? throw new Exception("Phone number is not registered");
+            
+            var customer = user.Customer ?? throw new Exception("Phone number is not registered");
 
-            if (user == null || !user.Any())
-                throw new Exception("Phone number is not registered");
-
-            var existingUser = user.First();
-
-            if (existingUser.OtpCode != otp || existingUser.OtpExpiry < DateTime.UtcNow)
+            if (customer.OtpCode != otp || customer.OtpExpiry < DateTime.UtcNow)
                 throw new Exception("Invalid or expired OTP");
 
-            existingUser.IsVerified = true;
-            existingUser.OtpCode = null;
-            existingUser.OtpExpiry = null;
+            customer.IsVerified = true;
+            customer.OtpCode = null;
+            customer.OtpExpiry = null;
 
-            await _unitOfWork.UserRepository.UpdateAsync(existingUser);
+            await _unitOfWork.CustomerRepository.UpdateAsync(customer);
 
             await _unitOfWork.SaveAsync();
 
             return new LoginResponse
             {
-                AccessToken = await _authentication.GenerateDefaultTokenAsync(existingUser),
-                RefreshToken = await _authentication.GenerateRefreshTokenAsync(existingUser)
+                AccessToken = await _authentication.GenerateDefaultTokenAsync(user),
+                RefreshToken = await _authentication.GenerateRefreshTokenAsync(user)
             };
         }
 
@@ -266,19 +278,20 @@ namespace INBS.Application.Services
         {
             phoneNumber = FormatPhoneNumber(phoneNumber);
 
-            var user = await _unitOfWork.UserRepository.GetAsync(x => x.PhoneNumber == phoneNumber);
+            var user = (await _unitOfWork.UserRepository.GetAsync(query => query
+                .Where(x => x.PhoneNumber == phoneNumber)
+                .Include(x => x.Customer))).FirstOrDefault()
+                ?? throw new Exception("Phone number is not registered");
 
-            if (user == null || !user.Any())
-                throw new Exception("Phone number is not registered");
+            var customer = user.Customer ?? throw new Exception("Phone number is not registered");
 
-            var existingUser = user.First();
-
-            if (existingUser.OtpExpiry >= DateTime.UtcNow)
+            if (customer.OtpExpiry >= DateTime.UtcNow)
                 throw new Exception("OTP is still valid, please use the existing OTP");
 
-            existingUser = await SendOtp(existingUser);
-
-            await _unitOfWork.UserRepository.UpdateAsync(existingUser);
+            customer.OtpCode = await SendOtp(user);
+            customer.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
+            
+            await _unitOfWork.CustomerRepository.UpdateAsync(customer);
             await _unitOfWork.SaveAsync();
         }
 

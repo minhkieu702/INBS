@@ -1,12 +1,5 @@
-﻿using INBS.Domain.Entities;
-using INBS.Domain.Entities.Common;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using INBS.Domain.Entities.Common;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
@@ -14,35 +7,33 @@ namespace INBS.Domain.Entities
     {
         public Booking() : base()
         {
+            Cancellations = [];
+            Feedbacks = [];
         }
         public DateOnly ServiceDate { get; set; }
 
-        public TimeOnly ServiceTime { get; set; }
+        public TimeOnly StartTime { get; set; }
 
-        public long Duration { get; set; }
+        public TimeOnly PredictEndTime { get; set; }
 
         public int Status { get; set; } 
 
         public long TotalAmount { get; set; }
 
-        public string? Preferences { get; set; }
+        public Guid CustomerSelectedId { get; set; }
+        [ForeignKey(nameof(CustomerSelectedId))]
+        [InverseProperty(nameof(CustomerSelected.Bookings))]
+        public virtual CustomerSelected? CustomerSelected { get; set; }
 
-        public Guid CustomDesignId { get; set; }
-        [ForeignKey(nameof(CustomDesignId))]
-        [InverseProperty(nameof(CustomDesign.Bookings))]
-        public virtual CustomDesign? CustomDesign { get; set; }
-
-        public Guid CustomComboId { get; set; }
-        [ForeignKey(nameof(CustomComboId))]
-        [InverseProperty(nameof(CustomCombo.Bookings))]
-        public virtual CustomCombo? CustomCombo { get; set; }
-
-        public Guid ArtistId { get; set; }
-        [ForeignKey(nameof(ArtistId))]
-        [InverseProperty(nameof(Artist.Bookings))]
-        public virtual Artist? Artist { get; set; }
+        public Guid ArtistStoreId { get; set; }
+        [ForeignKey(nameof(ArtistStoreId))]
+        [InverseProperty(nameof(ArtistStore.Bookings))]
+        public virtual ArtistStore? ArtistStore { get; set; }
 
         [InverseProperty(nameof(Cancellation.Booking))]
-        public virtual Cancellation? Cancellation { get; set; }
+        public virtual ICollection<Cancellation> Cancellations { get; set; }
+
+        [InverseProperty(nameof(Feedback.Booking))]
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }

@@ -15,36 +15,35 @@ namespace INBS.Domain.Entities
         public Customer()
         {
             Recommendations = [];
-            CustomCombos = [];
-            CustomDesigns = [];
             Preferences = [];
             DeviceTokens = [];
-            Feedbacks = [];
             Description = string.Empty;
+            CustomerSelecteds = [];
         }
         [Key]
         public Guid ID { get; set; }
         [ForeignKey(nameof(ID))]
         [InverseProperty(nameof(User.Customer))]
         public virtual User? User { get; set; }
+
+        public string? OtpCode { get; set; }
+
+        public DateTime? OtpExpiry { get; set; }
+
+        public bool IsVerified { get; set; }
+
         public string? Description { get; set; }
 
         [InverseProperty(nameof(Recommendation.Customer))]
         public virtual ICollection<Recommendation> Recommendations { get; set; }
 
-        [InverseProperty(nameof(CustomCombo.Customer))]
-        public virtual ICollection<CustomCombo> CustomCombos { get; set; }
-
-        [InverseProperty(nameof(CustomDesign.Customer))]
-        public virtual ICollection<CustomDesign> CustomDesigns { get; set; }
+        [InverseProperty(nameof(CustomerSelected.Customer))]
+        public virtual ICollection<CustomerSelected> CustomerSelecteds { get; set; }
 
         [InverseProperty(nameof(Preference.Customer))]
         public virtual ICollection<Preference> Preferences { get; set; }
             
         [InverseProperty(nameof(DeviceToken.Customer))]
         public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
-
-        [InverseProperty(nameof(Feedback.Customer))]
-        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }

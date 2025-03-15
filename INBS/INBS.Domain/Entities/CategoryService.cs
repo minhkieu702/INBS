@@ -11,6 +11,7 @@ namespace INBS.Domain.Entities
     public class CategoryService
     {
         public int CategoryId { get; set; }
+
         public Guid ServiceId { get; set; }
         [ForeignKey(nameof(ServiceId))]
         [InverseProperty(nameof(Service.CategoryServices))]

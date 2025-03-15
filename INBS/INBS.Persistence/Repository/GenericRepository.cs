@@ -1,12 +1,7 @@
 ﻿using INBS.Domain.IRepository;
 using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Persistence.Repository
 {
@@ -15,7 +10,10 @@ namespace INBS.Persistence.Repository
         internal INBSDbContext context;
         internal DbSet<TEntity> dbSet;
 
-        public IQueryable<TEntity> Entities => throw new NotImplementedException();
+        public IQueryable<TEntity> Query()
+        {
+            return dbSet.AsQueryable();
+        }
 
         public GenericRepository(INBSDbContext context)
         {
@@ -127,15 +125,9 @@ namespace INBS.Persistence.Repository
             dbSet.Remove(entity);
         }
         public async Task<IEnumerable<TEntity>> GetAsync(
-            Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
         {
             IQueryable<TEntity> query = dbSet;
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
 
             if (include != null)
             {

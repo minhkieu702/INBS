@@ -20,7 +20,7 @@ namespace INBS.Application.Services
         {
             try
             {
-                var check = await unitOfWork.UserRepository.GetAsync(x => x.Username == "admin" && x.Role == (int)Role.Admin);
+                var check = await unitOfWork.UserRepository.GetAsync(x => x.Where(x => x.Role == (int)Role.Admin));
 
                 if (check.Any())
                 {
@@ -28,29 +28,32 @@ namespace INBS.Application.Services
                 }
                 var user = new User
                 {
-                    Username = "admin",
                     Role = (int)Role.Admin,
                     CreatedAt = DateTime.Now,
-                    IsVerified = true,
                     DateOfBirth = new DateOnly(1990, 1, 1)
                 };
 
-                user.PasswordHash = authentication.HashedPassword(user, "admin");
+                var admin = new Admin
+                {
+                    ID = user.ID,
+                    Username = "admin"
+                };
+
+                var password = "admin";
+
+                user.PasswordHash = authentication.HashedPassword(user, password);
 
                 await unitOfWork.UserRepository.InsertAsync(user);
 
-                 await unitOfWork.AdminRepository.InsertAsync(new Admin
-                {
-                    ID = user.ID
-                });
+                 await unitOfWork.AdminRepository.InsertAsync(admin);
 
                 if (unitOfWork.Save() == 0)
                     throw new Exception("Create admin failed");
 
                 return new
                 {
-                    username = "admin",
-                    password = "admin"
+                    username = admin.Username,
+                    password
                 };
             }
             catch (Exception)
@@ -63,11 +66,13 @@ namespace INBS.Application.Services
         {
             try
             {
-                var user = await unitOfWork.UserRepository.GetAsync(x => x.Username == username && x.Role == (int)Role.Admin);
+                var admin = await unitOfWork.AdminRepository.GetAsync(x => x.Where(x => x.Username == username));
 
-                if (!user.Any() || user.First() == null)
+                var user = await unitOfWork.UserRepository.GetAsync(x => x.Where(x => x.Role == (int)Role.Admin));
+
+                if (user.FirstOrDefault() == null || admin.FirstOrDefault() == null)
                 {
-                    throw new Exception("This username not found");
+                    throw new Exception("Admin not found");
                 }
 
                 if (!authentication.VerifyPassword(user.First(), password))

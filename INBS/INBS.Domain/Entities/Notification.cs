@@ -17,9 +17,7 @@ namespace INBS.Domain.Entities
         }
         public int Status { get; set; } //Sent, Read, Removed
 
-        public DateTime NotifyAt { get; set; }
-
-        public int Type { get; set; } //Reminder, Promotion, Alert
+        public int NotificationType { get; set; } //Reminder, Promotion, Alert
 
         public Guid UserId { get; set; }
         [ForeignKey(nameof(UserId))]

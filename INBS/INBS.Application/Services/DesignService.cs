@@ -1,64 +1,139 @@
 ﻿using AutoMapper;
 using INBS.Application.Common;
 using INBS.Domain.Enums;
-using INBS.Application.DTOs.Common.Preference;
-using INBS.Application.DTOs.Design.Design;
-using INBS.Application.DTOs.Design.Image;
-using INBS.Application.DTOs.Design.NailDesign;
 using INBS.Application.Interfaces;
 using INBS.Application.IService;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
-using INBS.Application.DTOs.Design.DesignService;
+using INBS.Application.DTOs.Preference;
+using INBS.Application.DTOs.Image;
+using INBS.Application.DTOs.NailDesign;
+using INBS.Application.DTOs.Design;
+using Microsoft.AspNetCore.Http;
 
 namespace INBS.Application.Services
 {
     public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService) : IDesignService
     {
-        private async Task UpdateDesignService(Guid designId, IList<DesignServiceRequest> services)
+        private async Task HandleNailDesign(Guid designId, IList<NailDesignRequest> newList)
         {
-            if (services == null || !services.Any())
-                return;
+            ValidateNailDesigns(newList);
 
-            await ValidateService(services.Select(c => c.ServiceId));
+            var oldList = await _unitOfWork.NailDesignRepository.GetAsync(query => query.Where(c => c.DesignId == designId));
 
-            var oldDesignServices = await _unitOfWork.DesignServiceRepository.GetAsync(c => c.ServiceId == designId);
+            var updateList = new List<NailDesign>();
+            var insertList = new List<NailDesign>();
 
-            if (oldDesignServices.Any())
-                _unitOfWork.DesignServiceRepository.DeleteRange(oldDesignServices);
-
-            var newDesignServices = new List<Domain.Entities.DesignService>();
-
-            foreach (var service in services)
+            foreach (var newItem in newList)
             {
-                newDesignServices.Add(new Domain.Entities.DesignService
+                var item = oldList.FirstOrDefault(c => c.NailPosition == newItem.NailPosition && c.IsLeft == newItem.IsLeft);
+
+                if (item != null)
                 {
-                    ServiceId = service.ServiceId,
-                    DesignId = designId,
-                    ExtraPrice = service.ExtraPrice
-                });
+                    _mapper.Map(newItem, item);
+
+                    if (newItem.NewImage != null)
+                    {
+                        item.ImageUrl = await _firebaseService.UploadFileAsync(newItem.NewImage);
+                    }
+
+                    updateList.Add(item);
+
+                    if (newItem.NailDesignServiceRequests.Any())
+                    {
+                        await HandleNailDesignService(item.ID, newItem.NailDesignServiceRequests);
+                    }
+                }
+                else
+                {
+                    var newNailDesign = _mapper.Map<NailDesign>(newItem);
+
+                    if (newItem.NewImage != null)
+                    {
+                        newNailDesign.ImageUrl = await _firebaseService.UploadFileAsync(newItem.NewImage);
+                    }
+
+                    newNailDesign.DesignId = designId;
+
+                    insertList.Add(newNailDesign);
+
+                    if (newItem.NailDesignServiceRequests.Any())
+                    {
+                        await HandleNailDesignService(newNailDesign.ID, newItem.NailDesignServiceRequests);
+                    }
+                }
             }
-            await _unitOfWork.DesignServiceRepository.InsertRangeAsync(newDesignServices);
+            if (insertList.Count != 0) _unitOfWork.NailDesignRepository.InsertRange(insertList);
+            if (updateList.Count != 0) _unitOfWork.NailDesignRepository.UpdateRange(updateList);
         }
+
+        private async Task HandleNailDesignService(Guid nailDesignId, IList<NailDesignServiceRequest> nailDesignServiceRequests)
+        {
+            await ValidateService(nailDesignServiceRequests.Select(c => c.ServiceId));
+
+            var oldList = await _unitOfWork.NailDesignServiceRepository.GetAsync(
+                query => query.Where(c => c.NailDesignId == nailDesignId));
+
+            var updateList = new List<NailDesignService>();
+            var insertList = new List<NailDesignService>();
+            var processedItems = new HashSet<NailDesignServiceRequest>();
+            var newServiceIds = nailDesignServiceRequests.Select(c => c.ServiceId).ToHashSet(); // Tạo HashSet để tối ưu tìm kiếm
+
+            // 1️⃣ Duyệt danh sách cũ để cập nhật hoặc đánh dấu xóa
+            foreach (var oldNDS in oldList)
+            {
+                if (newServiceIds.Contains(oldNDS.ServiceId))
+                {
+                    var newItem = nailDesignServiceRequests.First(c => c.ServiceId == oldNDS.ServiceId);
+                    _mapper.Map(newItem, oldNDS);
+                    updateList.Add(oldNDS);
+
+                    // ✅ Thêm vào danh sách đã xử lý để tránh xóa trong vòng lặp
+                    processedItems.Add(newItem);
+                }
+                else
+                {
+                    // Nếu serviceId cũ không có trong danh sách mới -> Đánh dấu xóa mềm
+                    oldNDS.IsDeleted = true;
+                    updateList.Add(oldNDS);
+                }
+            }
+
+            // 2️⃣ Loại bỏ các phần tử đã xử lý khỏi danh sách mới
+            nailDesignServiceRequests = nailDesignServiceRequests.Except(processedItems).ToList();
+
+            // 3️⃣ Thêm mới các service chưa tồn tại
+            if (nailDesignServiceRequests.Count != 0)
+            {
+                var newEntities = _mapper.Map<List<NailDesignService>>(nailDesignServiceRequests);
+                newEntities.ForEach(n => n.NailDesignId = nailDesignId);
+                insertList.AddRange(newEntities);
+            }
+
+            // 4️⃣ Thực hiện batch insert/update
+            if (updateList.Count != 0) _unitOfWork.NailDesignServiceRepository.UpdateRange(updateList);
+            if (insertList.Count != 0) _unitOfWork.NailDesignServiceRepository.InsertRange(insertList);
+        }
+
 
         private async Task ValidateService(IEnumerable<Guid> serviceIds)
         {
-            var service = await _unitOfWork.ServiceRepository.GetAsync(include: query => query.Where(c => !c.IsDeleted && serviceIds.Contains(c.ID)));
+            var service = await _unitOfWork.ServiceRepository.GetAsync(query => query.Where(c => !c.IsDeleted && serviceIds.Contains(c.ID)));
             if (service.Count() != serviceIds.Count())
             {
                 throw new Exception("Some design is not existed");
             }
         }
 
-        public async Task Create(DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns)
+        public async Task Create(DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<MediaRequest> images, IList<NailDesignRequest> nailDesigns)
         {
             try
             {
                 _unitOfWork.BeginTransaction();
 
-                var existedEntity = await _unitOfWork.DesignRepository.GetAsync(x => x.Name.Equals(modelRequest.Name));
+                var existedEntity = await _unitOfWork.DesignRepository.GetAsync(c => c.Where(x => x.Name.Equals(modelRequest.Name)));
 
                 if (existedEntity.Any())
                     throw new Exception("This design's name has been already used");
@@ -68,19 +143,17 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.DesignRepository.InsertAsync(newEntity);
 
-                if (images.Any())
+                if (images.Count != 0)
                 {
-                    await HandleUpdateImage(images.OrderBy(c => c.NumerialOrder), newEntity.ID, []);
+                    await HandleMedias(newEntity.ID, images);
                 }
 
-                if (nailDesigns.Any())
+                if (nailDesigns.Count != 0)
                 {
-                    await HandleUpdateNailDesign(nailDesigns.OrderBy(c => (c.NailPosition, c.IsLeft)), newEntity.ID, []);
+                    await HandleNailDesign(newEntity.ID, nailDesigns);
                 }
 
                 await HandleUpdatePreference(preferenceRequest, newEntity.ID);
-
-                await UpdateDesignService(newEntity.ID, modelRequest.Services);
 
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
@@ -132,12 +205,12 @@ namespace INBS.Application.Services
         {
             var requestList = await PreferencesList(designID, modelRequest);
             
-            var designPreferences = await _unitOfWork.PreferenceRepository.GetAsync(filter: dp => dp.DesignId == designID);
+            var designPreferences = await _unitOfWork.PreferenceRepository.GetAsync(c => c.Where(dp => dp.DesignId == designID));
 
             if (designPreferences.Any())
                 _unitOfWork.PreferenceRepository.DeleteRange(designPreferences);
             
-            if (requestList.Any())
+            if (requestList.Count != 0)
                 await _unitOfWork.PreferenceRepository.InsertRangeAsync(requestList);
         }
 
@@ -164,23 +237,19 @@ namespace INBS.Application.Services
         {
             var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
 
-            var designs = await _unitOfWork.DesignRepository.GetAsync(include: 
+            var designs = await _unitOfWork.DesignRepository.GetAsync( 
                 query => query
-                .Include(d => d.Images.OrderBy(i => i.NumerialOrder))
+                .Include(d => d.Medias)
                 .Include(d => d.Preferences)
                 .Include(d => d.NailDesigns)
-                .Include(d => d.CustomDesigns.Where(cd => !cd.IsDeleted && !cd.Customer!.User!.IsDeleted))
-                    .ThenInclude(cd => cd.Customer)
-                        .ThenInclude(c => c!.User)
-                .Include(d => d.CustomDesigns)
-                    .ThenInclude(cd => cd.CustomNailDesigns)
-                        .ThenInclude(cnd => cnd.AccessoryCustomNailDesigns)
-                            .ThenInclude(acnd => acnd.Accessory)
-                .Include(d => d.DesignServices.Where(ad => !ad.Service!.IsDeleted))
-                    .ThenInclude(ad => ad.Service)
-                        .ThenInclude(s => s!.ArtistServices.Where(c => !c.Artist!.User!.IsDeleted))
-                            .ThenInclude(asr => asr.Artist)
-                                .ThenInclude(a => a!.User)
+                    .ThenInclude(nd => nd.NailDesignServices.Where(c => !c.Service!.IsDeleted))
+                        .ThenInclude(nds => nds.Service)
+                .Include(d => d.NailDesigns)
+                    .ThenInclude(nd => nd.NailDesignServices)
+                        .ThenInclude(nds => nds.NailDesignServiceSelecteds)
+                            .ThenInclude(nds => nds.CustomerSelected)
+                                .ThenInclude(cs => cs!.Customer)
+                                    .ThenInclude(c => c!.User)
                 .AsNoTracking()
                 );
 
@@ -211,7 +280,7 @@ namespace INBS.Application.Services
             return responses;
         }
 
-        public async Task Update(Guid designId, DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<ImageRequest> images, IList<NailDesignRequest> nailDesigns)
+        public async Task Update(Guid designId, DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<MediaRequest> images, IList<NailDesignRequest> nailDesigns)
         {
             try
             {
@@ -221,25 +290,13 @@ namespace INBS.Application.Services
                 
                 _mapper.Map(modelRequest, existedEntity);
 
-                var currentImagesList = await _unitOfWork.ImageRepository.GetAsync(filter: i => i.DesignId == designId);
+                await _unitOfWork.DesignRepository.UpdateAsync(existedEntity);
 
-                var currentNailDesignList = await _unitOfWork.NailDesignRepository.GetAsync(filter: nd => nd.DesignId == designId);
-
-                await HandleUpdateImage(
-                    images.OrderBy(c => c.NumerialOrder), 
-                    designId,
-                    currentImagesList.OrderBy(c => c.NumerialOrder).ToDictionary(c => (c.NumerialOrder)));
+                await HandleMedias(designId, images);
 
                 await HandleUpdatePreference(preferenceRequest, designId);
 
-                await HandleUpdateNailDesign(
-                    nailDesigns.OrderBy(c => c.NailPosition), 
-                    designId,
-                    currentNailDesignList.OrderBy(c => c.NailPosition).ToDictionary(c => (c.NailPosition, c.IsLeft)));
-
-                await UpdateDesignService(designId, modelRequest.Services);
-
-                await _unitOfWork.DesignRepository.UpdateAsync(existedEntity);
+                await HandleNailDesign(designId, nailDesigns);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("This action failed");
@@ -267,67 +324,7 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task HandleUpdateNailDesign(IEnumerable<NailDesignRequest> nailDesignsReq, Guid
-             designId, Dictionary<(int, bool), NailDesign> nailDesignDict)
-        {
-            ValidateNailDesigns(nailDesignsReq);
-
-            var updatinglist = new List<NailDesign>();
-            var insertingList = new List<NailDesign>();
-            var uploadTasks = new List<Task>(); // Danh sách các task upload ảnh (chạy đồng thời)
-
-            foreach (var nailDesignRq in nailDesignsReq)
-            {
-                // Lấy NailDesign hiện tại từ dictionary, kiểm tra nếu tồn tại
-                if (nailDesignDict.TryGetValue((nailDesignRq.NailPosition, nailDesignRq.IsLeft), out var nailDesign))
-                {
-                    // Nếu có ảnh mới, upload ảnh đồng thời
-                    if (nailDesignRq.NewImage != null)
-                    {
-                        var uploadTask = _firebaseService
-                            .UploadFileAsync(nailDesignRq.NewImage)
-                            .ContinueWith(t => nailDesign.ImageUrl = t.Result);
-
-                        uploadTasks.Add(uploadTask);
-                    }
-                    else
-                    {
-                        nailDesign.ImageUrl = nailDesignRq.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
-                    }
-
-                    updatinglist.Add(nailDesign);
-                }
-                else
-                {
-                    nailDesign = _mapper.Map<NailDesign>(nailDesignRq);
-                    nailDesign.DesignId = designId;
-
-                    if (nailDesignRq.NewImage != null)
-                    {
-                        var uploadTask = _firebaseService
-                            .UploadFileAsync(nailDesignRq.NewImage)
-                            .ContinueWith(t => nailDesign.ImageUrl = t.Result);
-                        
-                        uploadTasks.Add(uploadTask);
-                    }
-                    else
-                    {
-                        nailDesign.ImageUrl = nailDesignRq.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
-                    }
-
-                    insertingList.Add(nailDesign);
-                }
-            }
-
-            // Đợi tất cả ảnh upload xong
-            await Task.WhenAll(uploadTasks);
-
-            if(insertingList.Count != 0) _unitOfWork.NailDesignRepository.InsertRange(insertingList);
-            
-            if(updatinglist.Count != 0) _unitOfWork.NailDesignRepository.UpdateRange(updatinglist);
-        }
-
-        private void ValidateImages(IEnumerable<ImageRequest> imageReqs)
+        private static void ValidateMedia(IEnumerable<MediaRequest> imageReqs)
         {
             var seenOrders = new HashSet<int>();
 
@@ -340,65 +337,75 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task HandleUpdateImage(IEnumerable<ImageRequest> imageReqs,Guid designId, Dictionary<int, Image> currentImageList)
+        private async Task HandleMedias(Guid designId, IList<MediaRequest> newList)
         {
+            ValidateMedia(newList);
 
-            ValidateImages(imageReqs);
+            var oldList = await _unitOfWork.MediaRepository.GetAsync(c => c.Where(m => m.DesignId == designId));
 
-            var updatingList = new List<Image>();
-            var insertingList = new List<Image>();
-            var uploadTasks = new List<Task>(); // Danh sách task upload ảnh
+            var newIdsSet = newList.Select(c => c.NumerialOrder).ToHashSet();
+            var processedItems = new HashSet<MediaRequest>();
 
-            foreach (var imgReq in imageReqs)
+            var updatingList = new List<Media>();
+            var insertingList = new List<Media>();
+            var deletingList = new List<Media>();
+            var uploadTasks = new List<Task>();  // 🔥 Chạy upload ảnh song song để tối ưu tốc độ
+
+            // 1️⃣ Duyệt danh sách cũ để cập nhật hoặc xóa
+            foreach (var oldItem in oldList)
             {
-                if (currentImageList.TryGetValue(imgReq.NumerialOrder, out var image)) // Ảnh đã tồn tại
+                if (newIdsSet.Contains(oldItem.NumerialOrder))
                 {
-                    if (imgReq.NewImage != null)
+                    var newItem = newList.First(c => c.NumerialOrder == oldItem.NumerialOrder);
+
+                    _mapper.Map(newItem, oldItem);
+
+                    if (newItem.NewImage != null)
                     {
-                        // Upload ảnh đồng thời
-                        var uploadTask = _firebaseService.UploadFileAsync(imgReq.NewImage)
-                            .ContinueWith(t => image.ImageUrl = t.Result);
+                        var uploadTask = UploadImageAsync(newItem.NewImage, oldItem);  // 🔥 Tạo Task thay vì `await` ngay
                         uploadTasks.Add(uploadTask);
                     }
-                    else
-                    {
-                        image.ImageUrl = imgReq.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
-                    }
 
-                    updatingList.Add(image);
+                    updatingList.Add(oldItem);
+                    processedItems.Add(newItem);  // ✅ Thêm vào danh sách đã xử lý
                 }
-                else // Ảnh mới cần thêm vào
+                else
                 {
-                    image = _mapper.Map<Image>(imgReq);
-                    image.DesignId = designId;
-
-                    if (imgReq.NewImage != null)
-                    {
-                        // Upload ảnh đồng thời
-                        var uploadTask = _firebaseService.UploadFileAsync(imgReq.NewImage)
-                            .ContinueWith(t => image.ImageUrl = t.Result);
-                        uploadTasks.Add(uploadTask);
-                    }
-                    else
-                    {
-                        image.ImageUrl = imgReq.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
-                    }
-
-                    insertingList.Add(image);
+                    deletingList.Add(oldItem);
                 }
             }
 
-            // Đợi tất cả ảnh upload hoàn thành
-            await Task.WhenAll(uploadTasks);
+            // 2️⃣ Xóa tất cả phần tử đã xử lý khỏi danh sách mới
+            newList = newList.Except(processedItems).ToList();
 
-            // Xóa ảnh không còn tồn tại trong danh sách đầu vào
-            var deleteList = currentImageList.Values
-                .Where(img => !imageReqs.Select(req => req.NumerialOrder).Contains(img.NumerialOrder))
-                .ToList();
+            // 3️⃣ Duyệt danh sách mới để thêm Media mới
+            foreach (var newItem in newList)
+            {
+                var media = _mapper.Map<Media>(newItem);
+                media.DesignId = designId;
 
-            if(deleteList.Count != 0) _unitOfWork.ImageRepository.DeleteRange(deleteList);
-            if (updatingList.Count != 0) _unitOfWork.ImageRepository.UpdateRange(updatingList);
-            if (insertingList.Count != 0) _unitOfWork.ImageRepository.InsertRange(insertingList);
+                if (newItem.NewImage != null)
+                {
+                    var uploadTask = UploadImageAsync(newItem.NewImage, media);
+                    uploadTasks.Add(uploadTask);
+                }
+
+                insertingList.Add(media);
+            }
+
+
+            // 🔥 Chạy upload ảnh song song để tối ưu tốc độ
+            if (uploadTasks.Count != 0) await Task.WhenAll(uploadTasks);
+
+            // 4️⃣ Xử lý batch cập nhật vào DB
+            if (deletingList.Count != 0) _unitOfWork.MediaRepository.DeleteRange(deletingList);
+            if (updatingList.Count != 0) _unitOfWork.MediaRepository.UpdateRange(updatingList);
+            if (insertingList.Count != 0) _unitOfWork.MediaRepository.InsertRange(insertingList);
+        }
+
+        private async Task UploadImageAsync(IFormFile newImage, Media media)
+        {
+            media.ImageUrl = await _firebaseService.UploadFileAsync(newImage);
         }
     }
 }
