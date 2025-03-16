@@ -11,7 +11,7 @@ namespace INBS.Application.DTOs.Customer
         [Key]
         public Guid ID { get; set; }
 
-        public string? Preferences { get; set; }
+        public string? Description { get; set; }
 
         public UserResponse? User { get; set; }
 
@@ -19,7 +19,7 @@ namespace INBS.Application.DTOs.Customer
 
         public virtual ICollection<CustomerSelectedResponse> CustomerSelecteds { get; set; } = [];
 
-        public virtual ICollection<PreferenceResponse> CustomerPreferences { get; set; } = [];
+        public virtual ICollection<PreferenceResponse> Preferences { get; set; } = [];
 
         public virtual ICollection<DeviceTokenResponse> DeviceTokens { get; set; } = [];
     }

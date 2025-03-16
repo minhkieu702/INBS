@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.CustomerSelected;
+using INBS.Application.DTOs.DesignService;
 using System.ComponentModel.DataAnnotations;
 
 namespace INBS.Application.DTOs.NailDesignServiceSelected
@@ -11,7 +12,7 @@ namespace INBS.Application.DTOs.NailDesignServiceSelected
 
         [Key]
         public Guid NailDesignServiceId { get; set; }
-        public virtual NailDesignServiceSelectedResponse? NailDesignService { get; set; }
+        public virtual NailDesignServiceResponse? NailDesignService { get; set; }
 
         public long Duration { get; set; }
     }
