@@ -17,12 +17,10 @@ namespace INBS.Application.DTOs.Booking
         [JsonConverter(typeof(TimeOnlyJsonConverter))]
         public TimeOnly StartTime { get; set; }
 
-        public string? Preferences { get; set; }
-
-        public Guid CustomDesignId { get; set; }
-
-        public Guid CustomComboId { get; set; }
+        public Guid CustomerSelectedId { get; set; }
 
         public Guid ArtistId { get; set; }
+
+        public Guid StoreId { get; set; }
     }
 }

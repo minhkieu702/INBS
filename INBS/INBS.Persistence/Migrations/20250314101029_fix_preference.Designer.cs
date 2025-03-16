@@ -4,6 +4,7 @@ using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    partial class INBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250314101029_fix_preference")]
+    partial class fix_preference
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,9 +82,6 @@ namespace INBS.Persistence.Migrations
 
                     b.Property<Guid>("ArtistId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("BreakTime")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -465,47 +465,6 @@ namespace INBS.Persistence.Migrations
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.Payment", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<long>("TotalAmount")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.PaymentDetail", b =>
-                {
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BookingId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("PaymentId", "BookingId");
-
-                    b.HasIndex("BookingId");
-
-                    b.ToTable("PaymentDetails");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Preference", b =>
                 {
                     b.Property<int>("ID")
@@ -885,25 +844,6 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.PaymentDetail", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Booking", "Booking")
-                        .WithMany("PaymentDetails")
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("INBS.Domain.Entities.Payment", "Payment")
-                        .WithMany("PaymentDetails")
-                        .HasForeignKey("PaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("Payment");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Preference", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.Customer", "Customer")
@@ -955,8 +895,6 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Cancellations");
 
                     b.Navigation("Feedbacks");
-
-                    b.Navigation("PaymentDetails");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Customer", b =>
@@ -996,11 +934,6 @@ namespace INBS.Persistence.Migrations
             modelBuilder.Entity("INBS.Domain.Entities.NailDesignService", b =>
                 {
                     b.Navigation("NailDesignServiceSelecteds");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.Payment", b =>
-                {
-                    b.Navigation("PaymentDetails");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Service", b =>

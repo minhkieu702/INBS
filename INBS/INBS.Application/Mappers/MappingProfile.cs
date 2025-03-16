@@ -13,6 +13,7 @@ using INBS.Application.DTOs.DesignService;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignServiceSelected;
+using INBS.Application.DTOs.Notification;
 using INBS.Application.DTOs.Preference;
 using INBS.Application.DTOs.Service;
 using INBS.Application.DTOs.Store;
@@ -77,7 +78,7 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region DeviceToken
-
+            CreateMap<DeviceToken, DeviceTokenResponse>();
             #endregion
 
             #region Feedback
@@ -114,7 +115,8 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region Notification
-
+            CreateMap<NotificationRequest, Notification>();
+            CreateMap<Notification, NotificationResponse>();
             #endregion
 
             #region Preference
