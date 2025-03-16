@@ -9,8 +9,6 @@ namespace INBS.Application.DTOs.NailDesign
 {
     public class NailDesignRequest
     {
-        public Guid DesignId { get; set; }
-
         public IFormFile? NewImage { get; set; }
 
         public string? ImageUrl { get; set; }
@@ -19,6 +17,6 @@ namespace INBS.Application.DTOs.NailDesign
 
         public bool IsLeft { get; set; } //true - left, false - right
 
-        public IList<NailDesignServiceRequest> NailDesignServiceRequests { get; set; } = [];
+        public IList<NailDesignServiceRequest> NailDesignServices { get; set; } = [];
     }
 }
