@@ -53,6 +53,10 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Notification> Notifications { get; set; }
 
+        public virtual DbSet<Payment> Payments { get; set; }
+
+        public virtual DbSet<PaymentDetail> PaymentDetails { get; set; }
+
         public virtual DbSet<Preference> Preferences { get; set; }
 
         public virtual DbSet<Recommendation> Recommendations { get; set; }
@@ -71,6 +75,7 @@ namespace INBS.Persistence.Data
             modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
             modelBuilder.Entity<Media>().HasKey(c => new { c.DesignId, c.NumerialOrder });
             modelBuilder.Entity<Recommendation>().HasKey(c => new { c.CustomerId, c.DesignId });
+            modelBuilder.Entity<PaymentDetail>().HasKey(c => new { c.PaymentId, c.BookingId });
 
             modelBuilder.ConfigureRestrictOneToOne<Customer, User>(a => a.User, u => u.Customer, a => a.ID);
             modelBuilder.ConfigureRestrictOneToOne<Artist, User>(a => a.User, u => u.Artist, a => a.ID);

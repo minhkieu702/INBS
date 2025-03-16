@@ -43,6 +43,10 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Notification> NotificationRepository { get; }
 
+        public IGenericRepository<Payment> PaymentRepository { get; }
+
+        public IGenericRepository<PaymentDetail> PaymentDetailRepository { get; }
+
         public IGenericRepository<Preference> PreferenceRepository { get; }
 
         public IGenericRepository<Recommendation> RecommendationRepository { get; }
