@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Booking;
+using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,6 @@ namespace INBS.Application.IService
         IQueryable<BookingResponse> Get();
 
         Task CompleteBooking(Guid id);
+        Task<List<Booking>> GetBookingsWithinNextMinutes(int minutes);
     }
 }

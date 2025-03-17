@@ -16,6 +16,8 @@ using INBS.Infrastructure.Integrations;
 using INBS.Application.Services;
 using INBS.Application.IServices;
 using INBS.Infrastructure.Authentication;
+using Quartz;
+using INBS.Infrastructure.Quartz.Jobs;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -95,6 +97,8 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IFirebaseService, FirebaseService>();
 
             services.AddScoped<IAuthentication, Authentication>();
+            services.AddScoped<AutoNotificationBooking>();
+
         }
 
         public static void AddRepositories(this IServiceCollection services)
@@ -123,6 +127,24 @@ namespace Infrastructure.DependencyInjection
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWTSettings:Key") ?? throw new InvalidOperationException("Key is not configured.")))
                     };
                 });
+        }
+
+        public static void AddQuartz(this IServiceCollection services)
+        {
+            services.AddQuartz(q =>
+            {
+                var jobKey = new JobKey("AutoNotificationBooking");
+
+                q.AddJob<AutoNotificationBooking>(opts => opts.WithIdentity(jobKey));
+
+                // Cấu hình Trigger để chạy Job mỗi 5 phút
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity("AutoNotificationBookingTrigger")
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).RepeatForever()));
+            });
+
+            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
         }
     }
 }
