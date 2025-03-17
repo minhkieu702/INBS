@@ -13,7 +13,7 @@ namespace INBS.Application.IService
 {
     public interface IDesignService
     {
-        Task<IEnumerable<DesignResponse>> Get();
+        IQueryable<DesignResponse> Get();
 
         Task Create(DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<MediaRequest> images, IList<NailDesignRequest> nailDesigns);
 

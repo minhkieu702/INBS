@@ -11,7 +11,5 @@ namespace INBS.Application.DTOs.Design
         public string? Description { get; set; }
 
         public int Price { get; set; }
-
-        public IList<NailDesignServiceRequest> Services { get; set; } = [];
     }
 }

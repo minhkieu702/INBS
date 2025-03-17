@@ -25,6 +25,8 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(Store.ArtistStores))]
         public virtual Store? Store { get; set; }
 
+        public long BreakTime { get; set; }
+
         public DateOnly WorkingDate { get; set; }
 
         public TimeOnly StartTime { get; set; }

@@ -14,6 +14,21 @@ namespace INBS.Application.Services
 {
     public class AuthenticationService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper, IAuthentication _authentication, ISMSService _smsService, IHttpContextAccessor _contextAccesstor) : IAuthenticationService
     {
+        public async Task<bool> CheckPhoneNumberVerified(string phoneNumber)
+        {
+            phoneNumber = FormatPhoneNumber(phoneNumber);
+
+            var user = (await _unitOfWork.UserRepository.GetAsync(x => x.Where(x => x.PhoneNumber == phoneNumber).Include(c => c.Customer))).FirstOrDefault() ?? throw new Exception("Phone number is not registered");
+            
+            var customer = user.Customer ?? throw new Exception("Phone number is not registered");
+
+
+            if (!customer.IsVerified)
+                throw new Exception("Phone number has not been verified");
+
+            return true;
+        }
+
         public async Task<LoginResponse> LoginCustomer(string phone, string password)
         {
             try

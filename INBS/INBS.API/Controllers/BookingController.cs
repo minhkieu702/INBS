@@ -23,17 +23,9 @@ namespace INBS.API.Controllers
         /// <returns>A list of bookings.</returns>
         [HttpGet]
         [EnableQuery]
-        public async Task<IActionResult> Get()
+        public IQueryable<BookingResponse> Get()
         {
-            try
-            {
-                var result = await service.Get();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(ex.Message);
-            }
+            return service.Get();
         }
 
         /// <summary>

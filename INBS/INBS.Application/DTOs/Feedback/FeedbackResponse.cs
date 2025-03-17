@@ -19,9 +19,7 @@ namespace INBS.Application.DTOs.Feedback
 
         public string Content { get; set; } = string.Empty;
 
-        public Guid CustomerId { get; set; }
-
-        public virtual CustomerResponse? Customer { get; set; }
+        public Guid TypeId { get; set; }
 
         public Guid BookingId { get; set; }
         public virtual BookingResponse? Booking { get; set; }

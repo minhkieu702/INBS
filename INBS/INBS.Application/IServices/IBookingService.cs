@@ -15,6 +15,8 @@ namespace INBS.Application.IService
 
         Task Update(Guid id, BookingRequest request);
 
-        Task<IEnumerable<BookingResponse>> Get();
+        IQueryable<BookingResponse> Get();
+
+        Task CompleteBooking(Guid id);
     }
 }

@@ -12,6 +12,7 @@ using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.Design;
 using Microsoft.AspNetCore.Http;
+using AutoMapper.QueryableExtensions;
 
 namespace INBS.Application.Services
 {
@@ -41,9 +42,9 @@ namespace INBS.Application.Services
 
                     updateList.Add(item);
 
-                    if (newItem.NailDesignServiceRequests.Any())
+                    if (newItem.NailDesignServices.Any())
                     {
-                        await HandleNailDesignService(item.ID, newItem.NailDesignServiceRequests);
+                        await HandleNailDesignService(item.ID, newItem.NailDesignServices);
                     }
                 }
                 else
@@ -59,9 +60,9 @@ namespace INBS.Application.Services
 
                     insertList.Add(newNailDesign);
 
-                    if (newItem.NailDesignServiceRequests.Any())
+                    if (newItem.NailDesignServices.Any())
                     {
-                        await HandleNailDesignService(newNailDesign.ID, newItem.NailDesignServiceRequests);
+                        await HandleNailDesignService(newNailDesign.ID, newItem.NailDesignServices);
                     }
                 }
             }
@@ -123,7 +124,7 @@ namespace INBS.Application.Services
             var service = await _unitOfWork.ServiceRepository.GetAsync(query => query.Where(c => !c.IsDeleted && serviceIds.Contains(c.ID)));
             if (service.Count() != serviceIds.Count())
             {
-                throw new Exception("Some design is not existed");
+                throw new Exception("Some service is not existed");
             }
         }
 
@@ -233,51 +234,60 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<IEnumerable<DesignResponse>> Get()
+        public IQueryable<DesignResponse> Get()
         {
-            var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
-
-            var designs = await _unitOfWork.DesignRepository.GetAsync( 
-                query => query
-                .Include(d => d.Medias)
-                .Include(d => d.Preferences)
-                .Include(d => d.NailDesigns)
-                    .ThenInclude(nd => nd.NailDesignServices.Where(c => !c.Service!.IsDeleted))
-                        .ThenInclude(nds => nds.Service)
-                .Include(d => d.NailDesigns)
-                    .ThenInclude(nd => nd.NailDesignServices)
-                        .ThenInclude(nds => nds.NailDesignServiceSelecteds)
-                            .ThenInclude(nds => nds.CustomerSelected)
-                                .ThenInclude(cs => cs!.Customer)
-                                    .ThenInclude(c => c!.User)
-                .AsNoTracking()
-                );
-
-            var responses = _mapper.Map<IEnumerable<DesignResponse>>(designs);
-
-            foreach (var response in responses)
+            try
             {
-                var preferenceActions = new Dictionary<PreferenceType, Action<PreferenceResponse>>()
-                {
-                    [PreferenceType.Color] = prefer => prefer.Data = colors.FirstOrDefault(c => c.ID == prefer.PreferenceId),
-
-                    [PreferenceType.Occasion] = prefer => prefer.Data = occasions.FirstOrDefault(c => c.ID == prefer.PreferenceId),
-
-                    [PreferenceType.PaintType] = prefer => prefer.Data = paintTypes.FirstOrDefault(c => c.ID == prefer.PreferenceId),
-
-                    [PreferenceType.SkinTone] = prefer => prefer.Data = skintones.FirstOrDefault(c => c.ID == prefer.PreferenceId)
-                };
-
-                foreach (var preference in response.Preferences)
-                {
-                    if (Enum.TryParse(preference.PreferenceType, out PreferenceType type) && preferenceActions.TryGetValue(type, out var action))
-                    {
-                        action(preference);
-                    }
-                }
+                return _unitOfWork.DesignRepository.Query().ProjectTo<DesignResponse>(_mapper.ConfigurationProvider);
             }
+            catch (Exception)
+            {
 
-            return responses;
+                throw;
+            }
+            //var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
+
+            //var designs = await _unitOfWork.DesignRepository.GetAsync( 
+            //    query => query
+            //    .Include(d => d.Medias)
+            //    .Include(d => d.Preferences)
+            //    .Include(d => d.NailDesigns)
+            //        .ThenInclude(nd => nd.NailDesignServices.Where(c => !c.Service!.IsDeleted))
+            //            .ThenInclude(nds => nds.Service)
+            //    .Include(d => d.NailDesigns)
+            //        .ThenInclude(nd => nd.NailDesignServices)
+            //            .ThenInclude(nds => nds.NailDesignServiceSelecteds)
+            //                .ThenInclude(nds => nds.CustomerSelected)
+            //                    .ThenInclude(cs => cs!.Customer)
+            //                        .ThenInclude(c => c!.User)
+            //    .AsNoTracking()
+            //    );
+
+            //var responses = _mapper.Map<IEnumerable<DesignResponse>>(designs);
+
+            //foreach (var response in responses)
+            //{
+            //    var preferenceActions = new Dictionary<PreferenceType, Action<PreferenceResponse>>()
+            //    {
+            //        [PreferenceType.Color] = prefer => prefer.Data = colors.FirstOrDefault(c => c.ID == prefer.PreferenceId),
+
+            //        [PreferenceType.Occasion] = prefer => prefer.Data = occasions.FirstOrDefault(c => c.ID == prefer.PreferenceId),
+
+            //        [PreferenceType.PaintType] = prefer => prefer.Data = paintTypes.FirstOrDefault(c => c.ID == prefer.PreferenceId),
+
+            //        [PreferenceType.SkinTone] = prefer => prefer.Data = skintones.FirstOrDefault(c => c.ID == prefer.PreferenceId)
+            //    };
+
+            //    foreach (var preference in response.Preferences)
+            //    {
+            //        if (Enum.TryParse(preference.PreferenceType, out PreferenceType type) && preferenceActions.TryGetValue(type, out var action))
+            //        {
+            //            action(preference);
+            //        }
+            //    }
+            //}
+
+            //return responses;
         }
 
         public async Task Update(Guid designId, DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<MediaRequest> images, IList<NailDesignRequest> nailDesigns)

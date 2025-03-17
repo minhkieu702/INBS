@@ -170,19 +170,6 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region Preference
-        private IGenericRepository<Preference>? _preferenceRepository;
-
-        public IGenericRepository<Preference> PreferenceRepository
-        {
-            get
-            {
-                _preferenceRepository ??= new GenericRepository<Preference>(_context);
-                return _preferenceRepository;
-            }
-        }
-        #endregion
-
         #region NailDesignServiceSelected
         private IGenericRepository<NailDesignServiceSelected>? _nailDesignServiceSelectedRepository;
 
@@ -270,6 +257,43 @@ namespace INBS.Persistence.Repository
             {
                 _notificationRepository ??= new GenericRepository<Notification>(_context);
                 return _notificationRepository;
+            }
+        }
+        #endregion
+
+        #region Preference
+        private IGenericRepository<Preference>? _preferenceRepository;
+
+        public IGenericRepository<Preference> PreferenceRepository
+        {
+            get
+            {
+                _preferenceRepository ??= new GenericRepository<Preference>(_context);
+                return _preferenceRepository;
+            }
+        }
+        #endregion
+
+        #region Payment
+        private IGenericRepository<Payment>? _paymentRepository;
+        public IGenericRepository<Payment> PaymentRepository 
+        { 
+            get 
+            {
+                _paymentRepository ??= new GenericRepository<Payment>(_context);
+                return _paymentRepository;
+            } 
+        }
+        #endregion
+
+        #region PaymentDetail
+        private IGenericRepository<PaymentDetail>? _paymentDetailRepository;
+        public IGenericRepository<PaymentDetail> PaymentDetailRepository
+        {
+            get
+            {
+                _paymentDetailRepository ??= new GenericRepository<PaymentDetail>(_context);
+                return _paymentDetailRepository;
             }
         }
         #endregion
