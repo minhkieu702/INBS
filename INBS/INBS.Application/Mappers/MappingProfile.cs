@@ -16,6 +16,7 @@ using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.DTOs.Notification;
 using INBS.Application.DTOs.Preference;
 using INBS.Application.DTOs.Service;
+using INBS.Application.DTOs.ServicePriceHistory;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User;
 using INBS.Domain.Common;
@@ -160,6 +161,10 @@ namespace INBS.Application.Mappers
                         _ => null
                     };
                 });
+            #endregion
+
+            #region ServicePriceHistory
+            CreateMap<ServicePriceHistory, ServicePriceHistoryResponse>();
             #endregion
 
             #region Service

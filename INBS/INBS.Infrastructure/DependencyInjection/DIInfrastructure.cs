@@ -18,6 +18,7 @@ using INBS.Application.IServices;
 using INBS.Infrastructure.Authentication;
 using Quartz;
 using INBS.Infrastructure.Quartz.Jobs;
+using INBS.Infrastructure.Payment.PayOSIntegration;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -46,6 +47,8 @@ namespace Infrastructure.DependencyInjection
             services.AddSingleton<IConnectionMapping, ConnectionMapping>();
 
             services.AddAutoMapper(typeof(MappingProfile));
+
+            services.AddScoped<IPayOSHandler, PayOSHandler>();
 
             //Firebase
             //services.Configure<FirebaseConfig>(

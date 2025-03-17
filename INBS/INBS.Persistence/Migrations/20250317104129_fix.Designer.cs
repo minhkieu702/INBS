@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    [Migration("20250304152311_update_feedback_and_some_relationship")]
-    partial class update_feedback_and_some_relationship
+    [Migration("20250317104129_fix")]
+    partial class fix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,68 +25,14 @@ namespace INBS.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("INBS.Domain.Entities.Accessory", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReorderLevel")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UnitInStock")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Accessories");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.AccessoryCustomNailDesign", b =>
-                {
-                    b.Property<Guid>("AccessoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CustomNailDesignId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("X")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Y")
-                        .HasColumnType("int");
-
-                    b.HasKey("AccessoryId", "CustomNailDesignId");
-
-                    b.HasIndex("CustomNailDesignId");
-
-                    b.ToTable("AccessoryCustomDesigns");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Admin", b =>
                 {
                     b.Property<Guid>("ID")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
 
@@ -101,57 +47,16 @@ namespace INBS.Persistence.Migrations
                     b.Property<int>("Level")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("StoreId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("YearsOfExperience")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("StoreId");
-
                     b.ToTable("Artists");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.ArtistAvailability", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ArtistId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateOnly>("AvailableDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("BreakTime")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("MaximumBreakTime")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("ArtistId");
-
-                    b.ToTable("ArtistAvailabilities");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.ArtistService", b =>
@@ -169,26 +74,23 @@ namespace INBS.Persistence.Migrations
                     b.ToTable("ArtistServices");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.Booking", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.ArtistStore", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ArtistAvailabilityId")
+                    b.Property<Guid>("ArtistId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("BreakTime")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("CustomComboId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CustomDesignId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("Duration")
-                        .HasColumnType("bigint");
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -196,16 +98,52 @@ namespace INBS.Persistence.Migrations
                     b.Property<DateTime>("LastModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("PaymentMethod")
-                        .HasColumnType("int");
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
 
-                    b.Property<string>("Preferences")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly>("WorkingDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ArtistId");
+
+                    b.HasIndex("StoreId");
+
+                    b.ToTable("ArtistStores");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.Booking", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ArtistStoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CustomerSelectedId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeOnly>("PredictEndTime")
+                        .HasColumnType("time");
 
                     b.Property<DateOnly>("ServiceDate")
                         .HasColumnType("date");
 
-                    b.Property<TimeOnly>("ServiceTime")
+                    b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
 
                     b.Property<int>("Status")
@@ -216,11 +154,9 @@ namespace INBS.Persistence.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ArtistAvailabilityId");
+                    b.HasIndex("ArtistStoreId");
 
-                    b.HasIndex("CustomComboId");
-
-                    b.HasIndex("CustomDesignId");
+                    b.HasIndex("CustomerSelectedId");
 
                     b.ToTable("Bookings");
                 });
@@ -244,8 +180,7 @@ namespace INBS.Persistence.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("BookingId")
-                        .IsUnique();
+                    b.HasIndex("BookingId");
 
                     b.ToTable("Cancellations");
                 });
@@ -265,14 +200,33 @@ namespace INBS.Persistence.Migrations
                     b.ToTable("CategoryServices");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.CustomCombo", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.Customer", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OtpCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("OtpExpiry")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.CustomerSelected", b =>
                 {
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("CustomerID")
                         .HasColumnType("uniqueidentifier");
@@ -283,89 +237,11 @@ namespace INBS.Persistence.Migrations
                     b.Property<bool>("IsFavorite")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("ID");
 
                     b.HasIndex("CustomerID");
 
-                    b.ToTable("CustomCombos");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.CustomDesign", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CustomerID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DesignID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSave")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("CustomerID");
-
-                    b.HasIndex("DesignID");
-
-                    b.ToTable("CustomDesigns");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.CustomNailDesign", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CustomDesignId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsLeft")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("NailPosition")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("CustomDesignId");
-
-                    b.ToTable("CustomNailDesigns");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.Customer", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Customers");
+                    b.ToTable("CustomerSelected");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Design", b =>
@@ -393,30 +269,12 @@ namespace INBS.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
                     b.Property<float>("TrendScore")
                         .HasColumnType("real");
 
                     b.HasKey("ID");
 
                     b.ToTable("Designs");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.DesignService", b =>
-                {
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DesignId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ServiceId", "DesignId");
-
-                    b.HasIndex("DesignId");
-
-                    b.ToTable("DesignServices");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.DeviceToken", b =>
@@ -450,9 +308,6 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ArtistId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("BookingId")
                         .HasColumnType("uniqueidentifier");
 
@@ -463,8 +318,8 @@ namespace INBS.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("DesignId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("FeedbackType")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -475,29 +330,17 @@ namespace INBS.Persistence.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("StoreId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("TypeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ArtistId");
-
                     b.HasIndex("BookingId");
-
-                    b.HasIndex("DesignId");
-
-                    b.HasIndex("StoreId");
 
                     b.ToTable("Feedbacks");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.Image", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.Media", b =>
                 {
                     b.Property<Guid>("DesignId")
                         .HasColumnType("uniqueidentifier");
@@ -509,29 +352,89 @@ namespace INBS.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("MediaType")
+                        .HasColumnType("int");
+
                     b.HasKey("DesignId", "NumerialOrder");
 
-                    b.ToTable("Images");
+                    b.ToTable("Medias");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.NailDesign", b =>
                 {
-                    b.Property<Guid>("DesignId")
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("NailPosition")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsLeft")
-                        .HasColumnType("bit");
+                    b.Property<Guid>("DesignId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("DesignId", "NailPosition", "IsLeft");
+                    b.Property<bool>("IsLeft")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NailPosition")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("DesignId");
 
                     b.ToTable("NailDesigns");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.NailDesignService", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ExtraPrice")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("NailDesignId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("NailDesignId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("NailDesignService");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.NailDesignServiceSelected", b =>
+                {
+                    b.Property<Guid>("NailDesignServiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerSelectedId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("Duration")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("NailDesignServiceId", "CustomerSelectedId");
+
+                    b.HasIndex("CustomerSelectedId");
+
+                    b.ToTable("NailDesignServiceSelecteds");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Notification", b =>
@@ -549,13 +452,10 @@ namespace INBS.Persistence.Migrations
                     b.Property<DateTime>("LastModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("NotifyAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
+                    b.Property<int>("NotificationType")
                         .HasColumnType("int");
 
-                    b.Property<int>("Type")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<Guid>("UserId")
@@ -568,6 +468,43 @@ namespace INBS.Persistence.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.Payment", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("Method")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TotalAmount")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.PaymentDetail", b =>
+                {
+                    b.Property<int>("PaymentId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("PaymentId", "BookingId");
+
+                    b.HasIndex("BookingId");
+
+                    b.ToTable("PaymentDetails");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.Preference", b =>
                 {
                     b.Property<int>("ID")
@@ -576,10 +513,10 @@ namespace INBS.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<Guid>("CustomerId")
+                    b.Property<Guid?>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("DesignId")
+                    b.Property<Guid?>("DesignId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("PreferenceId")
@@ -599,37 +536,18 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Recommendation", b =>
                 {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Artists")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CustomerId")
+                    b.Property<Guid>("DesignId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("GenerateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.HasKey("CustomerId", "DesignId");
 
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RecommendedDesigns")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RecommendedTimeSlots")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("DesignId");
 
                     b.ToTable("Recommendations");
                 });
@@ -665,30 +583,36 @@ namespace INBS.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
                     b.HasKey("ID");
 
                     b.ToTable("Services");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.ServiceCustomCombo", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.ServicePriceHistory", b =>
                 {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<DateTime>("EffectiveFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EffectiveTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint");
+
                     b.Property<Guid>("ServiceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CustomComboId")
-                        .HasColumnType("uniqueidentifier");
+                    b.HasKey("ID");
 
-                    b.Property<long>("Duration")
-                        .HasColumnType("bigint");
+                    b.HasIndex("ServiceId");
 
-                    b.HasKey("ServiceId", "CustomComboId");
-
-                    b.HasIndex("CustomComboId");
-
-                    b.ToTable("ServiceCustomCombos");
+                    b.ToTable("ServicePriceHistory");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Store", b =>
@@ -701,8 +625,8 @@ namespace INBS.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("AdminId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("AverageRating")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -724,8 +648,6 @@ namespace INBS.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("AdminId");
 
                     b.ToTable("Stores");
                 });
@@ -752,16 +674,7 @@ namespace INBS.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OtpCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("OtpExpiry")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PasswordHash")
@@ -774,32 +687,9 @@ namespace INBS.Persistence.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("ID");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.AccessoryCustomNailDesign", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Accessory", "Accessory")
-                        .WithMany("AccessoryCustomNailDesigns")
-                        .HasForeignKey("AccessoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("INBS.Domain.Entities.CustomNailDesign", "CustomNailDesign")
-                        .WithMany("AccessoryCustomNailDesigns")
-                        .HasForeignKey("CustomNailDesignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Accessory");
-
-                    b.Navigation("CustomNailDesign");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Admin", b =>
@@ -807,7 +697,7 @@ namespace INBS.Persistence.Migrations
                     b.HasOne("INBS.Domain.Entities.User", "User")
                         .WithOne("Admin")
                         .HasForeignKey("INBS.Domain.Entities.Admin", "ID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -818,29 +708,10 @@ namespace INBS.Persistence.Migrations
                     b.HasOne("INBS.Domain.Entities.User", "User")
                         .WithOne("Artist")
                         .HasForeignKey("INBS.Domain.Entities.Artist", "ID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("INBS.Domain.Entities.Store", "Store")
-                        .WithMany("Artists")
-                        .HasForeignKey("StoreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Store");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.ArtistAvailability", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Artist", "Artist")
-                        .WithMany("ArtistAvailabilities")
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Artist");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.ArtistService", b =>
@@ -862,38 +733,49 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Service");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.ArtistStore", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.Artist", "Artist")
+                        .WithMany("ArtistStores")
+                        .HasForeignKey("ArtistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("INBS.Domain.Entities.Store", "Store")
+                        .WithMany("ArtistStores")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Artist");
+
+                    b.Navigation("Store");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.Booking", b =>
                 {
-                    b.HasOne("INBS.Domain.Entities.ArtistAvailability", "ArtistAvailability")
+                    b.HasOne("INBS.Domain.Entities.ArtistStore", "ArtistStore")
                         .WithMany("Bookings")
-                        .HasForeignKey("ArtistAvailabilityId")
+                        .HasForeignKey("ArtistStoreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("INBS.Domain.Entities.CustomCombo", "CustomCombo")
+                    b.HasOne("INBS.Domain.Entities.CustomerSelected", "CustomerSelected")
                         .WithMany("Bookings")
-                        .HasForeignKey("CustomComboId")
+                        .HasForeignKey("CustomerSelectedId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("INBS.Domain.Entities.CustomDesign", "CustomDesign")
-                        .WithMany("Bookings")
-                        .HasForeignKey("CustomDesignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("ArtistStore");
 
-                    b.Navigation("ArtistAvailability");
-
-                    b.Navigation("CustomCombo");
-
-                    b.Navigation("CustomDesign");
+                    b.Navigation("CustomerSelected");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Cancellation", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.Booking", "Booking")
-                        .WithOne("Cancellation")
-                        .HasForeignKey("INBS.Domain.Entities.Cancellation", "BookingId")
+                        .WithMany("Cancellations")
+                        .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -911,47 +793,6 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Service");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.CustomCombo", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
-                        .WithMany("CustomCombos")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.CustomDesign", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
-                        .WithMany("CustomDesigns")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("INBS.Domain.Entities.Design", "Design")
-                        .WithMany("CustomDesigns")
-                        .HasForeignKey("DesignID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Design");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.CustomNailDesign", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.CustomDesign", "CustomDesign")
-                        .WithMany("CustomNailDesigns")
-                        .HasForeignKey("CustomDesignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CustomDesign");
-                });
-
             modelBuilder.Entity("INBS.Domain.Entities.Customer", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.User", "User")
@@ -963,23 +804,15 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.DesignService", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.CustomerSelected", b =>
                 {
-                    b.HasOne("INBS.Domain.Entities.Design", "Design")
-                        .WithMany("DesignServices")
-                        .HasForeignKey("DesignId")
+                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
+                        .WithMany("CustomerSelecteds")
+                        .HasForeignKey("CustomerID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("INBS.Domain.Entities.Service", "Service")
-                        .WithMany("DesignServices")
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Design");
-
-                    b.Navigation("Service");
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.DeviceToken", b =>
@@ -995,37 +828,19 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Feedback", b =>
                 {
-                    b.HasOne("INBS.Domain.Entities.Artist", "Artist")
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("ArtistId");
-
                     b.HasOne("INBS.Domain.Entities.Booking", "Booking")
                         .WithMany("Feedbacks")
                         .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("INBS.Domain.Entities.Design", "Design")
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("DesignId");
-
-                    b.HasOne("INBS.Domain.Entities.Store", "Store")
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("StoreId");
-
-                    b.Navigation("Artist");
-
                     b.Navigation("Booking");
-
-                    b.Navigation("Design");
-
-                    b.Navigation("Store");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.Image", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.Media", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.Design", "Design")
-                        .WithMany("Images")
+                        .WithMany("Medias")
                         .HasForeignKey("DesignId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1044,6 +859,44 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Design");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.NailDesignService", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.NailDesign", "NailDesign")
+                        .WithMany("NailDesignServices")
+                        .HasForeignKey("NailDesignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("INBS.Domain.Entities.Service", "Service")
+                        .WithMany("NailDesignServices")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("NailDesign");
+
+                    b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.NailDesignServiceSelected", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.CustomerSelected", "CustomerSelected")
+                        .WithMany("NailDesignServiceSelecteds")
+                        .HasForeignKey("CustomerSelectedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("INBS.Domain.Entities.NailDesignService", "NailDesignService")
+                        .WithMany("NailDesignServiceSelecteds")
+                        .HasForeignKey("NailDesignServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomerSelected");
+
+                    b.Navigation("NailDesignService");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.Notification", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.User", "User")
@@ -1055,19 +908,34 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.PaymentDetail", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.Booking", "Booking")
+                        .WithMany("PaymentDetails")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("INBS.Domain.Entities.Payment", "Payment")
+                        .WithMany("PaymentDetails")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("Payment");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.Preference", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.Customer", "Customer")
                         .WithMany("Preferences")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CustomerId");
 
                     b.HasOne("INBS.Domain.Entities.Design", "Design")
                         .WithMany("Preferences")
-                        .HasForeignKey("DesignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DesignId");
 
                     b.Navigation("Customer");
 
@@ -1082,94 +950,52 @@ namespace INBS.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Customer");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.ServiceCustomCombo", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.CustomCombo", "CustomCombo")
-                        .WithMany("ServiceCustomCombos")
-                        .HasForeignKey("CustomComboId")
+                    b.HasOne("INBS.Domain.Entities.Design", "Design")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("DesignId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Customer");
+
+                    b.Navigation("Design");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.ServicePriceHistory", b =>
+                {
                     b.HasOne("INBS.Domain.Entities.Service", "Service")
-                        .WithMany("ServiceCustomCombos")
+                        .WithMany("ServicePriceHistories")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CustomCombo");
-
                     b.Navigation("Service");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.Store", b =>
-                {
-                    b.HasOne("INBS.Domain.Entities.Admin", "Admin")
-                        .WithMany("Stores")
-                        .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Admin");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.Accessory", b =>
-                {
-                    b.Navigation("AccessoryCustomNailDesigns");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.Admin", b =>
-                {
-                    b.Navigation("Stores");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Artist", b =>
                 {
-                    b.Navigation("ArtistAvailabilities");
-
                     b.Navigation("ArtistServices");
 
-                    b.Navigation("Feedbacks");
+                    b.Navigation("ArtistStores");
                 });
 
-            modelBuilder.Entity("INBS.Domain.Entities.ArtistAvailability", b =>
+            modelBuilder.Entity("INBS.Domain.Entities.ArtistStore", b =>
                 {
                     b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Booking", b =>
                 {
-                    b.Navigation("Cancellation");
+                    b.Navigation("Cancellations");
 
                     b.Navigation("Feedbacks");
-                });
 
-            modelBuilder.Entity("INBS.Domain.Entities.CustomCombo", b =>
-                {
-                    b.Navigation("Bookings");
-
-                    b.Navigation("ServiceCustomCombos");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.CustomDesign", b =>
-                {
-                    b.Navigation("Bookings");
-
-                    b.Navigation("CustomNailDesigns");
-                });
-
-            modelBuilder.Entity("INBS.Domain.Entities.CustomNailDesign", b =>
-                {
-                    b.Navigation("AccessoryCustomNailDesigns");
+                    b.Navigation("PaymentDetails");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Customer", b =>
                 {
-                    b.Navigation("CustomCombos");
-
-                    b.Navigation("CustomDesigns");
+                    b.Navigation("CustomerSelecteds");
 
                     b.Navigation("DeviceTokens");
 
@@ -1178,19 +1004,37 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Recommendations");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.CustomerSelected", b =>
+                {
+                    b.Navigation("Bookings");
+
+                    b.Navigation("NailDesignServiceSelecteds");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.Design", b =>
                 {
-                    b.Navigation("CustomDesigns");
-
-                    b.Navigation("DesignServices");
-
-                    b.Navigation("Feedbacks");
-
-                    b.Navigation("Images");
+                    b.Navigation("Medias");
 
                     b.Navigation("NailDesigns");
 
                     b.Navigation("Preferences");
+
+                    b.Navigation("Recommendations");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.NailDesign", b =>
+                {
+                    b.Navigation("NailDesignServices");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.NailDesignService", b =>
+                {
+                    b.Navigation("NailDesignServiceSelecteds");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.Payment", b =>
+                {
+                    b.Navigation("PaymentDetails");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Service", b =>
@@ -1199,16 +1043,14 @@ namespace INBS.Persistence.Migrations
 
                     b.Navigation("CategoryServices");
 
-                    b.Navigation("DesignServices");
+                    b.Navigation("NailDesignServices");
 
-                    b.Navigation("ServiceCustomCombos");
+                    b.Navigation("ServicePriceHistories");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Store", b =>
                 {
-                    b.Navigation("Artists");
-
-                    b.Navigation("Feedbacks");
+                    b.Navigation("ArtistStores");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.User", b =>

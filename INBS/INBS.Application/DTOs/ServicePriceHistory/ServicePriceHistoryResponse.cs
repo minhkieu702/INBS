@@ -12,7 +12,7 @@ namespace INBS.Application.DTOs.ServicePriceHistory
     public class ServicePriceHistoryResponse
     {
             [Key]
-            public Guid ID { get; set; }
+            public int ID { get; set; }
 
             public Guid ServiceId { get; set; }
             public virtual ServiceResponse? Service { get; set; }
