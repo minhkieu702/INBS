@@ -18,7 +18,7 @@ namespace INBS.Application.DTOs.Design
 
         public int AverageRating { get; set; }
 
-        public ICollection<MediaResponse> Images { get; set; } = [];
+        public ICollection<MediaResponse> Medias { get; set; } = [];
 
         public ICollection<PreferenceResponse> Preferences { get; set; } = [];
 
