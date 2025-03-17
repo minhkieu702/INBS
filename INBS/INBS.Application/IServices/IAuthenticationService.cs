@@ -13,7 +13,6 @@ namespace INBS.Application.IServices
         Task<string> ResetPasswordCustomer(string phone, string newPassword, string confirmPassword);
         Task<LoginResponse> VerifyOtpAsync(string phoneNumber, string otp);
         Task ResendOtpAsync(string phoneNumber);
-        Task<bool> CheckPhoneNumberVerified(string phoneNumber);
         Task ChangeProfile(UserRequest requestModel);
         Task Delete(Guid? id);
     }
