@@ -84,25 +84,7 @@ namespace INBS.API.Controllers
             {
                 return new BadRequestObjectResult(ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Check sdt đã Verified hay chưa
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("checkPhone")]
-        public async Task<IActionResult> CheckPhoneNumberVerifiedForCustomer([FromQuery] string phoneNumber)
-        {
-            try
-            {
-                var isVerified = await service.CheckPhoneNumberVerified(phoneNumber);
-                return Ok(isVerified);
-            }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(ex.Message);
-            }
-        }
+        }     
 
         /// <summary>
         /// Gửi lại OTP nếu OTP đã hết hạn
@@ -115,6 +97,24 @@ namespace INBS.API.Controllers
             {
                 await service.ResendOtpAsync(phoneNumber);
                 return Ok("OTP has been Resend successfully");
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Check sdt đã Verified hay chưa
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("checkPhone")]
+        public async Task<IActionResult> CheckPhoneVerifiedForCustomer([FromQuery] string phoneNumber)
+        {
+            try
+            {
+                var isVerified = await service.CheckPhoneNumberVerified(phoneNumber);
+                return Ok(isVerified);
             }
             catch (Exception ex)
             {
