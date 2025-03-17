@@ -34,6 +34,7 @@ namespace INBS.Application.DependencyInjection
             services.AddScoped<IStoreService, StoreService>();
 
             services.AddScoped<ISMSService, SMSService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
 
         }
