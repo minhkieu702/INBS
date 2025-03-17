@@ -38,7 +38,7 @@ namespace Infrastructure.DependencyInjection
             services.AddServices();
 
             // Authentications
-            services.AddAuthentication(configuration);
+            services.AddAuthentication();
 
             //SignalR
             services.AddSignalR();

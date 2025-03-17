@@ -44,7 +44,7 @@ namespace INBS.API.AppStart
 
             // Register various layers of the application
             services.AddInfrastructure();
-            services.AddApplication(configuration);
+            services.AddApplication();
             services.AddPersistence();
 
             return services;

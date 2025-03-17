@@ -35,7 +35,7 @@ namespace INBS.Application.Services
 
         private async Task<CustomerSelected> PredictDuration(BookingRequest request)
         {
-            var customerSelecteds = await _unitOfWork.CustomerSelectedRepository.GetAsync(c 
+            var customerSelecteds = await _unitOfWork.CustomerSelectedRepository.GetAsync(c
                 => c.Where(c => c.ID == request.CustomerSelectedId)
                 .Include(c => c.NailDesignServiceSelecteds
                     .Where(c => !c.NailDesignService!.Service!.IsDeleted && !c.NailDesignService!.IsDeleted))
@@ -54,15 +54,15 @@ namespace INBS.Application.Services
 
             var bookings = await _unitOfWork.BookingRepository.GetAsync(c => c.Where(oldBooking
                 => oldBooking.ArtistStoreId == booking.ArtistStoreId
-                
+
                 && oldBooking.ServiceDate == booking.ServiceDate
-                
-                && ( IsStuckTime(booking.StartTime, booking.PredictEndTime.AddMinutes(breaktime), oldBooking.StartTime, oldBooking.PredictEndTime.AddMinutes(breaktime))
-                
+
+                && (IsStuckTime(booking.StartTime, booking.PredictEndTime.AddMinutes(breaktime), oldBooking.StartTime, oldBooking.PredictEndTime.AddMinutes(breaktime))
+
                 || IsOverlapping(oldBooking.StartTime, oldBooking.PredictEndTime.AddMinutes(breaktime), booking.StartTime, booking.PredictEndTime.AddMinutes(breaktime)))
 
                 && !new[] { (int)BookingStatus.isCanceled, (int)BookingStatus.isCompleted }.Contains(oldBooking.Status)
-                
+
                 && oldBooking.ID != booking.ID
                 && !oldBooking.IsDeleted
                 ));
@@ -73,10 +73,10 @@ namespace INBS.Application.Services
 
         private static bool IsStuckTime(TimeOnly outerStartTime, TimeOnly outerEndTime, TimeOnly innerStartTime, TimeOnly innerEndTime)
         {
-                // Booking start time is between old booking start time and end time
-                // Booking end time is between old booking start time and end time
-            return 
-                outerStartTime <= innerStartTime && innerStartTime <= outerEndTime 
+            // Booking start time is between old booking start time and end time
+            // Booking end time is between old booking start time and end time
+            return
+                outerStartTime <= innerStartTime && innerStartTime <= outerEndTime
                 || outerStartTime <= innerEndTime && innerEndTime <= outerEndTime;
         }
 
@@ -148,8 +148,8 @@ namespace INBS.Application.Services
 
         private async Task RecheckStatusBooking(Booking bookingReq)
         {
-            var pendingBookings = await _unitOfWork.BookingRepository.GetAsync(c => c.Where(c 
-                => c.ServiceDate == bookingReq.ServiceDate 
+            var pendingBookings = await _unitOfWork.BookingRepository.GetAsync(c => c.Where(c
+                => c.ServiceDate == bookingReq.ServiceDate
                 && c.ArtistStoreId == bookingReq.ArtistStoreId
                 && c.ID != bookingReq.ID
                 && new[] { (int)BookingStatus.isWaiting, (int)BookingStatus.isConfirmed }.Contains(c.Status)
@@ -162,12 +162,12 @@ namespace INBS.Application.Services
             var waitbookings = pendingBookings.OrderBy(c => c.LastModifiedAt).Where(c => c.Status == (int)BookingStatus.isWaiting);
             var bookedlist = pendingBookings.OrderBy(c => c.LastModifiedAt).Where(c => c.Status == (int)BookingStatus.isConfirmed);
             var artistStore = pendingBookings.First().ArtistStore ?? throw new Exception("Artist is not at this store");
-            
+
             var updateList = new List<Booking>();
-            
+
             foreach (var waitbooking in waitbookings)
             {
-                var changeBooking = bookedlist.FirstOrDefault(booking 
+                var changeBooking = bookedlist.FirstOrDefault(booking
                     => (
                     // "book with isBooked" start time is between wait booking start time and end time
                     // "book with isBooked" end time is between wait booking start time and end time
