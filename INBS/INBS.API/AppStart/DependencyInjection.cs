@@ -43,9 +43,9 @@ namespace INBS.API.AppStart
             services.AddSwagger();
 
             // Register various layers of the application
-            services.AddInfrastructure(configuration);
+            services.AddInfrastructure();
             services.AddApplication(configuration);
-            services.AddPersistence(configuration);
+            services.AddPersistence();
 
             return services;
         }
