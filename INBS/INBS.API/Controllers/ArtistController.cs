@@ -24,17 +24,9 @@ namespace INBS.API.Controllers
         /// <returns>A list of artists.</returns>
         [HttpGet]
         [EnableQuery]
-        public async Task<IActionResult> Get()
+        public IQueryable<ArtistResponse> Get()
         {
-            try
-            {
-                var result = await service.Get();
-                return Ok(result.AsQueryable());
-            }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(ex.Message);
-            }
+            return service.Get();
         }
 
         /// <summary>

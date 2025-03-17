@@ -40,7 +40,8 @@ namespace INBS.Application.Services
                 .Include(c => c.NailDesignServiceSelecteds
                     .Where(c => !c.NailDesignService!.Service!.IsDeleted && !c.NailDesignService!.IsDeleted))
                     .ThenInclude(c => c.NailDesignService)
-                        .ThenInclude(c => c!.Service));
+                        .ThenInclude(c => c!.Service)
+                            .ThenInclude(c => c!.ServicePriceHistories));
 
             var customerSelected = customerSelecteds.FirstOrDefault() ?? throw new Exception("Your selected nail design and service not found");
 
@@ -91,10 +92,11 @@ namespace INBS.Application.Services
             var totalAmount = 0L;
             foreach (var item in customerSelected.NailDesignServiceSelecteds)
             {
+                var servicePrice = item.NailDesignService!.Service!.ServicePriceHistories.FirstOrDefault(c => c.EffectiveTo == null) ?? throw new Exception("Some service do not have price");
                 totalDuration += item.NailDesignService!.Service!.AverageDuration;
-                totalAmount += item.NailDesignService!.Service!.Price + item.NailDesignService!.ExtraPrice;
+                totalAmount += servicePrice.Price + item.NailDesignService!.ExtraPrice;
             }
-            booking.Status = (int)BookingStatus.isBooked;
+            booking.Status = (int)BookingStatus.isConfirmed;
             booking.PredictEndTime = booking.StartTime.AddMinutes(totalDuration);
             booking.TotalAmount = totalAmount;
             booking.ArtistStoreId = artistStore.ID;
@@ -116,7 +118,7 @@ namespace INBS.Application.Services
 
                 if ((await ValidateBooking(booking, artistStore)).Any())
                 {
-                    booking.Status = (int)BookingStatus.isWating;
+                    booking.Status = (int)BookingStatus.isWaiting;
                 }
 
                 // Save booking to the repository
@@ -150,15 +152,15 @@ namespace INBS.Application.Services
                 => c.ServiceDate == bookingReq.ServiceDate 
                 && c.ArtistStoreId == bookingReq.ArtistStoreId
                 && c.ID != bookingReq.ID
-                && new[] { (int)BookingStatus.isWating, (int)BookingStatus.isBooked }.Contains(c.Status)
+                && new[] { (int)BookingStatus.isWaiting, (int)BookingStatus.isConfirmed }.Contains(c.Status)
                 && c.ID != bookingReq.ID
                 && !c.IsDeleted
                 ).Include(x => x.ArtistStore));
 
             if (!pendingBookings.Any()) return;
 
-            var waitbookings = pendingBookings.OrderBy(c => c.LastModifiedAt).Where(c => c.Status == (int)BookingStatus.isWating);
-            var bookedlist = pendingBookings.OrderBy(c => c.LastModifiedAt).Where(c => c.Status == (int)BookingStatus.isBooked);
+            var waitbookings = pendingBookings.OrderBy(c => c.LastModifiedAt).Where(c => c.Status == (int)BookingStatus.isWaiting);
+            var bookedlist = pendingBookings.OrderBy(c => c.LastModifiedAt).Where(c => c.Status == (int)BookingStatus.isConfirmed);
             var artistStore = pendingBookings.First().ArtistStore ?? throw new Exception("Artist is not at this store");
             
             var updateList = new List<Booking>();
@@ -177,7 +179,7 @@ namespace INBS.Application.Services
                 if (changeBooking == null) continue;
 
                 // Change status of wait booking to isBooked
-                waitbooking.Status = (int)BookingStatus.isBooked;
+                waitbooking.Status = (int)BookingStatus.isConfirmed;
 
 #warning do notification with fcm or signalr here
 
@@ -193,7 +195,7 @@ namespace INBS.Application.Services
             {
                 _unitOfWork.BeginTransaction();
 
-                var booking = await _unitOfWork.BookingRepository.GetByIdAsync(id) ?? throw new Exception($"The entity with {id} is not existed.");
+                var booking = await _unitOfWork.BookingRepository.GetByIdAsync(id) ?? throw new Exception($"The booking with {id} is not existed.");
 
                 _mapper.Map(bookingRequest, booking);
 
@@ -206,7 +208,7 @@ namespace INBS.Application.Services
 
                 if ((await ValidateBooking(booking, artistStore)).Any())
                 {
-                    booking.Status = (int)BookingStatus.isWating;
+                    booking.Status = (int)BookingStatus.isWaiting;
                 }
 
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
@@ -258,7 +260,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task CompleteBooking(Guid id)
+        public async Task SetBookingIsServicing(Guid id)
         {
             try
             {

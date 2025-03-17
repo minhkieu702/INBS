@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using INBS.Application.DTOs.Artist;
 using INBS.Application.DTOs.Store;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
@@ -73,24 +75,15 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<IEnumerable<StoreResponse>> Get()
+        public IQueryable<StoreResponse> Get()
         {
             try
             {
-                var result = await _unitOfWork.StoreRepository.GetAsync(
-                    query => query.Where(s => !s.IsDeleted)
-                    .Include(s => s.ArtistStores.Where(a => !a.IsDeleted && !a.Artist!.User!.IsDeleted))
-                        .ThenInclude(a => a.Artist)
-                            .ThenInclude(a => a!.User)
-                    //.Include(s => s.Admin)
-                    );
-
-                return _mapper.Map<IEnumerable<StoreResponse>>(result);
+                return _unitOfWork.StoreRepository.Query().ProjectTo<StoreResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
-
-                throw;
+                return Enumerable.Empty<StoreResponse>().AsQueryable();
             }
         }
 

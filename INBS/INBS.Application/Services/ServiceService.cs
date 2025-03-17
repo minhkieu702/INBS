@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using INBS.Application.Common;
+using INBS.Application.DTOs.Artist;
 using INBS.Application.DTOs.Service;
 using INBS.Application.DTOs.ServiceDesign;
 using INBS.Application.Interfaces;
@@ -86,6 +88,11 @@ namespace INBS.Application.Services
             }
         }
 
+        private async Task HandlePrice(Guid id, ServiceRequest modelRequest)
+        {
+            var latestPrice = await _unitOfWork.ServicePriceHistoryRepository.GetAsync(query => query.AsNoTracking());
+        }
+
         public async Task Create(ServiceRequest modelRequest, IList<ServiceNailDesignRequest> serviceNailDesignRequests)
         {
             try
@@ -152,39 +159,15 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<IEnumerable<ServiceResponse>> Get()
+        public IQueryable<ServiceResponse> Get()
         {
             try
             {
-                var services = await _unitOfWork.ServiceRepository.GetAsync( s => s.Where(service => !service.IsDeleted)
-                  .Include(service => service.CategoryServices)
-                  .Include(service => service.ArtistServices.Where(c => !c.Artist!.User!.IsDeleted))
-                    .ThenInclude(service => service.Artist)
-                        .ThenInclude(Artist => Artist!.User)
-                   .Include(service => service.NailDesignServices.Where(c => !c.NailDesign!.Design!.IsDeleted))
-                    .ThenInclude(service => service.NailDesign)
-                        .ThenInclude(service => service!.Design)
-                ) ?? throw new Exception("Something went wrong!");
-
-                var responses = _mapper.Map<IEnumerable<ServiceResponse>>(services);
-
-                if (responses.Any())
-                {
-                    var categories = await Utils.GetCategoriesAsync();
-                    foreach (var service in responses)
-                    {
-                        foreach (var cateService in service.CategoryServices)
-                        {
-                            cateService.Category = categories.FirstOrDefault(c => c.ID == cateService.CategoryId);
-                        }
-                    }
-                }
-
-                return responses;
+                return _unitOfWork.ServiceRepository.Query().ProjectTo<ServiceResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
-                throw;
+                return Enumerable.Empty<ServiceResponse>().AsQueryable();
             }
         }
 

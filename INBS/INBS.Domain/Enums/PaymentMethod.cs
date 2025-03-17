@@ -8,7 +8,7 @@ namespace INBS.Domain.Enums
 {
     public enum PaymentMethod
     {
-        Cash = 1,
-        BankTransfer = 0
+        Cash = 0,
+        QRCode = 2
     }
 }

@@ -23,7 +23,7 @@ namespace Infrastructure.DependencyInjection
 {
     public static class DIInfrastructure
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
             //MediatR
             //services.AddMediatR(NewMethod().Assembly);

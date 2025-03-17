@@ -22,17 +22,9 @@ namespace INBS.API.Controllers
         /// <returns>A list of stores.</returns>
         [HttpGet]
         [EnableQuery]
-        public async Task<IActionResult> Get()
+        public IQueryable<StoreResponse> Get()
         {
-            try
-            {
-                var stores = await service.Get();
-                return Ok(stores.AsQueryable());
-            }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(ex.Message);
-            }
+                return service.Get();
         }
 
         /// <summary>

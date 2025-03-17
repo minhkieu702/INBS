@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using INBS.Application.Common;
 using INBS.Application.DTOs.Artist;
 using INBS.Application.DTOs.ArtistService;
@@ -240,24 +241,15 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<IEnumerable<ArtistResponse>> Get()
+        public IQueryable<ArtistResponse> Get()
         {
             try
             {
-                var artist = await _unitOfWork.ArtistRepository.GetAsync(query => 
-                query.Where(c => !c.User!.IsDeleted)
-                    .Include(c => c.User)
-                    .Include(c => c.ArtistStores.Where(c => !c.IsDeleted && !c.Store!.IsDeleted))
-                        .ThenInclude(c => c.Store)
-                    .Include(c => c.ArtistServices.Where(c => !c.Service!.IsDeleted))
-                        .ThenInclude(c => c.Service)
-                    );
-                return _mapper.Map<IEnumerable<ArtistResponse>>(artist);
+                return _unitOfWork.ArtistRepository.Query().ProjectTo<ArtistResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
-
-                throw;
+                return Enumerable.Empty<ArtistResponse>().AsQueryable();
             }
         }
 

@@ -50,12 +50,30 @@ namespace INBS.Application.Mappers
 
             #region Booking
             CreateMap<BookingRequest, Booking>();
-            CreateMap<Booking, BookingResponse>();
+            CreateMap<Booking, BookingResponse>()
+                .AfterMap((source, dest) =>
+                {
+                    foreach (var item in dest.CustomerSelected!.NailDesignServiceSelecteds)
+                    {
+                        item.PriceAtBooking = item
+                        .NailDesignService!
+                        .Service!
+                        .ServicePriceHistories
+                        .Where(c => c.EffectiveFrom <= source.LastModifiedAt)
+                        .OrderByDescending(source => source.EffectiveFrom)
+                        .Select(c => c.Price)
+                        .FirstOrDefault();
+                    }
+                });
             #endregion
 
             #region CategoryService
             //CreateMap<CategoryServiceRequest, CategoryService>();
-            CreateMap<CategoryService, CategoryServiceResponse>();
+            CreateMap<CategoryService, CategoryServiceResponse>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.Category = Utils.GetCategories().FirstOrDefault(c => c.ID == source.CategoryId);
+                });
             #endregion
 
             #region Customer
@@ -150,8 +168,15 @@ namespace INBS.Application.Mappers
             {
                 dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
                 dest.LastModifiedAt = DateTime.Now;
-            }); 
-            CreateMap<Service, ServiceResponse>();
+            });
+            CreateMap<Service, ServiceResponse>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.Price = source.ServicePriceHistories
+                        .OrderByDescending(ph => ph.EffectiveFrom)
+                        .Select(ph => ph.Price)
+                        .FirstOrDefault();
+                });
             #endregion
 
             #region Store

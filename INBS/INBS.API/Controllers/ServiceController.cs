@@ -26,17 +26,9 @@ namespace INBS.API.Controllers
         /// <returns>A list of services.</returns>
         [HttpGet]
         [EnableQuery]
-        public async Task<IActionResult> Get()
+        public IQueryable<ServiceResponse> Get()
         {
-            try
-            {
-                var services = await _service.Get();
-                return Ok(services.AsQueryable());
-            }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(ex.Message);  
-            }
+            return _service.Get();
         }
 
         /// <summary>
