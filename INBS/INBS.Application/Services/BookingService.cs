@@ -284,5 +284,20 @@ namespace INBS.Application.Services
                 throw;
             }
         }
+
+        public async Task<List<Booking>> GetBookingsWithinNextMinutes(int minutes)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var now = TimeOnly.FromDateTime(DateTime.Now);
+            var targetTime = now.AddMinutes(minutes);
+
+            var bookings = await _unitOfWork.BookingRepository.GetAsync(query => query
+                .Where(b => b.ServiceDate == today && b.StartTime >= now && b.StartTime <= targetTime)
+                .Include(b => b.CustomerSelected)
+                .ThenInclude(b => b.Customer)
+                .ThenInclude(b => b.User));
+
+            return bookings.ToList();
+        }
     }
 }
