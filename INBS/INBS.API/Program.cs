@@ -2,8 +2,8 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole(); // Đảm bảo log ra console
+//builder.Logging.ClearProviders();
+//builder.Logging.AddConsole(); // Đảm bảo log ra console
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
