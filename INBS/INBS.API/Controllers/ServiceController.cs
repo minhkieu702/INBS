@@ -25,7 +25,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns>A list of services.</returns>
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public IQueryable<ServiceResponse> Get()
         {
             return _service.Get();

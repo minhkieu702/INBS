@@ -21,7 +21,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns>A list of stores.</returns>
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public IQueryable<StoreResponse> Get()
         {
                 return service.Get();

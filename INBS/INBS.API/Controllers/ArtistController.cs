@@ -23,7 +23,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns>A list of artists.</returns>
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public IQueryable<ArtistResponse> Get()
         {
             return service.Get();

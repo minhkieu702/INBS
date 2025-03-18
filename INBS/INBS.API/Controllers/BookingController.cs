@@ -22,7 +22,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns>A list of bookings.</returns>
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public IQueryable<BookingResponse> Get()
         {
             return service.Get();

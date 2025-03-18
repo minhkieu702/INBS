@@ -23,6 +23,7 @@ namespace INBS.API.Controllers
         {
             try
             {
+                var user = User;
                 await service.UpdatePreferencesAsync(request);
                 return Ok();
             }
@@ -37,7 +38,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns>Customer preferences.</returns>
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public IQueryable<CustomerResponse> Get()
         {
             return service.Get();
