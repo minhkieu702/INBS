@@ -48,42 +48,30 @@ namespace Infrastructure.DependencyInjection
 
             services.AddAutoMapper(typeof(MappingProfile));
 
-            services.AddScoped<IPayOSHandler, PayOSHandler>();
-
             //Firebase
-            //services.Configure<FirebaseConfig>(
-            //    options => options.ApiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey"));
+            services.Configure<FirebaseConfig>(
+                options => options.ApiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey"));
 
-            //// Initialize Firebase if not initialized
-            //if (FirebaseApp.DefaultInstance == null)
-            //{
-            //    try
-            //    {
-            //        var credentialPath = Path.Combine(
-            //            AppDomain.CurrentDomain.BaseDirectory,
-            //            Environment.GetEnvironmentVariable("FirebaseSettings:credentialFile"));
+            // Initialize Firebase if not initialized
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                try
+                {
+                    FirebaseApp.Create(new AppOptions()
+                    {
+                        Credential = GoogleCredential.FromJson(Environment.GetEnvironmentVariable("FirebaseSettings:config"))
+                    });
 
-            //        if (!File.Exists(credentialPath))
-            //        {
-            //            throw new FileNotFoundException(
-            //                $"Firebase credential file not found at {credentialPath}");
-            //        }
+                    services.AddSingleton(FirebaseMessaging.DefaultInstance);
 
-            //        FirebaseApp.Create(new AppOptions()
-            //        {
-            //            Credential = GoogleCredential.FromFile(credentialPath)
-            //        });
-
-            //        services.AddSingleton(FirebaseMessaging.DefaultInstance);
-
-            //        Console.WriteLine("Firebase initialized successfully!");
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Console.WriteLine($"Error initializing Firebase: {ex.Message}");
-            //        throw;
-            //    }
-            //}
+                    Console.WriteLine("Firebase initialized successfully!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error initializing Firebase: {ex.Message}");
+                    throw;
+                }
+            }
 
             //Quartz
             //services.AddQuartz();
@@ -100,7 +88,10 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IFirebaseService, FirebaseService>();
 
             services.AddScoped<IAuthentication, Authentication>();
+
             services.AddScoped<AutoNotificationBooking>();
+
+            services.AddScoped<IPayOSHandler, PayOSHandler>();
 
         }
 
@@ -113,7 +104,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 
-        public static void AddAuthentication(this IServiceCollection services, IConfiguration config)
+        public static void AddAuthentication(this IServiceCollection services)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
