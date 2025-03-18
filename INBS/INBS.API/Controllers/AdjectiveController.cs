@@ -19,7 +19,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns>A list of categories.</returns>
         [HttpGet("Categories")]
-        [EnableQuery(MaxExpansionDepth = 100)]
+        [EnableQuery]
         public async Task<IActionResult> GetCategories()
         {
             try

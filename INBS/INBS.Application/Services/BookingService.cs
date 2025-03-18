@@ -57,10 +57,8 @@ namespace INBS.Application.Services
 
                 && oldBooking.ServiceDate == booking.ServiceDate
 
-                && (IsStuckTime(booking.StartTime, booking.PredictEndTime.AddMinutes(breaktime), oldBooking.StartTime, oldBooking.PredictEndTime.AddMinutes(breaktime))
-
-                || IsOverlapping(oldBooking.StartTime, oldBooking.PredictEndTime.AddMinutes(breaktime), booking.StartTime, booking.PredictEndTime.AddMinutes(breaktime)))
-
+                && (booking.StartTime < oldBooking.PredictEndTime.AddMinutes(breaktime)
+                && oldBooking.StartTime < booking.PredictEndTime.AddMinutes(breaktime))
                 && !new[] { (int)BookingStatus.isCanceled, (int)BookingStatus.isCompleted }.Contains(oldBooking.Status)
 
                 && oldBooking.ID != booking.ID

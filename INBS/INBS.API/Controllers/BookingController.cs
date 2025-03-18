@@ -34,7 +34,7 @@ namespace INBS.API.Controllers
         /// <param name="booking">The booking request.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] BookingRequest booking)
+        public async Task<IActionResult> Create([FromForm] BookingRequest booking)
         {
             try
             {
