@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\User\Artist\**" />
+    <EmbeddedResource Remove="DTOs\User\Artist\**" />
+    <None Remove="DTOs\User\Artist\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FirebaseAdmin" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
@@ -22,10 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\INBS.Domain\INBS.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DTOs\User\Artist\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties common_4occasion_1json__JsonSchema="https://cdn.jsdelivr.net/gh/roadrunner-server/roadrunner@latest/schemas/config/3.0.schema.json" /></VisualStudio></ProjectExtensions>
