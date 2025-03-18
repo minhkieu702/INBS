@@ -10,10 +10,7 @@ using System.Threading.Tasks;
 namespace INBS.Application.DTOs.Feedback
 {
     public class FeedbackResponse : BaseEntity
-    {
-        public FeedbackResponse():base() { }
-
-        public int FeedbackType { get; set; }
+    {        public int FeedbackType { get; set; }
 
         public int Rating { get; set; }
 

@@ -13,7 +13,7 @@ namespace INBS.Application.DTOs.Customer
 
         public string? Description { get; set; }
 
-        public UserResponse? User { get; set; }
+        public virtual UserResponse? User { get; set; }
 
         public virtual ICollection<FeedbackResponse> Feedbacks { get; set; } = [];
 

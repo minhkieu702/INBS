@@ -9,9 +9,6 @@ namespace INBS.Application.DTOs.CustomerSelected
 {
     public class CustomerSelectedRequest
     {
-        [Key]
-        public Guid ID { get; set; }
-
         public bool IsFavorite { get; set; }
     }
 }

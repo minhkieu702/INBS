@@ -14,16 +14,14 @@ namespace INBS.Application.DTOs.Design
 
         public string? Description { get; set; }
 
-        public int Price { get; set; }
-
         public int AverageRating { get; set; }
 
-        public ICollection<MediaResponse> Medias { get; set; } = [];
+        public virtual ICollection<MediaResponse> Medias { get; set; } = [];
 
-        public ICollection<PreferenceResponse> Preferences { get; set; } = [];
+        public virtual ICollection<PreferenceResponse> Preferences { get; set; } = [];
 
-        public ICollection<NailDesignResponse> NailDesigns { get; set; } = [];
+        public virtual ICollection<NailDesignResponse> NailDesigns { get; set; } = [];
 
-        public ICollection<NailDesignServiceResponse> DesignServices { get; set; } = [];
+        public virtual ICollection<NailDesignServiceResponse> DesignServices { get; set; } = [];
     }
 }

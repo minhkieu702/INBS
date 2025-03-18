@@ -29,12 +29,12 @@ namespace INBS.Application.DTOs.Service
 
         public long AverageDuration { get; set; }
 
-        public ICollection<CategoryServiceResponse> CategoryServices { get; set; } = [];
+        public virtual ICollection<CategoryServiceResponse> CategoryServices { get; set; } = [];
 
-        public ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];
+        public virtual ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];
 
-        public ICollection<NailDesignServiceResponse> NailDesignServices { get; set; } = [];
+        public virtual ICollection<NailDesignServiceResponse> NailDesignServices { get; set; } = [];
 
-        public ICollection<ServicePriceHistoryResponse> ServicePriceHistories { get; set; } = [];
+        public virtual ICollection<ServicePriceHistoryResponse> ServicePriceHistories { get; set; } = [];
     }
 }

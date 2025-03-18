@@ -35,6 +35,6 @@ namespace INBS.Application.DTOs.User
 
         public ArtistResponse? Artist { get; set; }
 
-        public ICollection<NotificationResponse> Notifications { get; set; } = [];
+        public virtual ICollection<NotificationResponse> Notifications { get; set; } = [];
     }
 }
