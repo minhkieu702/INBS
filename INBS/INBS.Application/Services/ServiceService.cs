@@ -191,7 +191,7 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.ServiceRepository.Query().ProjectTo<ServiceResponse>(_mapper.ConfigurationProvider);
+                return _unitOfWork.ServiceRepository.Query().Include(c => c.ServicePriceHistories).ProjectTo<ServiceResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
