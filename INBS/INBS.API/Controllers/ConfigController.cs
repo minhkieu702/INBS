@@ -4,11 +4,12 @@ namespace INBS.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ConfigController : ControllerBase
+    public class ConfigController(ILogger<ConfigController> logger) : ControllerBase
     {
         [HttpGet("ReadConnectionString")]
         public IActionResult GetconnectionString()
         {
+            logger.LogWarning(Environment.GetEnvironmentVariable("connectionString"));
             return Ok(Environment.GetEnvironmentVariable("connectionString"));
         }
 

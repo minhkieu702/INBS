@@ -1,10 +1,14 @@
 using INBS.API.AppStart;
 using Infrastructure.DependencyInjection;
-
+using Microsoft.Extensions.Logging.AzureAppServices; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+builder.Logging.ClearProviders(); // Xóa các provider mặc định
+builder.Logging.AddConsole();     // Ghi log ra console (hiển thị trên Log Stream)
+builder.Logging.AddDebug();       // Ghi log debug (nếu cần)
+builder.Logging.AddAzureWebAppDiagnostics(); // This should now work with the correct using directive
 
 //builder.Logging.ClearProviders();
 //builder.Logging.AddConsole(); // Đảm bảo log ra console
@@ -20,7 +24,12 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
+app.Use(async (context, next) =>
+{
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("🚀 Request: {Method} {Path}", context.Request.Method, context.Request.Path);
+    await next();
+});
 app.UseSwagger();
 app.UseSwaggerUI();
 
