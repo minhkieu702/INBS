@@ -4,20 +4,31 @@ namespace INBS.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ConfigController(ILogger<ConfigController> logger) : ControllerBase
+    public class ConfigController : ControllerBase
     {
-        [HttpGet("ReadConnectionString")]
-        public IActionResult GetconnectionString()
+        private readonly ILogger<ConfigController> _logger;
+
+        public ConfigController(ILogger<ConfigController> logger)
         {
-            logger.LogWarning(Environment.GetEnvironmentVariable("connectionString"));
-            logger.LogInformation("hiiiiiiiiiiiiiiiiiiiiiii");
-            return Ok(Environment.GetEnvironmentVariable("connectionString"));
+            _logger = logger;
+        }
+
+        [HttpGet("ReadConnectionString")]
+        public IActionResult GetConnectionString()
+        {
+            var connectionString = Environment.GetEnvironmentVariable("connectionString") ?? "Not Found";
+
+            _logger.LogWarning("Connection String: {ConnectionString}", connectionString);
+            _logger.LogInformation("hiiiiiiiiiiiiiiiiiiiiiii");
+
+            return Ok(connectionString);
         }
 
         [HttpGet("ReadFirebaseConfig")]
         public IActionResult GetFirebaseConfig()
         {
-            return Ok(Environment.GetEnvironmentVariable("FirebaseSettings:config"));
+            var firebaseConfig = Environment.GetEnvironmentVariable("FirebaseSettings_config") ?? "Not Found";
+            return Ok(firebaseConfig);
         }
-        }
+    }
 }

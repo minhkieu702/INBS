@@ -1,20 +1,21 @@
 using INBS.API.AppStart;
 using Infrastructure.DependencyInjection;
-using Microsoft.Extensions.Logging.AzureAppServices; // Add this using directive
+using Microsoft.Extensions.Logging.AzureAppServices;
+using Serilog;
+using Serilog.Events; // Add this using directive
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.Services.AddLogging(lb =>
-{
-    lb.AddConsole();
-    lb.AddDebug();
-    lb.AddAzureWebAppDiagnostics();
-});
-
-//builder.Logging.ClearProviders();
-//builder.Logging.AddConsole(); // Đảm bảo log ra console
-
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information() // Chỉ log từ mức độ Information trở lên
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning) // Giảm log không cần thiết từ Microsoft
+    .WriteTo.Console() // Ghi log ra console (hỗ trợ Azure Log Stream)
+    .WriteTo.Debug() // Ghi log ra Debug Output (hữu ích khi chạy local)
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day) // Ghi log vào file
+    .WriteTo.AzureApp() // Gửi log lên Azure Log Stream
+    .CreateLogger();
+builder.Host.UseSerilog();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -28,10 +29,10 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.Use(async (context, next) =>
 {
-    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation("🚀 Request: {Method} {Path}", context.Request.Method, context.Request.Path);
+    Log.Information("🚀 Request: {Method} {Path}", context.Request.Method, context.Request.Path);
     await next();
 });
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
