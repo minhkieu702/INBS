@@ -26,7 +26,6 @@ namespace INBS.Application.Services
                && c.ArtistId == request.ArtistId
                && c.WorkingDate == request.ServiceDate
                && c.StartTime <= request.StartTime
-               && c.EndTime >= predictEndTime
                && !c.IsDeleted
                ));
 
@@ -56,6 +55,7 @@ namespace INBS.Application.Services
                 => oldBooking.ArtistStoreId == booking.ArtistStoreId
 
                 && oldBooking.ServiceDate == booking.ServiceDate
+
 
                 && (booking.StartTime < oldBooking.PredictEndTime.AddMinutes(breaktime)
                 && oldBooking.StartTime < booking.PredictEndTime.AddMinutes(breaktime))
