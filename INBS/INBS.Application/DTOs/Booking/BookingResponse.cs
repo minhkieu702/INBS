@@ -34,6 +34,6 @@ namespace INBS.Application.DTOs.Booking
 
         //public virtual ICollection<Cancellation> Cancellations { get; set; } = [];
 
-        public virtual ICollection<FeedbackResponse> Feedbacks { get; set; } = [];
+        public virtual ICollection<FeedbackResponse>? Feedbacks { get; set; } = [];
     }
 }

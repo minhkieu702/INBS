@@ -15,6 +15,8 @@ using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.DTOs.Notification;
+using INBS.Application.DTOs.Payment;
+using INBS.Application.DTOs.PaymentDetail;
 using INBS.Application.DTOs.Preference;
 using INBS.Application.DTOs.Service;
 using INBS.Application.DTOs.ServicePriceHistory;
@@ -149,6 +151,16 @@ namespace INBS.Application.Mappers
                 GetPreferenceData((PreferenceType)src.PreferenceType, src.PreferenceId)))
                 .ForMember(dest => dest.PreferenceType, opt => opt.MapFrom(src => GetPreferenceType(src.PreferenceType)))
                 ;
+            #endregion
+
+            #region Payment
+            CreateMap<PaymentRequest, Payment>();
+            CreateMap<Payment, PaymentResponse>();
+            #endregion
+
+            #region PaymentDetail
+            CreateMap<PaymentDetailRequest, Payment>();
+            CreateMap<PaymentDetail, PaymentDetailResponse>();
             #endregion
 
             #region ServicePriceHistory

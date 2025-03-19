@@ -63,7 +63,7 @@ namespace INBS.Application.Services
 
                 await DeletePaymentDetails(bookingIds: paymentDetailRequests.Select(c => c.BookingId));
 
-                var payment = _mapper.Map<Payment>(paymentRequest);
+                var payment = new Payment();
 
                 payment.Method = (int)PaymentMethod.QRCode;
 

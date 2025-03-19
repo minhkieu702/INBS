@@ -85,5 +85,19 @@ namespace INBS.API.Controllers
                 return new BadRequestObjectResult(ex.Message);
             }
         }
+
+        [HttpPost("Serving")]
+        public async Task<IActionResult> Serving([FromQuery] Guid id)
+        {
+            try
+            {
+                await service.SetBookingIsServicing(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
     }
 }
