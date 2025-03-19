@@ -11,6 +11,7 @@ namespace INBS.Domain.Entities
             Medias = [];
             NailDesigns = [];
             Preferences = [];
+            Recommendations = [];
         }
 
         public string Name { get; set; }

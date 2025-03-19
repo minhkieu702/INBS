@@ -41,10 +41,10 @@
     <None Include="File\PaintType.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="File\ServiceCategory.json" >
+    <None Include="File\ServiceCategory.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="File\Skintone.json" >
+    <None Include="File\Skintone.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -53,6 +53,10 @@
     <Compile Update="Controllers\StoreController.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\" />
   </ItemGroup>
 
 </Project>

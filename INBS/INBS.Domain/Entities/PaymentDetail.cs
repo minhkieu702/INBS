@@ -9,7 +9,7 @@ namespace INBS.Domain.Entities
 {
     public class PaymentDetail
     {
-        public Guid PaymentId { get; set; }
+        public int PaymentId { get; set; }
         [ForeignKey(nameof(PaymentId))]
         [InverseProperty(nameof(Payment.PaymentDetails))]
         public virtual Payment? Payment { get; set; }

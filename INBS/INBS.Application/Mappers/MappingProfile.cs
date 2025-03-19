@@ -10,17 +10,22 @@ using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.CustomerSelected;
 using INBS.Application.DTOs.Design;
 using INBS.Application.DTOs.DesignService;
+using INBS.Application.DTOs.Feedback;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.DTOs.Notification;
+using INBS.Application.DTOs.Payment;
+using INBS.Application.DTOs.PaymentDetail;
 using INBS.Application.DTOs.Preference;
 using INBS.Application.DTOs.Service;
+using INBS.Application.DTOs.ServicePriceHistory;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.Enums;
+using Twilio.Base;
 
 namespace INBS.Application.Mappers
 {
@@ -50,12 +55,30 @@ namespace INBS.Application.Mappers
 
             #region Booking
             CreateMap<BookingRequest, Booking>();
-            CreateMap<Booking, BookingResponse>();
+            CreateMap<Booking, BookingResponse>()
+                .AfterMap((source, dest) =>
+                {
+                    foreach (var item in dest.CustomerSelected!.NailDesignServiceSelecteds)
+                    {
+                        item.PriceAtBooking = item
+                        .NailDesignService!
+                        .Service!
+                        .ServicePriceHistories
+                        .Where(c => c.EffectiveFrom <= source.LastModifiedAt)
+                        .OrderByDescending(source => source.EffectiveFrom)
+                        .Select(c => c.Price)
+                        .FirstOrDefault();
+                    }
+                });
             #endregion
 
             #region CategoryService
             //CreateMap<CategoryServiceRequest, CategoryService>();
-            CreateMap<CategoryService, CategoryServiceResponse>();
+            CreateMap<CategoryService, CategoryServiceResponse>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.Category = Utils.GetCategories().FirstOrDefault(c => c.ID == source.CategoryId);
+                });
             #endregion
 
             #region Customer
@@ -82,7 +105,7 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region Feedback
-
+            CreateMap<Feedback, FeedbackResponse>();
             #endregion
 
             #region Media
@@ -99,7 +122,9 @@ namespace INBS.Application.Mappers
                 .AfterMap((source, dest) =>
                 {
                     dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
-                });
+                    dest.NailDesignServices = [];
+                })
+                ;
             CreateMap<NailDesign, NailDesignResponse>();
             #endregion
 
@@ -122,26 +147,24 @@ namespace INBS.Application.Mappers
             #region Preference
             CreateMap<PreferenceRequest, Preference>();
             CreateMap<Preference, PreferenceResponse>()
-                .AfterMap((source, dest) =>
-                {
-                     dest.PreferenceType = source.PreferenceType switch
-                     {
-                         (int)PreferenceType.Color => PreferenceType.Color.ToString(),
-                         (int)PreferenceType.Occasion => PreferenceType.Occasion.ToString(),
-                         (int)PreferenceType.PaintType => PreferenceType.PaintType.ToString(),
-                         (int)PreferenceType.SkinTone => PreferenceType.SkinTone.ToString(),
-                         _ => "No Info"
-                     };
+                .ForMember(dest => dest.Data, opt => opt.MapFrom(src =>
+                GetPreferenceData((PreferenceType)src.PreferenceType, src.PreferenceId)))
+                .ForMember(dest => dest.PreferenceType, opt => opt.MapFrom(src => GetPreferenceType(src.PreferenceType)))
+                ;
+            #endregion
 
-                    dest.Data = source.PreferenceType switch
-                    {
-                        (int)PreferenceType.Color => Utils.GetColors().FirstOrDefault(c => c.ID == source.PreferenceId),
-                        (int)PreferenceType.Occasion => Utils.GetOccasions().FirstOrDefault(c => c.ID == source.PreferenceId),
-                        (int)PreferenceType.PaintType => Utils.GetPaintTypes().FirstOrDefault(c => c.ID == source.PreferenceId),
-                        (int)PreferenceType.SkinTone => Utils.GetSkinTones().FirstOrDefault(c => c.ID == source.PreferenceId),
-                        _ => null
-                    };
-                });
+            #region Payment
+            CreateMap<PaymentRequest, Payment>();
+            CreateMap<Payment, PaymentResponse>();
+            #endregion
+
+            #region PaymentDetail
+            CreateMap<PaymentDetailRequest, Payment>();
+            CreateMap<PaymentDetail, PaymentDetailResponse>();
+            #endregion
+
+            #region ServicePriceHistory
+            CreateMap<ServicePriceHistory, ServicePriceHistoryResponse>();
             #endregion
 
             #region Service
@@ -150,8 +173,14 @@ namespace INBS.Application.Mappers
             {
                 dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
                 dest.LastModifiedAt = DateTime.Now;
-            }); 
-            CreateMap<Service, ServiceResponse>();
+            });
+            CreateMap<Service, ServiceResponse>()
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src =>
+                    src.ServicePriceHistories
+                        .Where(ph => ph.EffectiveTo == null)
+                        .Select(ph => ph.Price)
+                        .FirstOrDefault()
+            ));
             #endregion
 
             #region Store
@@ -160,7 +189,7 @@ namespace INBS.Application.Mappers
                 {
                     dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
                     dest.LastModifiedAt = DateTime.Now;
-                }); 
+                });
             CreateMap<Store, StoreResponse>()
                 .AfterMap((src, dest) =>
                 {
@@ -181,6 +210,31 @@ namespace INBS.Application.Mappers
             });
             CreateMap<User, UserResponse>();
             #endregion
+        }
+
+        private static string GetPreferenceType(int preferenceType)
+        {
+            return preferenceType switch
+            {
+                (int)PreferenceType.Color => PreferenceType.Color.ToString(),
+                (int)PreferenceType.Occasion => PreferenceType.Occasion.ToString(),
+                (int)PreferenceType.PaintType => PreferenceType.PaintType.ToString(),
+                (int)PreferenceType.SkinTone => PreferenceType.SkinTone.ToString(),
+                _ => "No Info"
+            };
+        }
+
+        // Hàm hỗ trợ để tránh lỗi khi sử dụng switch trong MapFrom
+        private static object? GetPreferenceData(PreferenceType preferenceType, int preferenceId)
+        {
+            return preferenceType switch
+            {
+                PreferenceType.Color => Utils.GetColors().FirstOrDefault(c => c.ID == preferenceId),
+                PreferenceType.Occasion => Utils.GetOccasions().FirstOrDefault(c => c.ID == preferenceId),
+                PreferenceType.PaintType => Utils.GetPaintTypes().FirstOrDefault(c => c.ID == preferenceId),
+                PreferenceType.SkinTone => Utils.GetSkinTones().FirstOrDefault(c => c.ID == preferenceId),
+                _ => null
+            };
         }
     }
 }

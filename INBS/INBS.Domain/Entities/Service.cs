@@ -1,6 +1,7 @@
 ﻿using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace INBS.Domain.Entities
             NailDesignServices = [];
             CategoryServices = [];
             ArtistServices = [];
+            ServicePriceHistories = [];
         }
 
         public string Name { get; set; }
@@ -26,11 +28,12 @@ namespace INBS.Domain.Entities
 
         public string? ImageUrl { get; set; }
 
-        public long Price { get; set; }
-
         public long AverageDuration { get; set; }
 
         public bool IsAdditional { get; set; }
+
+        [InverseProperty(nameof(ServicePriceHistory.Service))]
+        public virtual ICollection<ServicePriceHistory> ServicePriceHistories { get; set; }
 
         [InverseProperty(nameof(CategoryService.Service))]
         public virtual ICollection<CategoryService> CategoryServices { get; set; }

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.Interfaces
+namespace INBS.Application.DTOs.ServicePriceHistory
 {
-    public interface IPayOS
+    public class ServicePriceHistoryRequest
     {
-        public int MyProperty { get; set; }
     }
 }

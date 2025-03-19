@@ -26,10 +26,18 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns>A list of designs.</returns>
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public IQueryable<DesignResponse> Get()
         {
-            return service.Get();
+            try
+            {
+                return service.Get();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         /// <summary>

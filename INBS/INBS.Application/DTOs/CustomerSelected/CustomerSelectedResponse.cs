@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.Customer;
+﻿using INBS.Application.DTOs.Booking;
+using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.NailDesignServiceSelected;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace INBS.Application.DTOs.CustomerSelected
 
         public virtual ICollection<NailDesignServiceSelectedResponse> NailDesignServiceSelecteds { get; set; } = [];
 
-#warning Add Bookings property
+        public virtual ICollection<BookingResponse> Bookings { get; set; } = [];
+
     }
 }

@@ -1,4 +1,7 @@
-﻿using INBS.Domain.Common;
+﻿using INBS.Application.DTOs.Design;
+using INBS.Application.DTOs.DesignService;
+using INBS.Domain.Common;
+using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,14 +15,17 @@ namespace INBS.Application.DTOs.NailDesign
     public class NailDesignResponse
     {
         [Key]
+        public Guid ID { get; set; }
+
         public Guid DesignId { get; set; }
+        public virtual DesignResponse? Design { get; set; }
 
         public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
 
-        [Key]
         public int NailPosition { get; set; } //4, 8, 12, 16, 20
 
-        [Key]
         public bool IsLeft { get; set; } //true - left, false - right
+
+        public virtual ICollection<NailDesignServiceResponse> NailDesignServices { get; set; } = [];
     }
 }

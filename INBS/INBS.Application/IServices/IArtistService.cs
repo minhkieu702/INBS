@@ -13,7 +13,7 @@ namespace INBS.Application.IServices
 {
     public interface IArtistService
     {
-        Task<IEnumerable<ArtistResponse>> Get();
+        IQueryable<ArtistResponse> Get();
         Task<ArtistResponse> Create(ArtistRequest artistRequest, UserRequest userRequest, IList<ArtistServiceRequest> artistServiceRequest, IList<ArtistStoreRequest> artistStoreRequest);
         Task Update(Guid id, ArtistRequest requestModel, UserRequest userRequest, IList<ArtistServiceRequest> artistServiceRequest, IList<ArtistStoreRequest> artistStoreRequest);
         Task Delete(Guid id);

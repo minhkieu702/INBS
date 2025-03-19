@@ -1,5 +1,6 @@
 ﻿using INBS.Application.DTOs.Payment;
 using INBS.Application.DTOs.PaymentDetail;
+using INBS.Application.DTOs.PayOS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,10 @@ namespace INBS.Application.IServices
 {
     public interface IPaymentService
     {
-        Task Create(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests);
-        Task Update(Guid id, PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests);
+        Task<string> CreatePayOSUrl(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests);
         IQueryable<PaymentResponse> Get();
-        Task Delete(Guid id);
+        Task Delete(int id);
+        Task CreatePaymentForCash(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests);
+        Task ConfirmWebHook(WebhookBody webhookBody);
     }
 }

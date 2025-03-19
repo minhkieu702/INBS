@@ -9,8 +9,9 @@ namespace INBS.Domain.Enums
     public enum BookingStatus
     {
         isCanceled = -1,
-        isWating = 0,
-        isBooked = 1,
-        isCompleted = 2
+        isWaiting = 0,
+        isConfirmed = 1,
+        isServing = 2,
+        isCompleted = 3
     }
 }

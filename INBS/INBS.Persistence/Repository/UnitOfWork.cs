@@ -144,7 +144,7 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region CustomCombo
+        #region CustomerSelected
         private IGenericRepository<CustomerSelected>? _customerSelectedRepository;
 
         public IGenericRepository<CustomerSelected> CustomerSelectedRepository
@@ -257,6 +257,19 @@ namespace INBS.Persistence.Repository
             {
                 _notificationRepository ??= new GenericRepository<Notification>(_context);
                 return _notificationRepository;
+            }
+        }
+        #endregion
+
+        #region ServicePriceHistory
+        private IGenericRepository<ServicePriceHistory>? _servicePriceHistoryRepository;
+
+        public IGenericRepository<ServicePriceHistory> ServicePriceHistoryRepository
+        {
+            get
+            {
+                _servicePriceHistoryRepository ??= new GenericRepository<ServicePriceHistory>(_context);
+                return _servicePriceHistoryRepository;
             }
         }
         #endregion

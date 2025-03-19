@@ -12,14 +12,19 @@ using INBS.Application.DTOs.DesignService;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignServiceSelected;
+using INBS.Application.DTOs.Notification;
+using INBS.Application.DTOs.Payment;
+using INBS.Application.DTOs.PaymentDetail;
 using INBS.Application.DTOs.Preference;
 using INBS.Application.DTOs.Service;
+using INBS.Application.DTOs.ServicePriceHistory;
 using INBS.Application.DTOs.Store;
 using INBS.Application.DTOs.User;
 using INBS.Domain.Entities;
 using INBS.Persistence.DependencyInjection;
 using Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.OData;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -35,17 +40,16 @@ namespace INBS.API.AppStart
         /// Adds presentation layer services to the specified IServiceCollection.
         /// </summary>
         /// <param name="services">The IServiceCollection to add services to.</param>
-        /// <param name="configuration">The configuration to use for the services.</param>
         /// <returns>The IServiceCollection with the added services.</returns>
-        public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddPresentation(this IServiceCollection services)
         {
             // Add Swagger for API documentation
             services.AddSwagger();
 
             // Register various layers of the application
-            services.AddInfrastructure(configuration);
-            services.AddApplication(configuration);
-            services.AddPersistence(configuration);
+            services.AddInfrastructure();
+            services.AddApplication();
+            services.AddPersistence();
 
             return services;
         }
@@ -78,11 +82,14 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<NailDesignResponse>(nameof(NailDesign));
                     odataBuilder.EntitySet<NailDesignServiceResponse>(nameof(NailDesignService));
                     odataBuilder.EntitySet<NailDesignServiceSelectedResponse>(nameof(NailDesignServiceSelected));
-#warning notification
+                    odataBuilder.EntitySet<NotificationResponse>(nameof(Notification));
                     odataBuilder.EntitySet<Occasion>(nameof(Occasion));
                     odataBuilder.EntitySet<PaintType>(nameof(PaintType));
                     odataBuilder.EntitySet<PreferenceResponse>(nameof(Preference));
+                    odataBuilder.EntitySet<PaymentResponse>(nameof(Payment));
+                    odataBuilder.EntitySet<PaymentDetailResponse>(nameof(PaymentDetail));
                     odataBuilder.EntitySet<ServiceResponse>(nameof(Service));
+                    odataBuilder.EntitySet<ServicePriceHistoryResponse>(nameof(ServicePriceHistory));
                     odataBuilder.EntitySet<Skintone>(nameof(Skintone));
                     odataBuilder.EntitySet<StoreResponse>(nameof(Store));
                     odataBuilder.EntitySet<UserResponse>(nameof(User));

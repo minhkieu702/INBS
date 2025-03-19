@@ -12,9 +12,9 @@ namespace INBS.Application.DTOs.Booking
 {
     public class BookingRequest
     {
-        [JsonConverter(typeof(DateOnlyJsonConverter))]
+        //[JsonConverter(typeof(DateOnlyJsonConverter))]
         public DateOnly ServiceDate { get; set; }
-        [JsonConverter(typeof(TimeOnlyJsonConverter))]
+        //[JsonConverter(typeof(TimeOnlyJsonConverter))]
         public TimeOnly StartTime { get; set; }
 
         public Guid CustomerSelectedId { get; set; }

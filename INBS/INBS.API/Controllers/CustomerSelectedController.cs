@@ -18,7 +18,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns>A list of customer selected.</returns>
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public IQueryable<CustomerSelectedResponse> Get()
         {
             return service.Get();
