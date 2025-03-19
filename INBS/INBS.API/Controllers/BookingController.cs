@@ -47,6 +47,25 @@ namespace INBS.API.Controllers
             }
         }
 
+        //[HttpPost("create")]
+        //public async Task<IActionResult> CreateBooking([FromBody] BookingRequest bookingRequest)
+        //{
+        //    if (bookingRequest == null)
+        //    {
+        //        return BadRequest("Invalid booking request");
+        //    }
+
+        //    try
+        //    {
+        //        await service.Create(bookingRequest);
+        //        return Ok(new { Message = "Booking created successfully" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, "An error occurred while creating the booking");
+        //    }
+        //}
+
         /// <summary>
         /// Updates an existing booking.
         /// </summary>
