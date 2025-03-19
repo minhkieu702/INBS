@@ -84,7 +84,7 @@ namespace Infrastructure.DependencyInjection
 
             //Quartz
             services.AddQuartz();
-
+            services.AddMemoryCache();
             services.AddHttpClient();
 
             return services;
@@ -142,6 +142,9 @@ namespace Infrastructure.DependencyInjection
                     .ForJob(jobKey)
                     .WithIdentity("AutoNotificationBookingTrigger")
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).RepeatForever()));
+
+                q.AddJob<SendSmsNotificationJob>(opts => opts.StoreDurably());
+
             });
 
             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
