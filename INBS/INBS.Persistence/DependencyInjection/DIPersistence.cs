@@ -17,7 +17,7 @@ namespace INBS.Persistence.DependencyInjection
         {
             services.AddDbContext<INBSDbContext>(options =>
             {
-                options
+                options.UseLazyLoadingProxies()
                         .UseSqlServer(Environment.GetEnvironmentVariable("connectionString"));
             });
             return services;
