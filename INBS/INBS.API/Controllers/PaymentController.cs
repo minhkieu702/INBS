@@ -40,11 +40,11 @@ namespace INBS.API.Controllers
         }
 
         [HttpPost("PayOSUrl")]
-        public async Task<IActionResult> CreatePayOSUrl([FromForm] PaymentRequest paymentRequest, [FromForm] IList<PaymentDetailRequest> paymentDetailRequests)
+        public async Task<IActionResult> CreatePayOSUrl(/*[FromForm] PaymentRequest paymentRequest*/[FromForm] IList<PaymentDetailRequest> paymentDetailRequests)
         {
             try
             {
-                var service = await _service.CreatePayOSUrl(paymentRequest, paymentDetailRequests);
+                var service = await _service.CreatePayOSUrl(new PaymentRequest(), paymentDetailRequests);
 
                 return Ok(service.ToString());
             }
