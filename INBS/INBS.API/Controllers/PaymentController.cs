@@ -17,7 +17,7 @@ namespace INBS.API.Controllers
     /// <param name="service">The payment service.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class PaymentController(IPaymentService service) : ControllerBase
+    public class PaymentController(IPaymentService service, ILogger<PaymentController> logger) : ControllerBase
     {
         private readonly IPaymentService _service = service;
 
@@ -26,7 +26,7 @@ namespace INBS.API.Controllers
         {
             try
             {
-                Console.WriteLine(JsonConvert.SerializeObject(payment));
+                logger.LogInformation("Webhook received: {WebhookData}", JsonConvert.SerializeObject(payment));
                 await _service.ConfirmWebHook(payment);
                 return Ok();
             }
