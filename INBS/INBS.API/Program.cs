@@ -12,7 +12,7 @@ var configuration = builder.Configuration;
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddPresentation(configuration);
+builder.Services.AddPresentation();
 
 builder.Services.AddCors(options =>
 {
