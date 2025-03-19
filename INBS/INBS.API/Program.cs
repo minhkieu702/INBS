@@ -3,6 +3,8 @@ using Infrastructure.DependencyInjection;
 
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
+
 
 //builder.Logging.ClearProviders();
 //builder.Logging.AddConsole(); // Đảm bảo log ra console
@@ -10,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddPresentation();
+builder.Services.AddPresentation(configuration);
 
 builder.Services.AddCors(options =>
 {
