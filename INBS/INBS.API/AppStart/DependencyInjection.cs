@@ -41,7 +41,7 @@ namespace INBS.API.AppStart
         /// </summary>
         /// <param name="services">The IServiceCollection to add services to.</param>
         /// <returns>The IServiceCollection with the added services.</returns>
-        public static IServiceCollection AddPresentation(this IServiceCollection services)
+        public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
         {
             // Add Swagger for API documentation
             services.AddSwagger();
