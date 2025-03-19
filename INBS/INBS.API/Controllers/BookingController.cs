@@ -25,7 +25,15 @@ namespace INBS.API.Controllers
         [EnableQuery(MaxExpansionDepth = 100)]
         public IQueryable<BookingResponse> Get()
         {
-            return service.Get();
+            try
+            {
+                return service.Get();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         /// <summary>

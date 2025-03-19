@@ -4,6 +4,7 @@ using INBS.Application.DTOs.PayOS;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Net.payOS.Types;
+using Newtonsoft.Json;
 
 namespace INBS.API.Controllers
 {
@@ -25,6 +26,7 @@ namespace INBS.API.Controllers
         {
             try
             {
+                Console.WriteLine(JsonConvert.SerializeObject(payment));
                 await _service.ConfirmWebHook(payment);
                 return Ok();
             }
