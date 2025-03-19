@@ -162,23 +162,28 @@ namespace INBS.Application.Services
 
         private async Task RemovePayment(long id)
         {
-            var payment = await _unitOfWork.PaymentRepository.GetAsync(query 
+            var payments = await _unitOfWork.PaymentRepository.GetAsync(query 
                 => query.Where(c => id == c.ID)
                 .Include(c => c.PaymentDetails)
                 .AsNoTracking()
                 );
 
-            var deletePaymentDetails = new List<PaymentDetail>();
-            var deletePayment = new List<Payment>();
+            var payment = payments.FirstOrDefault() ?? throw new Exception("Payment not found");
 
-            foreach (var p in payment)
-            {
-                deletePayment.Add(p);
-                deletePaymentDetails.AddRange(p.PaymentDetails);
-            }
+            //var deletePaymentDetails = new List<PaymentDetail>();
+            //var deletePayment = new List<Payment>();
 
-            _unitOfWork.PaymentDetailRepository.DeleteRange(deletePaymentDetails);
-            _unitOfWork.PaymentRepository.DeleteRange(deletePayment);
+            //foreach (var p in payment)
+            //{
+            //    deletePayment.Add(p);
+            //    deletePaymentDetails.AddRange(p.PaymentDetails);
+            //}
+
+            //_unitOfWork.PaymentDetailRepository.DeleteRange(deletePaymentDetails);
+
+            payment.Status = (int)PaymentStatus.Failed;
+
+            _unitOfWork.PaymentRepository.Update(payment);
         }
 
         private async Task AcceptPayment(long id)
@@ -212,6 +217,35 @@ namespace INBS.Application.Services
                         break;
                     case false:
                         await RemovePayment(webhookBody.data.orderCode);
+                        break;
+                    default:
+                }
+                if (await _unitOfWork.SaveAsync() <= 0)
+                {
+                    throw new Exception("This action failed");
+                }
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
+        public async Task ReturnUrl(long orderCode, bool cancel)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                switch (cancel)
+                {
+                    case true:
+                        await AcceptPayment(orderCode);
+                        break;
+                    case false:
+                        await RemovePayment(orderCode);
                         break;
                     default:
                 }

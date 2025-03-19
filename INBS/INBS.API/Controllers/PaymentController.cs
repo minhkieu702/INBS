@@ -21,6 +21,30 @@ namespace INBS.API.Controllers
     {
         private readonly IPaymentService _service = service;
 
+        [HttpGet("return-url")]
+        public async Task<IActionResult> HandlePaymentCallback()
+        {
+            var code = Request.Query["code"];
+            var id = Request.Query["id"];
+            var cancel = Request.Query["cancel"];
+            var status = Request.Query["status"];
+            var orderCode = Request.Query["orderCode"];
+
+            if (long.TryParse(orderCode, out long paymentId) && bool.TryParse(cancel, out bool isCancel))
+            {
+                await _service.ReturnUrl(paymentId, !isCancel);
+            }
+
+            return Ok(new
+            {
+                Code = code,
+                Id = id,
+                Cancel = cancel,
+                Status = status,
+                OrderCode = orderCode
+            });
+        }
+
         [HttpPost("confirm-webhook")]
         public async Task<IActionResult> ConfirmWebHook([FromBody] WebhookType payment)
         {

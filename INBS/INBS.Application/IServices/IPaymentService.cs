@@ -17,5 +17,6 @@ namespace INBS.Application.IServices
         Task Delete(int id);
         Task CreatePaymentForCash(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests);
         Task ConfirmWebHook(WebhookType webhookBody);
+        Task ReturnUrl(long orderCode, bool cancel);
     }
 }
