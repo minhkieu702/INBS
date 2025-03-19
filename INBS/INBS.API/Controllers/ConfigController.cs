@@ -10,6 +10,7 @@ namespace INBS.API.Controllers
         public IActionResult GetconnectionString()
         {
             logger.LogWarning(Environment.GetEnvironmentVariable("connectionString"));
+            logger.LogInformation("hiiiiiiiiiiiiiiiiiiiiiii");
             return Ok(Environment.GetEnvironmentVariable("connectionString"));
         }
 

@@ -82,6 +82,17 @@ namespace INBS.Persistence.Data
             modelBuilder.ConfigureRestrictOneToOne<Admin, User>(a => a.User, u => u.Admin, a => a.ID);
             modelBuilder.ConfigureRestrictOneToMany<Feedback, Booking>(s => s.Booking, a => a.Feedbacks, s => s.BookingId);
 
+            modelBuilder.Entity<ArtistStore>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Booking>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<CustomerSelected>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Design>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Feedback>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<NailDesignService>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Notification>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Service>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Store>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<User>().HasQueryFilter(p => !p.IsDeleted);
+
             base.OnModelCreating(modelBuilder);
         }
 

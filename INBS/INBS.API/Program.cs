@@ -5,10 +5,12 @@ using Microsoft.Extensions.Logging.AzureAppServices; // Add this using directive
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-builder.Logging.ClearProviders(); // Xóa các provider mặc định
-builder.Logging.AddConsole();     // Ghi log ra console (hiển thị trên Log Stream)
-builder.Logging.AddDebug();       // Ghi log debug (nếu cần)
-builder.Logging.AddAzureWebAppDiagnostics(); // This should now work with the correct using directive
+builder.Services.AddLogging(lb =>
+{
+    lb.AddConsole();
+    lb.AddDebug();
+    lb.AddAzureWebAppDiagnostics();
+});
 
 //builder.Logging.ClearProviders();
 //builder.Logging.AddConsole(); // Đảm bảo log ra console
