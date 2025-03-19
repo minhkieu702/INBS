@@ -159,7 +159,7 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region PaymentDetail
-            CreateMap<PaymentDetailRequest, Payment>();
+            CreateMap<PaymentDetailRequest, PaymentDetail>();
             CreateMap<PaymentDetail, PaymentDetailResponse>();
             #endregion
 

@@ -3,6 +3,7 @@ using INBS.Application.DTOs.PaymentDetail;
 using INBS.Application.DTOs.PayOS;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Net.payOS.Types;
 
 namespace INBS.API.Controllers
 {
@@ -20,7 +21,7 @@ namespace INBS.API.Controllers
         private readonly IPaymentService _service = service;
 
         [HttpPost("confirm-webhook")]
-        public async Task<IActionResult> ConfirmWebHook([FromBody] WebhookBody payment)
+        public async Task<IActionResult> ConfirmWebHook([FromBody] WebhookType payment)
         {
             try
             {

@@ -1,6 +1,7 @@
 ﻿using INBS.Application.DTOs.Payment;
 using INBS.Application.DTOs.PaymentDetail;
 using INBS.Application.DTOs.PayOS;
+using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,6 @@ namespace INBS.Application.IServices
         IQueryable<PaymentResponse> Get();
         Task Delete(int id);
         Task CreatePaymentForCash(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests);
-        Task ConfirmWebHook(WebhookBody webhookBody);
+        Task ConfirmWebHook(WebhookType webhookBody);
     }
 }
