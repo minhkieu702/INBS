@@ -9,7 +9,7 @@ namespace INBS.Application.IServices
 {
     public interface IServiceService
     {
-        Task<IEnumerable<ServiceResponse>> Get();
+        IQueryable<ServiceResponse> Get();
         Task Create(ServiceRequest service, IList<ServiceNailDesignRequest> serviceNailDesignRequests);
         Task Update(Guid id, ServiceRequest service, IList<ServiceNailDesignRequest> serviceNailDesignRequests);
         Task DeleteById(Guid id);

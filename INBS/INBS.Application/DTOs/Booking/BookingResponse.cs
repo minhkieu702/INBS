@@ -14,8 +14,6 @@ namespace INBS.Application.DTOs.Booking
 {
     public class BookingResponse : BaseEntity
     {
-        public BookingResponse() : base() { }
-
         public DateOnly ServiceDate { get; set; }
 
         public TimeOnly StartTime { get; set; }
@@ -36,6 +34,6 @@ namespace INBS.Application.DTOs.Booking
 
         //public virtual ICollection<Cancellation> Cancellations { get; set; } = [];
 
-        public virtual ICollection<FeedbackResponse> Feedbacks { get; set; } = [];
+        public virtual ICollection<FeedbackResponse>? Feedbacks { get; set; } = [];
     }
 }

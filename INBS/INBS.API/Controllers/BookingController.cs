@@ -22,7 +22,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns>A list of bookings.</returns>
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public IQueryable<BookingResponse> Get()
         {
             return service.Get();
@@ -34,7 +34,7 @@ namespace INBS.API.Controllers
         /// <param name="booking">The booking request.</param>
         /// <returns>An action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] BookingRequest booking)
+        public async Task<IActionResult> Create([FromForm] BookingRequest booking)
         {
             try
             {
@@ -97,6 +97,20 @@ namespace INBS.API.Controllers
             try
             {
                 await service.CancelBooking(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
+
+        [HttpPost("Serving")]
+        public async Task<IActionResult> Serving([FromQuery] Guid id)
+        {
+            try
+            {
+                await service.SetBookingIsServicing(id);
                 return Ok();
             }
             catch (Exception ex)

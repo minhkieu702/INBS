@@ -18,7 +18,8 @@ namespace INBS.Application.IService
 
         IQueryable<BookingResponse> Get();
 
-        Task CompleteBooking(Guid id);
+        Task SetBookingIsServicing(Guid id);
+
         Task<List<Booking>> GetBookingsWithinNextMinutes(int minutes);
     }
 }

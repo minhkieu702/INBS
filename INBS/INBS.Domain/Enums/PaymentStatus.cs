@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Infrastructure.Payment.PayOS
+namespace INBS.Domain.Enums
 {
-    public class PayOS
+    public enum PaymentStatus
     {
+        Pending = 0,
+        Success = 1,
+        Failed = 2
     }
 }

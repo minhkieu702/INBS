@@ -13,7 +13,7 @@ namespace INBS.Application.DependencyInjection
 {
     public static class DIApplication
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddServices();
             services.AddHttpContextAccessor();
@@ -32,6 +32,7 @@ namespace INBS.Application.DependencyInjection
             services.AddScoped<IDesignService, DesignService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IStoreService, StoreService>();
+            services.AddScoped<IPaymentService, PaymentService>();
 
             services.AddScoped<ISMSService, SMSService>();
             services.AddScoped<INotificationService, NotificationService>();

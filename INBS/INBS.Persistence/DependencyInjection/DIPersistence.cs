@@ -13,11 +13,12 @@ namespace INBS.Persistence.DependencyInjection
 {
     public static class DIPersistence
     {
-        public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddPersistence(this IServiceCollection services)
         {
             services.AddDbContext<INBSDbContext>(options =>
             {
-                options.UseSqlServer(Environment.GetEnvironmentVariable("connectionString"));
+                options.UseLazyLoadingProxies()
+                        .UseSqlServer(Environment.GetEnvironmentVariable("connectionString"));
             });
             return services;
         }

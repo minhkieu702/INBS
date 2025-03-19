@@ -18,12 +18,13 @@ using INBS.Application.IServices;
 using INBS.Infrastructure.Authentication;
 using Quartz;
 using INBS.Infrastructure.Quartz.Jobs;
+using INBS.Infrastructure.Payment.PayOSIntegration;
 
 namespace Infrastructure.DependencyInjection
 {
     public static class DIInfrastructure
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
             //MediatR
             //services.AddMediatR(NewMethod().Assembly);
@@ -40,6 +41,7 @@ namespace Infrastructure.DependencyInjection
             // Authentications
             //services.AddAuthentication(configuration);
 
+
             //SignalR
             services.AddSignalR();
 
@@ -48,39 +50,29 @@ namespace Infrastructure.DependencyInjection
             services.AddAutoMapper(typeof(MappingProfile));
 
             //Firebase
-            //services.Configure<FirebaseConfig>(
-            //    options => options.ApiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey"));
+            services.Configure<FirebaseConfig>(
+                options => options.ApiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey"));
 
-            //// Initialize Firebase if not initialized
-            //if (FirebaseApp.DefaultInstance == null)
-            //{
-            //    try
-            //    {
-            //        var credentialPath = Path.Combine(
-            //            AppDomain.CurrentDomain.BaseDirectory,
-            //            Environment.GetEnvironmentVariable("FirebaseSettings:credentialFile"));
+            // Initialize Firebase if not initialized
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                try
+                {
+                    FirebaseApp.Create(new AppOptions()
+                    {
+                        Credential = GoogleCredential.FromJson(Environment.GetEnvironmentVariable("FirebaseSettings:config"))
+                    });
 
-            //        if (!File.Exists(credentialPath))
-            //        {
-            //            throw new FileNotFoundException(
-            //                $"Firebase credential file not found at {credentialPath}");
-            //        }
+                    services.AddSingleton(FirebaseMessaging.DefaultInstance);
 
-            //        FirebaseApp.Create(new AppOptions()
-            //        {
-            //            Credential = GoogleCredential.FromFile(credentialPath)
-            //        });
-
-            //        services.AddSingleton(FirebaseMessaging.DefaultInstance);
-
-            //        Console.WriteLine("Firebase initialized successfully!");
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Console.WriteLine($"Error initializing Firebase: {ex.Message}");
-            //        throw;
-            //    }
-            //}
+                    Console.WriteLine("Firebase initialized successfully!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error initializing Firebase: {ex.Message}");
+                    throw;
+                }
+            }
 
             //Quartz
             services.AddQuartz();
@@ -97,7 +89,11 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IFirebaseService, FirebaseService>();
 
             services.AddScoped<IAuthentication, Authentication>();
+          
             services.AddScoped<IJob, AutoNotificationBooking>();
+
+
+            services.AddScoped<IPayOSHandler, PayOSHandler>();
 
         }
 
@@ -137,7 +133,7 @@ namespace Infrastructure.DependencyInjection
 
                 q.AddJob<AutoNotificationBooking>(opts => opts.WithIdentity(jobKey).StoreDurably());
 
-                // Cấu hình Trigger để chạy Job mỗi 5 phút
+                // Cấu hình Trigger để chạy Job mỗi 5 giây
                 q.AddTrigger(opts => opts
                     .ForJob(jobKey)
                     .WithIdentity("AutoNotificationBookingTrigger")

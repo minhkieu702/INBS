@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.PayOS
 {
-    public class PayOSRequest
+    public class WebhookBody
     {
         public string Code { get; set; } = "";
 

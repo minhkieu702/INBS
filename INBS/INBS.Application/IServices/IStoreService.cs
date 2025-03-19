@@ -10,7 +10,7 @@ namespace INBS.Application.IServices
 {
     public interface IStoreService
     {
-        Task<IEnumerable<StoreResponse>> Get();
+        IQueryable<StoreResponse> Get();
 
         Task Create(StoreRequest request);
 

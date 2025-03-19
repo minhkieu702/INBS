@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using INBS.Application.Common;
+using INBS.Application.DTOs.Artist;
 using INBS.Application.DTOs.Service;
 using INBS.Application.DTOs.ServiceDesign;
 using INBS.Application.Interfaces;
@@ -86,6 +88,37 @@ namespace INBS.Application.Services
             }
         }
 
+        private async Task InsertPrice(Guid serviceId, long price)
+        {
+            var priceHistory = new ServicePriceHistory
+            {
+                ServiceId = serviceId,
+                EffectiveFrom = DateTime.UtcNow,
+                EffectiveTo = null,
+                Price = price
+            };
+            await _unitOfWork.ServicePriceHistoryRepository.InsertAsync(priceHistory);
+        }
+
+        private async Task HandlePrice(Guid serviceId, ServiceRequest modelRequest)
+        {
+            var latestPrice = (await _unitOfWork.ServicePriceHistoryRepository.GetAsync(query 
+                => query.Where(c => c.ServiceId == serviceId)
+                .OrderByDescending(ph => ph.EffectiveFrom)
+                .AsNoTracking())).FirstOrDefault();
+
+            if (latestPrice == null || modelRequest.Price != latestPrice.Price)
+            {
+                if (latestPrice != null)
+                {
+                    latestPrice.EffectiveTo = DateTime.UtcNow;
+                    await _unitOfWork.ServicePriceHistoryRepository.UpdateAsync(latestPrice);
+                }
+
+                await InsertPrice(serviceId, modelRequest.Price);
+            }
+        }
+
         public async Task Create(ServiceRequest modelRequest, IList<ServiceNailDesignRequest> serviceNailDesignRequests)
         {
             try
@@ -110,6 +143,8 @@ namespace INBS.Application.Services
                 var categoryServices = await _unitOfWork.CategoryServiceRepository.GetAsync(c => c.Where(cs => cs.ServiceId.Equals(newService.ID)));
 
                 await InsertCategoryService(newService.ID, modelRequest.CategoryIds, categoryServices);
+
+                await HandlePrice(newService.ID, modelRequest);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("Create service failed");
@@ -152,39 +187,15 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<IEnumerable<ServiceResponse>> Get()
+        public IQueryable<ServiceResponse> Get()
         {
             try
             {
-                var services = await _unitOfWork.ServiceRepository.GetAsync( s => s.Where(service => !service.IsDeleted)
-                  .Include(service => service.CategoryServices)
-                  .Include(service => service.ArtistServices.Where(c => !c.Artist!.User!.IsDeleted))
-                    .ThenInclude(service => service.Artist)
-                        .ThenInclude(Artist => Artist!.User)
-                   .Include(service => service.NailDesignServices.Where(c => !c.NailDesign!.Design!.IsDeleted))
-                    .ThenInclude(service => service.NailDesign)
-                        .ThenInclude(service => service!.Design)
-                ) ?? throw new Exception("Something went wrong!");
-
-                var responses = _mapper.Map<IEnumerable<ServiceResponse>>(services);
-
-                if (responses.Any())
-                {
-                    var categories = await Utils.GetCategoriesAsync();
-                    foreach (var service in responses)
-                    {
-                        foreach (var cateService in service.CategoryServices)
-                        {
-                            cateService.Category = categories.FirstOrDefault(c => c.ID == cateService.CategoryId);
-                        }
-                    }
-                }
-
-                return responses;
+                return _unitOfWork.ServiceRepository.Query().Include(c => c.ServicePriceHistories).ProjectTo<ServiceResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
-                throw;
+                return Enumerable.Empty<ServiceResponse>().AsQueryable();
             }
         }
 
@@ -224,6 +235,8 @@ namespace INBS.Application.Services
                     await UpdateDesignService(id, serviceNailDesignRequests);
 
                 await _unitOfWork.ServiceRepository.UpdateAsync(newEntity);
+
+                await HandlePrice(id, updatingRequest);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                     throw new Exception("Update service failed");

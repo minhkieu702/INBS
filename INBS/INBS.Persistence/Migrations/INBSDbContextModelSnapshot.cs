@@ -467,18 +467,14 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Payment", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastModifiedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Method")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -493,8 +489,8 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.PaymentDetail", b =>
                 {
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("PaymentId")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("BookingId")
                         .HasColumnType("uniqueidentifier");
@@ -584,12 +580,36 @@ namespace INBS.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint");
-
                     b.HasKey("ID");
 
                     b.ToTable("Services");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.ServicePriceHistory", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<DateTime>("EffectiveFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EffectiveTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ServiceId");
+
+                    b.ToTable("ServicePriceHistory");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Store", b =>
@@ -938,6 +958,17 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Design");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.ServicePriceHistory", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.Service", "Service")
+                        .WithMany("ServicePriceHistories")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Service");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.Artist", b =>
                 {
                     b.Navigation("ArtistServices");
@@ -1010,6 +1041,8 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("CategoryServices");
 
                     b.Navigation("NailDesignServices");
+
+                    b.Navigation("ServicePriceHistories");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Store", b =>

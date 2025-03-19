@@ -38,7 +38,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("Colors")]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public async Task<IActionResult> GetColors()
         {
             try
@@ -57,7 +57,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("Occasions")]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public async Task<IActionResult> GetOccasions()
         {
             try
@@ -76,7 +76,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("Skintone")]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public async Task<IActionResult> GetSkintones()
         {
             try
@@ -95,7 +95,7 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("PaintType")]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 100)]
         public async Task<IActionResult> GetPaintTypes()
         {
             try

@@ -16,6 +16,6 @@ namespace INBS.Application.DTOs.Preference
         public int PreferenceId { get; set; }
         public string PreferenceType { get; set; } = string.Empty;
 
-        public object? Data { get; set; }
+        public virtual object? Data { get; set; }
     }
 }
