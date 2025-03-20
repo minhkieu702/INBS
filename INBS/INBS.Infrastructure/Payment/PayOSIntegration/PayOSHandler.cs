@@ -34,8 +34,8 @@ namespace INBS.Infrastructure.Payment.PayOSIntegration
             {
                 itemData.Add(new ItemData(booking.ID.ToString(), 1, (int)booking.TotalAmount));
             }
-
-            var paymentLink = await payOS.createPaymentLink(new PaymentData(orderId, amount, description, itemData, PAYOS_RETURN_URL, PAYOS_CANCEL_URL));
+            var expired = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds();
+            var paymentLink = await payOS.createPaymentLink(new PaymentData(orderId, amount, description, itemData, PAYOS_RETURN_URL, PAYOS_CANCEL_URL, "", "", "", "", "", expired));
 
             return paymentLink.checkoutUrl;
         }
