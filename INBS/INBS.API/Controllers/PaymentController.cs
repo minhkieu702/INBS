@@ -56,13 +56,13 @@ namespace INBS.API.Controllers
         }
 
         [HttpPost("confirm-webhook")]
-        public async Task<IActionResult> ConfirmWebHook([FromBody] WebhookType payment)
+        public async Task<IActionResult> ConfirmWebHook([FromBody] WebhookBody payment)
         {
             try
             {
                 _logger.LogWarning("Hi");
                 _logger.LogInformation("Webhook received: {WebhookData}", JsonConvert.SerializeObject(payment));
-                await _service.ConfirmWebHook(payment);
+                //await _service.ConfirmWebHook(payment);
                 return Ok();
             }
             catch (Exception ex)
@@ -72,7 +72,7 @@ namespace INBS.API.Controllers
             }
         }
 
-        [HttpPost("confirm_webhook")]
+        [HttpPost("confirm-webhook")]
         public async Task<IActionResult> ConfirmWebHookTest([FromBody] WebhookType payment)
         {
             try

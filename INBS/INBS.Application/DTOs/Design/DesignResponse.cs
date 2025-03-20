@@ -21,7 +21,5 @@ namespace INBS.Application.DTOs.Design
         public virtual ICollection<PreferenceResponse> Preferences { get; set; } = [];
 
         public virtual ICollection<NailDesignResponse> NailDesigns { get; set; } = [];
-
-        public virtual ICollection<NailDesignServiceResponse> DesignServices { get; set; } = [];
     }
 }
