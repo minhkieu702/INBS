@@ -16,7 +16,7 @@ namespace INBS.Application.IServices
         IQueryable<PaymentResponse> Get();
         Task Delete(int id);
         Task CreatePaymentForCash(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests);
-        Task ConfirmWebHook(WebhookType webhookBody);
+        Task ConfirmWebHook(WebhookBody webhookBody);
         Task ReturnUrl(long orderCode, bool cancel);
     }
 }
