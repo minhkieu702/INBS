@@ -162,13 +162,16 @@ namespace INBS.Application.Services
 
         private async Task RemovePayment(long id)
         {
-            var payments = await _unitOfWork.PaymentRepository.GetAsync(query 
+            var payment = (await _unitOfWork.PaymentRepository.GetAsync(query
                 => query.Where(c => id == c.ID)
                 .Include(c => c.PaymentDetails)
-                .AsNoTracking()
-                );
+                    .ThenInclude(c => c.Booking))
+                ).FirstOrDefault();
 
-            var payment = payments.FirstOrDefault() ?? throw new Exception("Payment not found");
+            if (payment == null)
+            {
+                return;
+            }
 
             //var deletePaymentDetails = new List<PaymentDetail>();
             //var deletePayment = new List<Payment>();
@@ -191,8 +194,13 @@ namespace INBS.Application.Services
             var payment = (await _unitOfWork.PaymentRepository.GetAsync(query
                 => query.Where(c => id == c.ID)
                 .Include(c => c.PaymentDetails)
-                    .ThenInclude(c=>c.Booking))
-                ).FirstOrDefault() ?? throw new Exception("Payment not found");
+                    .ThenInclude(c => c.Booking))
+                ).FirstOrDefault();
+
+            if (payment == null)
+            {
+                return;
+            }
 
             payment.Status = (int)PaymentStatus.Success;
 
@@ -222,7 +230,7 @@ namespace INBS.Application.Services
                 }
                 if (await _unitOfWork.SaveAsync() <= 0)
                 {
-                    throw new Exception("This action failed");
+                    //throw new Exception("This action failed");
                 }
 
                 _unitOfWork.CommitTransaction();
