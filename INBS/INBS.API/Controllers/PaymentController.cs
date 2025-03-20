@@ -72,7 +72,7 @@ namespace INBS.API.Controllers
             }
         }
 
-        [HttpPost("confirm-webhook")]
+        [HttpPost("confirm_webhook")]
         public async Task<IActionResult> ConfirmWebHookTest([FromBody] WebhookType payment)
         {
             try
