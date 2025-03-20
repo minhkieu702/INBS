@@ -72,6 +72,23 @@ namespace INBS.API.Controllers
             }
         }
 
+        [HttpPost("confirm_webhook")]
+        public async Task<IActionResult> ConfirmWebHookTest([FromBody] WebhookType payment)
+        {
+            try
+            {
+                _logger.LogWarning("Hi");
+                _logger.LogInformation("Webhook received: {WebhookData}", JsonConvert.SerializeObject(payment));
+                await _service.ConfirmWebHook(payment);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
+
         [HttpGet]
         [EnableQuery(MaxExpansionDepth =10)]
         public IQueryable<PaymentResponse> Get()
