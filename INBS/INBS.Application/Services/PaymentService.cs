@@ -218,15 +218,14 @@ namespace INBS.Application.Services
             try
             {
                 _unitOfWork.BeginTransaction(); 
-                switch (webhookBody.Success)
+                switch (webhookBody.Data!.Code)
                 {
-                    case true:
+                    case "00":
                         await AcceptPayment(webhookBody.Data!.OrderCode);
                         break;
-                    case false:
+                    default:
                         await RemovePayment(webhookBody.Data!.OrderCode);
                         break;
-                    default:
                 }
                 if (await _unitOfWork.SaveAsync() <= 0)
                 {
@@ -247,15 +246,14 @@ namespace INBS.Application.Services
             try
             {
                 _unitOfWork.BeginTransaction();
-                switch (webhookBody.success)
+                switch (webhookBody.data.code)
                 {
-                    case true:
+                    case "00":
                         await AcceptPayment(webhookBody.data.orderCode);
                         break;
-                    case false:
+                    default:
                         await RemovePayment(webhookBody.data.orderCode);
                         break;
-                    default:
                 }
                 if (await _unitOfWork.SaveAsync() <= 0)
                 {
