@@ -2,6 +2,7 @@
 using INBS.Application.DTOs.PaymentDetail;
 using INBS.Application.DTOs.PayOS;
 using INBS.Application.IServices;
+using INBS.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Net.payOS.Types;
@@ -18,9 +19,17 @@ namespace INBS.API.Controllers
     /// <param name="service">The payment service.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class PaymentController(IPaymentService service, ILogger<PaymentController> logger) : ControllerBase
+    public class PaymentController : ControllerBase
     {
-        private readonly IPaymentService _service = service;
+
+        private readonly IPaymentService _service;
+        private readonly ILogger<PaymentController> _logger;
+
+        public PaymentController(ILogger<PaymentController>logger, IPaymentService service)
+        {
+            _service = service;
+            _logger = logger;
+        }
 
         [HttpGet("return-url")]
         public async Task<IActionResult> HandlePaymentCallback()
@@ -51,12 +60,14 @@ namespace INBS.API.Controllers
         {
             try
             {
-                logger.LogInformation("Webhook received: {WebhookData}", JsonConvert.SerializeObject(payment));
+                _logger.LogWarning("Hi");
+                _logger.LogInformation("Webhook received: {WebhookData}", JsonConvert.SerializeObject(payment));
                 await _service.ConfirmWebHook(payment);
                 return Ok();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 return new BadRequestObjectResult(ex.Message);
             }
         }
