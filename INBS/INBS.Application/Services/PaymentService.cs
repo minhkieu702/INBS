@@ -205,18 +205,18 @@ namespace INBS.Application.Services
             await _unitOfWork.PaymentRepository.UpdateAsync(payment);
         }
 
-        public async Task ConfirmWebHook(WebhookType webhookBody)
+        public async Task ConfirmWebHook(WebhookBody webhookBody)
         {
             try
             {
                 _unitOfWork.BeginTransaction(); 
-                switch (webhookBody.success)
+                switch (webhookBody.Success)
                 {
                     case true:
-                        await AcceptPayment(webhookBody.data.orderCode);
+                        await AcceptPayment(webhookBody.Data!.OrderCode);
                         break;
                     case false:
-                        await RemovePayment(webhookBody.data.orderCode);
+                        await RemovePayment(webhookBody.Data!.OrderCode);
                         break;
                     default:
                 }

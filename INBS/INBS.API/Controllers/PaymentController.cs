@@ -62,7 +62,7 @@ namespace INBS.API.Controllers
             {
                 _logger.LogWarning("Hi");
                 _logger.LogInformation("Webhook received: {WebhookData}", JsonConvert.SerializeObject(payment));
-                //await _service.ConfirmWebHook(payment);
+                await _service.ConfirmWebHook(payment);
                 return Ok();
             }
             catch (Exception ex)
