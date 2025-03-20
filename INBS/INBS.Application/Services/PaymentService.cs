@@ -234,6 +234,35 @@ namespace INBS.Application.Services
             }
         }
 
+        public async Task ConfirmWebHook(WebhookType webhookBody)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                switch (webhookBody.success)
+                {
+                    case true:
+                        await AcceptPayment(webhookBody.data.orderCode);
+                        break;
+                    case false:
+                        await RemovePayment(webhookBody.data.orderCode);
+                        break;
+                    default:
+                }
+                if (await _unitOfWork.SaveAsync() <= 0)
+                {
+                    throw new Exception("This action failed");
+                }
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
         public async Task ReturnUrl(long orderCode, bool cancel)
         {
             try
