@@ -34,7 +34,7 @@ namespace INBS.Infrastructure.Quartz.Jobs
 
         public async Task Execute(IJobExecutionContext context)
         {
-            _logger.LogInformation("Running AutoNotificationBooking Job...");
+            //_logger.LogInformation("Running AutoNotificationBooking Job...");
 
             // Lấy danh sách booking sắp diễn ra trong vòng 30 phút
             var upcomingBookings = await _bookingService.GetBookingsWithinNextMinutes(30);

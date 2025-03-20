@@ -84,20 +84,58 @@ namespace INBS.Application.Services
         }
 
 
-        private static void AssignBooking(ref Booking booking, CustomerSelected customerSelected, ArtistStore artistStore)
+        private async Task<Booking> AssignBooking(Booking oldBooking, BookingRequest bookingRequest)
         {
             var totalDuration = 0L;
             var totalAmount = 0L;
-            foreach (var item in customerSelected.NailDesignServiceSelecteds)
+
+            var customerSelectedId = oldBooking.CustomerSelectedId;
+
+            //var nailDesignServiceSelecteds = await _unitOfWork.NailDesignServiceSelectedRepository.GetAsync(c
+            //    => c.Where(c => c.CustomerSelectedId == bookingRequest.CustomerSelectedId));
+
+            //var nailDesignService = await _unitOfWork.NailDesignServiceRepository.GetAsync(c
+            //    => c.Include(c => c.Service)
+            //        .ThenInclude(c => c.ServicePriceHistories)
+            //        .Where(c => nailDesignServiceSelecteds.Select(c => c.NailDesignServiceId).Contains(c.
+            //    );
+
+            //var temp = _unitOfWork.NailDesignServiceRepository.Query().Include(c => c.Service).ThenInclude(c => c!.ServicePriceHistories).Where(c => !c.IsDeleted && c.Service != null && !c.Service.IsDeleted);
+
+            var nailDesignServiceSelecteds = _unitOfWork.NailDesignServiceSelectedRepository.Query()
+                .Where(c => 
+                    c.CustomerSelectedId == bookingRequest.CustomerSelectedId 
+                    && !c.NailDesignService!.IsDeleted
+                    && !c.NailDesignService.Service!.IsDeleted)
+                .Include(c => c.NailDesignService)
+                .ThenInclude(c => c!.Service)
+                .ThenInclude(c => c!.ServicePriceHistories);
+
+            if (!nailDesignServiceSelecteds.Any())
+            {
+                throw new Exception("Your selected nail design and service not found");
+            }
+
+            foreach (var item in nailDesignServiceSelecteds)
             {
                 var servicePrice = item.NailDesignService!.Service!.ServicePriceHistories.FirstOrDefault(c => c.EffectiveTo == null) ?? throw new Exception("Some service do not have price");
                 totalDuration += item.NailDesignService!.Service!.AverageDuration;
                 totalAmount += servicePrice.Price + item.NailDesignService!.ExtraPrice;
             }
-            booking.Status = (int)BookingStatus.isConfirmed;
-            booking.PredictEndTime = booking.StartTime.AddMinutes(totalDuration);
-            booking.TotalAmount = totalAmount;
-            booking.ArtistStoreId = artistStore.ID;
+            oldBooking.Status = (int)BookingStatus.isConfirmed;
+            oldBooking.PredictEndTime = oldBooking.StartTime.AddMinutes(totalDuration);
+            oldBooking.TotalAmount = totalAmount;
+
+            var artistStore = await ValidateArtistStore(bookingRequest, oldBooking.PredictEndTime);
+
+            if ((await ValidateBooking(oldBooking, artistStore)).Any())
+            {
+                oldBooking.Status = (int)BookingStatus.isWaiting;
+            }
+
+            oldBooking.ArtistStoreId = artistStore.ID;
+
+            return oldBooking;
         }
 
         public async Task Create(BookingRequest bookingRequest)
@@ -106,18 +144,8 @@ namespace INBS.Application.Services
             {
                 var booking = _mapper.Map<Booking>(bookingRequest);
 
-                var customerSelected = await PredictDuration(bookingRequest);
-
-                var artistStore = await ValidateArtistStore(bookingRequest, booking.PredictEndTime);
-                booking.ArtistStoreId = artistStore.ID;
-
                 // Assign booking details
-                AssignBooking(ref booking, customerSelected, artistStore);
-
-                if ((await ValidateBooking(booking, artistStore)).Any())
-                {
-                    booking.Status = (int)BookingStatus.isWaiting;
-                }
+                booking = await AssignBooking(booking, bookingRequest);
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.InsertAsync(booking);
@@ -140,7 +168,7 @@ namespace INBS.Application.Services
             }
             catch (Exception)
             {
-                return (new List<BookingResponse>()).AsQueryable();
+                throw;
             }
         }
 
@@ -197,17 +225,8 @@ namespace INBS.Application.Services
 
                 _mapper.Map(bookingRequest, booking);
 
-                var customerSelected = await PredictDuration(bookingRequest);
-
-                var artistStore = await ValidateArtistStore(bookingRequest, booking.PredictEndTime);
-
                 // Assign booking details
-                AssignBooking(ref booking, customerSelected, artistStore);
-
-                if ((await ValidateBooking(booking, artistStore)).Any())
-                {
-                    booking.Status = (int)BookingStatus.isWaiting;
-                }
+                booking = await AssignBooking(booking, bookingRequest);
 
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
 
@@ -266,7 +285,7 @@ namespace INBS.Application.Services
 
                 var booking = await _unitOfWork.BookingRepository.GetByIdAsync(id) ?? throw new Exception($"The entity with {id} is not existed.");
 
-                booking.Status = (int)BookingStatus.isCompleted;
+                booking.Status = (int)BookingStatus.isServing;
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);

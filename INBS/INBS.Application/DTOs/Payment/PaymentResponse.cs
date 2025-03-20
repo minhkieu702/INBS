@@ -3,14 +3,17 @@ using INBS.Application.DTOs.PaymentDetail;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.Payment
 {
-    public class PaymentResponse : BaseEntity
+    public class PaymentResponse
     {
+        [Key]
+        public int ID { get; set; }
         public string Method { get; set; } = string.Empty;
 
         public long TotalAmount { get; set; }

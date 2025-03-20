@@ -82,12 +82,23 @@ namespace INBS.Persistence.Data
             modelBuilder.ConfigureRestrictOneToOne<Admin, User>(a => a.User, u => u.Admin, a => a.ID);
             modelBuilder.ConfigureRestrictOneToMany<Feedback, Booking>(s => s.Booking, a => a.Feedbacks, s => s.BookingId);
 
+            modelBuilder.Entity<ArtistStore>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Booking>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<CustomerSelected>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Design>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Feedback>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<NailDesignService>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Notification>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Service>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<Store>().HasQueryFilter(p => !p.IsDeleted);
+            modelBuilder.Entity<User>().HasQueryFilter(p => !p.IsDeleted);
+
             base.OnModelCreating(modelBuilder);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=LAPTOP-NLTHM945\\DIVAORAM; uid=sa; pwd=12345; database=INBS; TrustServerCertificate=True");
+            optionsBuilder.UseSqlServer("Server=tcp:inbs.database.windows.net,1433;Initial Catalog=inbsdatabase;Persist Security Info=False;User ID=inbsadmin;Password=String123!@#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             //optionsBuilder.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
             //optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBSDatabase; TrustServerCertificate=True");
         }

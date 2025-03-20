@@ -9,6 +9,7 @@ using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace INBS.Application.Services
                 => query.Where(c => !c.IsDeleted && c.Status == (int)BookingStatus.isServing && bookingIds.Contains(c.ID)));
             if (bookings.Count() != bookingIds.Count())
             {
-                throw new Exception("Some booking is not existed");
+                throw new Exception("Some booking is not ready to serve");
             }
 
             return bookings;
@@ -54,6 +55,11 @@ namespace INBS.Application.Services
 
             await _unitOfWork.PaymentDetailRepository.InsertRangeAsync(paymentDetails);
         }
+        public static int GenerateOtp()
+        {
+            var random = new Random();
+            return random.Next(100000, 999999);
+        }
 
         public async Task<string> CreatePayOSUrl(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests)
         {
@@ -63,26 +69,34 @@ namespace INBS.Application.Services
 
                 await DeletePaymentDetails(bookingIds: paymentDetailRequests.Select(c => c.BookingId));
 
-                var payment = new Payment();
+                var payment = new Payment
+                {
+                    Method = (int)PaymentMethod.QRCode,
 
-                payment.Method = (int)PaymentMethod.QRCode;
-
-                payment.Status = (int)PaymentStatus.Pending;
+                    Status = (int)PaymentStatus.Pending
+                };
 
                 var bookings = await ValidatePaymentRequest(paymentDetailRequests.Select(c => c.BookingId));
 
                 var totalAmount = bookings.Sum(c => c.TotalAmount);
 
+                payment.TotalAmount = totalAmount;
+
                 await _unitOfWork.PaymentRepository.InsertAsync(payment);
-
-                await HandlePaymentDetail(payment.ID, paymentDetailRequests);
-
-                var payOSUrl = await _payOS.GetPaymentLinkAsync(payment.ID, (int)totalAmount, "", bookings.ToList());
 
                 if (await _unitOfWork.SaveAsync() <= 0)
                 {
                     throw new Exception("Something was wrong");
                 }
+
+                await HandlePaymentDetail(payment.ID, paymentDetailRequests);
+                
+                if (await _unitOfWork.SaveAsync() <= 0)
+                {
+                    throw new Exception("Something was wrong");
+                }
+                
+                var payOSUrl = await _payOS.GetPaymentLinkAsync(payment.ID, (int)totalAmount, "", bookings.ToList());
 
                 _unitOfWork.CommitTransaction();
 
@@ -124,14 +138,19 @@ namespace INBS.Application.Services
                 await UpdateBookingStatus(paymentDetailRequests.Select(c => c.BookingId), (int)BookingStatus.isCompleted);
 
                 await _unitOfWork.PaymentRepository.InsertAsync(payment);
-                
-                await HandlePaymentDetail(payment.ID, paymentDetailRequests);
-                
+                                
                 if (await _unitOfWork.SaveAsync() <= 0)
                 {
                     throw new Exception("Something was wrong");
                 }
-                
+
+                await HandlePaymentDetail(payment.ID, paymentDetailRequests);
+
+                if (await _unitOfWork.SaveAsync() <= 0)
+                {
+                    throw new Exception("Something was wrong");
+                }
+
                 _unitOfWork.CommitTransaction();
             }
             catch (Exception)
@@ -141,34 +160,47 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task RemovePayment(int id)
-        {
-            var payment = await _unitOfWork.PaymentRepository.GetAsync(query 
-                => query.Where(c => id == c.ID)
-                .Include(c => c.PaymentDetails)
-                .AsNoTracking()
-                );
-
-            var deletePaymentDetails = new List<PaymentDetail>();
-            var deletePayment = new List<Payment>();
-
-            foreach (var p in payment)
-            {
-                deletePayment.Add(p);
-                deletePaymentDetails.AddRange(p.PaymentDetails);
-            }
-
-            _unitOfWork.PaymentDetailRepository.DeleteRange(deletePaymentDetails);
-            _unitOfWork.PaymentRepository.DeleteRange(deletePayment);
-        }
-
-        private async Task AcceptPayment(int id)
+        private async Task RemovePayment(long id)
         {
             var payment = (await _unitOfWork.PaymentRepository.GetAsync(query
                 => query.Where(c => id == c.ID)
                 .Include(c => c.PaymentDetails)
-                    .ThenInclude(c=>c.Booking))
-                ).FirstOrDefault() ?? throw new Exception("Payment not found");
+                    .ThenInclude(c => c.Booking))
+                ).FirstOrDefault();
+
+            if (payment == null)
+            {
+                return;
+            }
+
+            //var deletePaymentDetails = new List<PaymentDetail>();
+            //var deletePayment = new List<Payment>();
+
+            //foreach (var p in payment)
+            //{
+            //    deletePayment.Add(p);
+            //    deletePaymentDetails.AddRange(p.PaymentDetails);
+            //}
+
+            //_unitOfWork.PaymentDetailRepository.DeleteRange(deletePaymentDetails);
+
+            payment.Status = (int)PaymentStatus.Failed;
+
+            _unitOfWork.PaymentRepository.Update(payment);
+        }
+
+        private async Task AcceptPayment(long id)
+        {
+            var payment = (await _unitOfWork.PaymentRepository.GetAsync(query
+                => query.Where(c => id == c.ID)
+                .Include(c => c.PaymentDetails)
+                    .ThenInclude(c => c.Booking))
+                ).FirstOrDefault();
+
+            if (payment == null)
+            {
+                return;
+            }
 
             payment.Status = (int)PaymentStatus.Success;
 
@@ -189,10 +221,68 @@ namespace INBS.Application.Services
                 switch (webhookBody.Success)
                 {
                     case true:
-                        await AcceptPayment(webhookBody.Data.OrderCode);
+                        await AcceptPayment(webhookBody.Data!.OrderCode);
                         break;
                     case false:
-                        await RemovePayment(webhookBody.Data.OrderCode);
+                        await RemovePayment(webhookBody.Data!.OrderCode);
+                        break;
+                    default:
+                }
+                if (await _unitOfWork.SaveAsync() <= 0)
+                {
+                    //throw new Exception("This action failed");
+                }
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
+        public async Task ConfirmWebHook(WebhookType webhookBody)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                switch (webhookBody.success)
+                {
+                    case true:
+                        await AcceptPayment(webhookBody.data.orderCode);
+                        break;
+                    case false:
+                        await RemovePayment(webhookBody.data.orderCode);
+                        break;
+                    default:
+                }
+                if (await _unitOfWork.SaveAsync() <= 0)
+                {
+                    //throw new Exception("This action failed");
+                }
+
+                _unitOfWork.CommitTransaction();
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
+        public async Task ReturnUrl(long orderCode, bool cancel)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                switch (cancel)
+                {
+                    case true:
+                        await AcceptPayment(orderCode);
+                        break;
+                    case false:
+                        await RemovePayment(orderCode);
                         break;
                     default:
                 }

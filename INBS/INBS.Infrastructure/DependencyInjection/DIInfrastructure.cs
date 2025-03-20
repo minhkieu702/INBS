@@ -39,7 +39,7 @@ namespace Infrastructure.DependencyInjection
             services.AddServices();
 
             // Authentications
-            //services.AddAuthentication(configuration);
+            services.AddAuthentication();
 
 
             //SignalR
@@ -106,24 +106,24 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 
-        //public static void AddAuthentication(this IServiceCollection services, IConfiguration config)
-        //{
-        //    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        //        .AddJwtBearer(options =>
-        //        {
-        //            options.TokenValidationParameters = new TokenValidationParameters
-        //            {
-        //                ValidateIssuer = true,
-        //                ValidateAudience = true,
-        //                ValidateLifetime = true,
-        //                RequireExpirationTime = true,
-        //                ClockSkew = TimeSpan.Zero,
-        //                ValidIssuer = Environment.GetEnvironmentVariable("JWTSettings:Issuer") ?? throw new InvalidOperationException("Issuer is not configured."),
-        //                ValidAudience = Environment.GetEnvironmentVariable("JWTSettings:Audience") ?? throw new InvalidOperationException("Audience is not configured."),
-        //                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWTSettings:Key") ?? throw new InvalidOperationException("Key is not configured.")))
-        //            };
-        //        });
-        //}
+        public static void AddAuthentication(this IServiceCollection services)
+        {
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        RequireExpirationTime = true,
+                        ClockSkew = TimeSpan.Zero,
+                        ValidIssuer = Environment.GetEnvironmentVariable("JWTSettings:Issuer") ?? throw new InvalidOperationException("Issuer is not configured."),
+                        ValidAudience = Environment.GetEnvironmentVariable("JWTSettings:Audience") ?? throw new InvalidOperationException("Audience is not configured."),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWTSettings:Key") ?? throw new InvalidOperationException("Key is not configured.")))
+                    };
+                });
+        }
 
         public static void AddQuartz(this IServiceCollection services)
         {

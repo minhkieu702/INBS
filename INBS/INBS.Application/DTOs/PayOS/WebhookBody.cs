@@ -14,7 +14,7 @@ namespace INBS.Application.DTOs.PayOS
 
         public bool Success { get; set; }
 
-        public PayOSData Data { get; set; }
+        public PayOSData? Data { get; set; }
 
         public string Signature { get; set; } = "";
     }
