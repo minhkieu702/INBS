@@ -3,6 +3,7 @@ using INBS.Application.DTOs.PaymentDetail;
 using INBS.Application.DTOs.PayOS;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using Net.payOS.Types;
 using Newtonsoft.Json;
 
@@ -61,7 +62,8 @@ namespace INBS.API.Controllers
         }
 
         [HttpGet]
-        public IQueryable Get()
+        [EnableQuery(MaxExpansionDepth =10)]
+        public IQueryable<PaymentResponse> Get()
         {
             return _service.Get();
         }
