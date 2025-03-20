@@ -259,7 +259,7 @@ namespace INBS.Application.Services
                 }
                 if (await _unitOfWork.SaveAsync() <= 0)
                 {
-                    throw new Exception("This action failed");
+                    //throw new Exception("This action failed");
                 }
 
                 _unitOfWork.CommitTransaction();
