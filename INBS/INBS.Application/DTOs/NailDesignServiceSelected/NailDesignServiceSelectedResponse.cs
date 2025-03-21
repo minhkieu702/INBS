@@ -1,5 +1,5 @@
 ﻿using INBS.Application.DTOs.CustomerSelected;
-using INBS.Application.DTOs.DesignService;
+using INBS.Application.DTOs.NailDesignService;
 using System.ComponentModel.DataAnnotations;
 
 namespace INBS.Application.DTOs.NailDesignServiceSelected

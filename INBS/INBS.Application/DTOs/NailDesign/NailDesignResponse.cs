@@ -1,5 +1,5 @@
 ﻿using INBS.Application.DTOs.Design;
-using INBS.Application.DTOs.DesignService;
+using INBS.Application.DTOs.NailDesignService;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using System;

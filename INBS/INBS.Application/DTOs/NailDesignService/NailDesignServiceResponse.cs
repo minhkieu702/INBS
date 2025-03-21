@@ -10,15 +10,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace INBS.Application.DTOs.DesignService
+namespace INBS.Application.DTOs.NailDesignService
 {
     public class NailDesignServiceResponse
     {
         [Key]
         public Guid ID { get; set; }
-        
+
         public Guid NailDesignId { get; set; }
-        public virtual NailDesignResponse? Design { get; set; }
+        public virtual NailDesignResponse? NailDesign { get; set; }
 
         public Guid ServiceId { get; set; }
         public virtual ServiceResponse? Service { get; set; }

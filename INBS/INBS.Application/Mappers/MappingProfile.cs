@@ -9,10 +9,10 @@ using INBS.Application.DTOs.CategoryService;
 using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.CustomerSelected;
 using INBS.Application.DTOs.Design;
-using INBS.Application.DTOs.DesignService;
 using INBS.Application.DTOs.Feedback;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
+using INBS.Application.DTOs.NailDesignService;
 using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.DTOs.Notification;
 using INBS.Application.DTOs.Payment;
@@ -195,15 +195,8 @@ namespace INBS.Application.Mappers
                     dest.LastModifiedAt = DateTime.Now;
                 });
             CreateMap<Store, StoreResponse>()
-                .AfterMap((src, dest) =>
-                {
-                    dest.Status = src.Status switch
-                    {
-                        0 => "Active",
-                        1 => "Inactive",
-                        _ => "No Info"
-                    };
-                });
+                .ForMember(dst => dst.Status, opt => opt.MapFrom(c => GetStoreStatus(c.Status)))
+                ;
             #endregion
 
             #region User
@@ -214,6 +207,16 @@ namespace INBS.Application.Mappers
             });
             CreateMap<User, UserResponse>();
             #endregion
+        }
+
+        private static string GetStoreStatus(int status)
+        {
+            return status switch
+            {
+                (int)StoreStatus.Inactive => StoreStatus.Inactive.ToString(),
+                (int)StoreStatus.Active => StoreStatus.Active.ToString(),
+                _ => "No Info"
+            };
         }
 
         private static string GetPaymentStatus(int preferenceType)

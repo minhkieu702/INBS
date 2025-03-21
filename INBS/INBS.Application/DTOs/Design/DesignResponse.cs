@@ -1,5 +1,5 @@
 ﻿using INBS.Application.DTOs.Common;
-using INBS.Application.DTOs.DesignService;
+using INBS.Application.DTOs.NailDesignService;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.Preference;
