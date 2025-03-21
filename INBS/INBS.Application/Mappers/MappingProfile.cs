@@ -71,7 +71,7 @@ namespace INBS.Application.Mappers
                 //        .FirstOrDefault();
                 //    }
                 //})
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => GetBookingStatus(src.Status)))
+                //.ForMember(dest => dest.Status, opt => opt.MapFrom(src => GetBookingStatus(src.Status)))
                 ;
             #endregion
 
