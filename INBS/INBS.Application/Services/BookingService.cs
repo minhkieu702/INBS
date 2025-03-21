@@ -8,16 +8,21 @@ using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Quartz.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Twilio.Http;
+using NetHttpClient = System.Net.Http.HttpClient;
+using TwilioHttpClient = Twilio.Http.HttpClient;
 
 namespace INBS.Application.Services
 {
-    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper) : IBookingService
+    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, ILogger<BookingService> logger) : IBookingService
     {
         private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly predictEndTime)
         {
@@ -142,10 +147,20 @@ namespace INBS.Application.Services
         {
             try
             {
+                logger.LogInformation(" BookingRequest: {@BookingRequest}", bookingRequest);
+
                 var booking = _mapper.Map<Booking>(bookingRequest);
+
+                int estimatedMinutes = await PredictCompletionTime(bookingRequest);
+
+                // Tính toán `PredictEndTime`
+                TimeOnly endTime = bookingRequest.StartTime.Add(TimeSpan.FromMinutes(estimatedMinutes));
+                booking.PredictEndTime = endTime;
 
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);
+
+                logger.LogInformation(" BookingRequest: {@BookingRequest}", bookingRequest);
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.InsertAsync(booking);
@@ -153,11 +168,47 @@ namespace INBS.Application.Services
                 {
                     throw new Exception("Your action failed");
                 }
+                logger.LogInformation("Booking created successfully: {@Booking}", booking);
+
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+        public async Task<int> PredictCompletionTime(BookingRequest bookingRequest)
+        {
+            using var httpClient = new NetHttpClient();
+
+            var fastApiUrl = "http://100.115.78.81:8001/api/booking"; // URL FastAPI
+
+            var jsonContent = JsonConvert.SerializeObject(new
+            {
+                ServiceDate = bookingRequest.ServiceDate.ToString("yyyy-MM-dd"),
+                StartTime = bookingRequest.StartTime.ToString(@"HH\:mm"),
+                CustomerSelectedId = bookingRequest.CustomerSelectedId.ToString(),
+                ArtistId = bookingRequest.ArtistId.ToString(),
+                StoreId = bookingRequest.StoreId.ToString()
+            });
+            Console.WriteLine($"📤 JSON Sent to FastAPI: {jsonContent}");
+
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await httpClient.PostAsync(fastApiUrl, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"❌ FastAPI Error: {response.StatusCode}, Response: {errorResponse}");
+                throw new Exception($"FastAPI Error: {response.StatusCode} - {errorResponse}");
+            }
+
+            var responseData = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"✅ FastAPI Response Data: {responseData}");
+
+            var result = JsonConvert.DeserializeObject<BookingResponse>(responseData);
+
+            return result.EstimatedCompletionMinutes;
         }
 
         public IQueryable<BookingResponse> Get()
