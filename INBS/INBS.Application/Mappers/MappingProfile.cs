@@ -57,21 +57,21 @@ namespace INBS.Application.Mappers
             #region Booking
             CreateMap<BookingRequest, Booking>();
             CreateMap<Booking, BookingResponse>()
-                .AfterMap((source, dest) =>
-                {
-                    foreach (var item in dest.CustomerSelected!.NailDesignServiceSelecteds)
-                    {
-                        item.PriceAtBooking = item
-                        .NailDesignService!
-                        .Service!
-                        .ServicePriceHistories
-                        .Where(c => c.EffectiveFrom <= source.LastModifiedAt)
-                        .OrderByDescending(source => source.EffectiveFrom)
-                        .Select(c => c.Price)
-                        .FirstOrDefault();
-                    }
-                })
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => GetBookingStatus(src.Status)));
+                //.AfterMap((source, dest) =>
+                //{
+                //    foreach (var item in dest.CustomerSelected!.NailDesignServiceSelecteds)
+                //    {
+                //        item.PriceAtBooking = item
+                //        .NailDesignService!
+                //        .Service!
+                //        .ServicePriceHistories
+                //        .Where(c => c.EffectiveFrom <= source.LastModifiedAt)
+                //        .OrderByDescending(source => source.EffectiveFrom)
+                //        .Select(c => c.Price)
+                //        .FirstOrDefault();
+                //    }
+                //})
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => GetBookingStatus(src.Status)))
                 ;
             #endregion
 
