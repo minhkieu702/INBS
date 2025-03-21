@@ -25,6 +25,7 @@ using INBS.Application.DTOs.User;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.Enums;
+using System.ComponentModel;
 using Twilio.Base;
 
 namespace INBS.Application.Mappers
@@ -69,7 +70,9 @@ namespace INBS.Application.Mappers
                         .Select(c => c.Price)
                         .FirstOrDefault();
                     }
-                });
+                })
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => GetBookingStatus(src.Status)));
+                ;
             #endregion
 
             #region CategoryService
@@ -155,7 +158,8 @@ namespace INBS.Application.Mappers
 
             #region Payment
             CreateMap<PaymentRequest, Payment>();
-            CreateMap<Payment, PaymentResponse>();
+            CreateMap<Payment, PaymentResponse>()
+                .ForMember(c => c.Status, c => c.MapFrom(src => GetPaymentStatus(src.Status)));
             #endregion
 
             #region PaymentDetail
@@ -212,6 +216,17 @@ namespace INBS.Application.Mappers
             #endregion
         }
 
+        private static string GetPaymentStatus(int preferenceType)
+        {
+            return preferenceType switch
+            {
+                (int)PaymentStatus.Success => PaymentStatus.Success.ToString(),
+                (int)PaymentStatus.Failed => PaymentStatus.Failed.ToString(),
+                (int)PaymentStatus.Pending => PaymentStatus.Pending.ToString(),
+                _ => "No Info"
+            };
+        }
+
         private static string GetPreferenceType(int preferenceType)
         {
             return preferenceType switch
@@ -236,5 +251,19 @@ namespace INBS.Application.Mappers
                 _ => null
             };
         }
+
+        private static string GetBookingStatus(int bookingStatus)
+        {
+            return bookingStatus switch
+            {
+                (int)BookingStatus.isWaiting => BookingStatus.isWaiting.ToString(),
+                (int)BookingStatus.isCanceled => BookingStatus.isCanceled.ToString(),
+                (int)BookingStatus.isCompleted => BookingStatus.isCompleted.ToString(),
+                (int)BookingStatus.isServing => BookingStatus.isServing.ToString(),
+                (int)BookingStatus.isConfirmed => BookingStatus.isConfirmed.ToString(),
+                _ => "No Info"
+            };
+        }
+
     }
 }
