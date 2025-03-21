@@ -16,6 +16,10 @@ namespace INBS.Application.Services
     {
         private async Task HandleNailDesignServiceSelected(Guid customerSelectedId, IList<NailDesignServiceSelectedRequest> nailDesignServiceSelectedRequests)
         {
+            if (!nailDesignServiceSelectedRequests.Any())
+            {
+                throw new Exception("You are not selecting any service of nail design");
+            }
             await ValidateNailDesignServiceSelected(nailDesignServiceSelectedRequests);
 
             var oldNailDesignServiceSelecteds = await _unitOfWork.NailDesignServiceSelectedRepository.GetAsync(c => c.Where(c => c.CustomerSelectedId == customerSelectedId));
