@@ -11,8 +11,6 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information() // Chỉ log từ mức độ Information trở lên
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning) // Giảm log không cần thiết từ Microsoft
     .WriteTo.Console() // Ghi log ra console (hỗ trợ Azure Log Stream)
-    .WriteTo.Debug() // Ghi log ra Debug Output (hữu ích khi chạy local)
-    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day) // Ghi log vào file
     .WriteTo.AzureApp() // Gửi log lên Azure Log Stream
     .CreateLogger();
 builder.Host.UseSerilog();
