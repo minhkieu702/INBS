@@ -27,7 +27,7 @@ namespace INBS.API.Controllers
         [HttpGet("ReadFirebaseConfig")]
         public IActionResult GetFirebaseConfig()
         {
-            var firebaseConfig = Environment.GetEnvironmentVariable("FirebaseSettings_config") ?? "Not Found";
+            var firebaseConfig = Environment.GetEnvironmentVariable("FirebaseSettings:config") ?? "Not Found";
             return Ok(firebaseConfig);
         }
     }
