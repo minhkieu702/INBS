@@ -107,14 +107,11 @@ namespace INBS.Application.Services
 
             //var temp = _unitOfWork.NailDesignServiceRepository.Query().Include(c => c.Service).ThenInclude(c => c!.ServicePriceHistories).Where(c => !c.IsDeleted && c.Service != null && !c.Service.IsDeleted);
 
-            var nailDesignServiceSelecteds = _unitOfWork.NailDesignServiceSelectedRepository.Query()
-                .Where(c => 
-                    c.CustomerSelectedId == bookingRequest.CustomerSelectedId 
-                    && !c.NailDesignService!.IsDeleted
-                    && !c.NailDesignService.Service!.IsDeleted)
+            var nailDesignServiceSelecteds = await _unitOfWork.NailDesignServiceSelectedRepository.GetAsync(c => c.Where(c =>
+                    c.CustomerSelectedId == bookingRequest.CustomerSelectedId)
                 .Include(c => c.NailDesignService)
                 .ThenInclude(c => c!.Service)
-                .ThenInclude(c => c!.ServicePriceHistories);
+                .ThenInclude(c => c!.ServicePriceHistories));
 
             if (!nailDesignServiceSelecteds.Any())
             {

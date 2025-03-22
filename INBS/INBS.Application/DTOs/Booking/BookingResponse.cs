@@ -21,7 +21,7 @@ namespace INBS.Application.DTOs.Booking
 
         public TimeOnly PredictEndTime { get; set; }
 
-        public string Status { get; set; } = string.Empty;
+        public int Status { get; set; }
 
         public long TotalAmount { get; set; }
 

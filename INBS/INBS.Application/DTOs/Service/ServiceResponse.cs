@@ -1,7 +1,7 @@
 ﻿using INBS.Application.DTOs.ArtistService;
 using INBS.Application.DTOs.CategoryService;
 using INBS.Application.DTOs.Common;
-using INBS.Application.DTOs.DesignService;
+using INBS.Application.DTOs.NailDesignService;
 using INBS.Application.DTOs.ServicePriceHistory;
 using INBS.Application.DTOs.Store;
 using INBS.Domain.Common;

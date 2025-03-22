@@ -9,10 +9,10 @@ using INBS.Application.DTOs.CategoryService;
 using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.CustomerSelected;
 using INBS.Application.DTOs.Design;
-using INBS.Application.DTOs.DesignService;
 using INBS.Application.DTOs.Feedback;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
+using INBS.Application.DTOs.NailDesignService;
 using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.DTOs.Notification;
 using INBS.Application.DTOs.Payment;
@@ -25,6 +25,7 @@ using INBS.Application.DTOs.User;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.Enums;
+using System.ComponentModel;
 using Twilio.Base;
 
 namespace INBS.Application.Mappers
@@ -56,20 +57,22 @@ namespace INBS.Application.Mappers
             #region Booking
             CreateMap<BookingRequest, Booking>();
             CreateMap<Booking, BookingResponse>()
-                .AfterMap((source, dest) =>
-                {
-                    foreach (var item in dest.CustomerSelected!.NailDesignServiceSelecteds)
-                    {
-                        item.PriceAtBooking = item
-                        .NailDesignService!
-                        .Service!
-                        .ServicePriceHistories
-                        .Where(c => c.EffectiveFrom <= source.LastModifiedAt)
-                        .OrderByDescending(source => source.EffectiveFrom)
-                        .Select(c => c.Price)
-                        .FirstOrDefault();
-                    }
-                });
+                //.AfterMap((source, dest) =>
+                //{
+                //    foreach (var item in dest.CustomerSelected!.NailDesignServiceSelecteds)
+                //    {
+                //        item.PriceAtBooking = item
+                //        .NailDesignService!
+                //        .Service!
+                //        .ServicePriceHistories
+                //        .Where(c => c.EffectiveFrom <= source.LastModifiedAt)
+                //        .OrderByDescending(source => source.EffectiveFrom)
+                //        .Select(c => c.Price)
+                //        .FirstOrDefault();
+                //    }
+                //})
+                //.ForMember(dest => dest.Status, opt => opt.MapFrom(src => GetBookingStatus(src.Status)))
+                ;
             #endregion
 
             #region CategoryService
@@ -155,7 +158,8 @@ namespace INBS.Application.Mappers
 
             #region Payment
             CreateMap<PaymentRequest, Payment>();
-            CreateMap<Payment, PaymentResponse>();
+            CreateMap<Payment, PaymentResponse>()
+                .ForMember(c => c.Status, c => c.MapFrom(src => GetPaymentStatus(src.Status)));
             #endregion
 
             #region PaymentDetail
@@ -191,15 +195,8 @@ namespace INBS.Application.Mappers
                     dest.LastModifiedAt = DateTime.Now;
                 });
             CreateMap<Store, StoreResponse>()
-                .AfterMap((src, dest) =>
-                {
-                    dest.Status = src.Status switch
-                    {
-                        0 => "Active",
-                        1 => "Inactive",
-                        _ => "No Info"
-                    };
-                });
+                .ForMember(dst => dst.Status, opt => opt.MapFrom(c => GetStoreStatus(c.Status)))
+                ;
             #endregion
 
             #region User
@@ -210,6 +207,27 @@ namespace INBS.Application.Mappers
             });
             CreateMap<User, UserResponse>();
             #endregion
+        }
+
+        private static string GetStoreStatus(int status)
+        {
+            return status switch
+            {
+                (int)StoreStatus.Inactive => StoreStatus.Inactive.ToString(),
+                (int)StoreStatus.Active => StoreStatus.Active.ToString(),
+                _ => "No Info"
+            };
+        }
+
+        private static string GetPaymentStatus(int preferenceType)
+        {
+            return preferenceType switch
+            {
+                (int)PaymentStatus.Success => PaymentStatus.Success.ToString(),
+                (int)PaymentStatus.Failed => PaymentStatus.Failed.ToString(),
+                (int)PaymentStatus.Pending => PaymentStatus.Pending.ToString(),
+                _ => "No Info"
+            };
         }
 
         private static string GetPreferenceType(int preferenceType)
@@ -236,5 +254,19 @@ namespace INBS.Application.Mappers
                 _ => null
             };
         }
+
+        private static string GetBookingStatus(int bookingStatus)
+        {
+            return bookingStatus switch
+            {
+                (int)BookingStatus.isWaiting => BookingStatus.isWaiting.ToString(),
+                (int)BookingStatus.isCanceled => BookingStatus.isCanceled.ToString(),
+                (int)BookingStatus.isCompleted => BookingStatus.isCompleted.ToString(),
+                (int)BookingStatus.isServing => BookingStatus.isServing.ToString(),
+                (int)BookingStatus.isConfirmed => BookingStatus.isConfirmed.ToString(),
+                _ => "No Info"
+            };
+        }
+
     }
 }

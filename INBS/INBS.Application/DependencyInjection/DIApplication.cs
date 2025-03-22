@@ -24,6 +24,7 @@ namespace INBS.Application.DependencyInjection
         {
             services.AddScoped<IAdjectiveService, AdjectiveService>();
             services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<IArtistStoreService, ArtistStoreService>();
             services.AddScoped<IArtistService, ArtistService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IBookingService, BookingService>();
