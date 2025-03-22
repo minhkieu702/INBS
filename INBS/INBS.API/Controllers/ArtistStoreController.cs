@@ -12,6 +12,10 @@ namespace INBS.API.Controllers
     [Route("api/[controller]")]
     public class ArtistStoreController(IArtistStoreService service) : ControllerBase
     {
+        /// <summary>
+        /// Retrieves all artist store records.
+        /// </summary>
+        /// <returns>An IQueryable of ArtistStoreResponse.</returns>
         [EnableQuery(MaxExpansionDepth = 10)]
         [HttpGet]
         public IQueryable<ArtistStoreResponse> Get()
