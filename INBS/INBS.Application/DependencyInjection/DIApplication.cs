@@ -26,14 +26,18 @@ namespace INBS.Application.DependencyInjection
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<IArtistStoreService, ArtistStoreService>();
             services.AddScoped<IArtistService, ArtistService>();
+            services.AddScoped<IArtistServiceService, ArtistServiceService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<ICustomerSelectedService, CustomerSelectedService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IDesignService, DesignService>();
+            services.AddScoped<INailDesignServiceSelectedService, NailDesignServiceSelectedService>();
+            services.AddScoped<INailDesignServiceService, NailDesignServiceService>();
+            services.AddScoped<IPaymentDetailService, PaymentDetailService>();
+            services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IStoreService, StoreService>();
-            services.AddScoped<IPaymentService, PaymentService>();
 
             services.AddScoped<ISMSService, SMSService>();
             services.AddScoped<INotificationService, NotificationService>();

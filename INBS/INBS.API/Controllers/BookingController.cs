@@ -113,6 +113,11 @@ namespace INBS.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Sets the booking status to servicing.
+        /// </summary>
+        /// <param name="id">The booking ID.</param>
+        /// <returns>An action result.</returns>
         [HttpPost("Serving")]
         public async Task<IActionResult> Serving([FromQuery] Guid id)
         {

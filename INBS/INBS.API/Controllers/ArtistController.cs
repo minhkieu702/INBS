@@ -34,6 +34,8 @@ namespace INBS.API.Controllers
         /// </summary>
         /// <param name="artist">The artist request.</param>
         /// <param name="user">The user request.</param>
+        /// <param name="artistStores"></param>
+        /// <param name="artistServices"></param>
         /// <returns>An action result.</returns>
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] ArtistRequest artist, [FromForm] UserRequest user, [FromForm] IList<ArtistServiceRequest> artistServices, [FromForm] IList<ArtistStoreRequest> artistStores)
@@ -55,6 +57,8 @@ namespace INBS.API.Controllers
         /// <param name="id">The artist ID.</param>
         /// <param name="artist">The artist request.</param>
         /// <param name="user">The user request.</param>
+        /// <param name="artistServices"></param>
+        /// <param name="artistStores"></param>
         /// <returns>An action result.</returns>
         [HttpPut]
         public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ArtistRequest artist, [FromForm] UserRequest user,  [FromForm] IList<ArtistServiceRequest> artistServices, [FromForm] IList<ArtistStoreRequest> artistStores)

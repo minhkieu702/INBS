@@ -3,6 +3,7 @@ using INBS.Application.IService;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using System.ComponentModel.Design;
 
 namespace INBS.API.Controllers
@@ -16,7 +17,7 @@ namespace INBS.API.Controllers
     /// <param name="service">The service service.</param>
     [ApiController]
     [Route("api/[controller]")]
-    public class ServiceController(IServiceService service) : ControllerBase
+    public class ServiceController(IServiceService service) : ODataController
     {
         private readonly IServiceService _service = service;
 

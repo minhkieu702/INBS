@@ -310,8 +310,8 @@ namespace INBS.Application.Services
             var bookings = await _unitOfWork.BookingRepository.GetAsync(query => query
                 .Where(b => b.ServiceDate == today && b.StartTime >= now && b.StartTime <= targetTime)
                 .Include(b => b.CustomerSelected)
-                .ThenInclude(b => b.Customer)
-                .ThenInclude(b => b.User));
+                .ThenInclude(b => b!.Customer)
+                .ThenInclude(b => b!.User));
 
             return bookings.ToList();
         }
