@@ -161,7 +161,7 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.BookingRepository.Query().ProjectTo<BookingResponse>(_mapper.ConfigurationProvider);
+                return _unitOfWork.BookingRepository.Query().IgnoreQueryFilters().ProjectTo<BookingResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {

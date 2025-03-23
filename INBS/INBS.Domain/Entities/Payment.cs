@@ -18,9 +18,8 @@ namespace INBS.Domain.Entities
             Status = (int)PaymentStatus.Pending;
         }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public int ID { get; set; }
+        public long ID { get; set; }
 
         public int Method { get; set; }
 

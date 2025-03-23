@@ -10,7 +10,7 @@ namespace INBS.Application.Interfaces
 {
     public interface IPayOSHandler
     {
-        Task<string> GetPaymentLinkAsync(int orderId, int amount, string description, IList<Booking> bookings);
+        Task<string> GetPaymentLinkAsync(long orderId, int amount, string description, IList<Booking> bookings);
 
         Task GetAsync(int orderId);
     }

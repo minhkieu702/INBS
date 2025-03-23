@@ -14,7 +14,7 @@ namespace INBS.Infrastructure.Payment.PayOSIntegration
 {
     public class PayOSHandler : IPayOSHandler
     {
-        public async Task<string> GetPaymentLinkAsync(int orderId, int amount, string description, IList<Booking> bookings)
+        public async Task<string> GetPaymentLinkAsync(long orderId, int amount, string description, IList<Booking> bookings)
         {
             var PAYOS_CLIENT_ID = Environment.GetEnvironmentVariable("PAYOS_CLIENT_ID");
             var PAYOS_API_KEY = Environment.GetEnvironmentVariable("PAYOS_API_KEY");

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using INBS.Application.Common;
 using INBS.Application.DTOs.Payment;
 using INBS.Application.DTOs.PaymentDetail;
 using INBS.Application.DTOs.PayOS;
@@ -47,18 +48,13 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task HandlePaymentDetail(int id, IList<PaymentDetailRequest> paymentDetailRequests)
+        private async Task HandlePaymentDetail(long id, IList<PaymentDetailRequest> paymentDetailRequests)
         {
             var paymentDetails = _mapper.Map<IList<PaymentDetail>>(paymentDetailRequests).ToList();
 
             paymentDetails.ForEach(c => c.PaymentId = id);
 
             await _unitOfWork.PaymentDetailRepository.InsertRangeAsync(paymentDetails);
-        }
-        public static int GenerateOtp()
-        {
-            var random = new Random();
-            return random.Next(100000, 999999);
         }
 
         public async Task<string> CreatePayOSUrl(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests)
@@ -71,6 +67,8 @@ namespace INBS.Application.Services
 
                 var payment = new Payment
                 {
+                    ID = Utils.GetID(),
+
                     Method = (int)PaymentMethod.QRCode,
 
                     Status = (int)PaymentStatus.Pending
@@ -84,20 +82,14 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.PaymentRepository.InsertAsync(payment);
 
-                if (await _unitOfWork.SaveAsync() <= 0)
-                {
-                    throw new Exception("Something was wrong");
-                }
-
                 await HandlePaymentDetail(payment.ID, paymentDetailRequests);
-                
-                if (await _unitOfWork.SaveAsync() <= 0)
-                {
-                    throw new Exception("Something was wrong");
-                }
-                
+
                 var payOSUrl = await _payOS.GetPaymentLinkAsync(payment.ID, (int)totalAmount, "", bookings.ToList());
 
+                if (await _unitOfWork.SaveAsync() <= 0)
+                {
+                    throw new Exception("Something was wrong");
+                }
                 _unitOfWork.CommitTransaction();
 
                 return payOSUrl;
