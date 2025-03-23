@@ -6,11 +6,32 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace INBS.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class fix_type_of_key : Migration
+    public partial class drop_payment_temp : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "PaymentDetails");
+
+            migrationBuilder.DropTable(
+                name: "Payments");
+
+            migrationBuilder.AddColumn<string>(
+                name: "PaymentDetails",
+                table: "Bookings",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "PaymentDetails",
+                table: "Bookings");
+
             migrationBuilder.CreateTable(
                 name: "Payments",
                 columns: table => new
@@ -18,8 +39,8 @@ namespace INBS.Persistence.Migrations
                     ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Method = table.Column<int>(type: "int", nullable: false),
-                    TotalAmount = table.Column<long>(type: "bigint", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    TotalAmount = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,16 +75,6 @@ namespace INBS.Persistence.Migrations
                 name: "IX_PaymentDetails_BookingId",
                 table: "PaymentDetails",
                 column: "BookingId");
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "PaymentDetails");
-
-            migrationBuilder.DropTable(
-                name: "Payments");
         }
     }
 }

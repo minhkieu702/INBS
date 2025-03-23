@@ -473,11 +473,8 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Payment", b =>
                 {
-                    b.Property<long>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
+                    b.Property<string>("ID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Method")
                         .HasColumnType("int");
@@ -495,8 +492,8 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.PaymentDetail", b =>
                 {
-                    b.Property<long>("PaymentId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("BookingId")
                         .HasColumnType("uniqueidentifier");

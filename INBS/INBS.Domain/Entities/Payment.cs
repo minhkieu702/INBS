@@ -1,12 +1,6 @@
-﻿using INBS.Domain.Entities.Common;
-using INBS.Domain.Enums;
-using System;
-using System.Collections.Generic;
+﻿using INBS.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
@@ -14,12 +8,13 @@ namespace INBS.Domain.Entities
     {
         public Payment()
         {
+            ID = string.Empty;
             PaymentDetails = [];
             Status = (int)PaymentStatus.Pending;
         }
 
         [Key]
-        public long ID { get; set; }
+        public string ID { get; set; }
 
         public int Method { get; set; }
 

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    [Migration("20250322150615_add_rating_to_artist")]
-    partial class add_rating_to_artist
+    [Migration("20250323171237_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -476,11 +476,11 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Payment", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<long>("ID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ID"));
 
                     b.Property<int>("Method")
                         .HasColumnType("int");
@@ -498,8 +498,8 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.PaymentDetail", b =>
                 {
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("int");
+                    b.Property<long>("PaymentId")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("BookingId")
                         .HasColumnType("uniqueidentifier");

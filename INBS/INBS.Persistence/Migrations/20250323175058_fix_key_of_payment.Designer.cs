@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    [Migration("20250317104129_fix")]
-    partial class Fix
+    [Migration("20250323175058_fix_key_of_payment")]
+    partial class fix_key_of_payment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,6 +21,9 @@ namespace INBS.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -43,6 +46,9 @@ namespace INBS.Persistence.Migrations
                 {
                     b.Property<Guid>("ID")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AverageRating")
+                        .HasColumnType("int");
 
                     b.Property<int>("Level")
                         .HasColumnType("int");
@@ -470,11 +476,8 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Payment", b =>
                 {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+                    b.Property<string>("ID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Method")
                         .HasColumnType("int");
@@ -492,8 +495,8 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.PaymentDetail", b =>
                 {
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("int");
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("BookingId")
                         .HasColumnType("uniqueidentifier");

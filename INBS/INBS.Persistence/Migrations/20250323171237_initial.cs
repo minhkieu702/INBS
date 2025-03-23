@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace INBS.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Fix : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,7 +33,7 @@ namespace INBS.Persistence.Migrations
                 name: "Payments",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
+                    ID = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Method = table.Column<int>(type: "int", nullable: false),
                     TotalAmount = table.Column<long>(type: "bigint", nullable: false),
@@ -208,7 +208,8 @@ namespace INBS.Persistence.Migrations
                     ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     YearsOfExperience = table.Column<int>(type: "int", nullable: false),
-                    Level = table.Column<int>(type: "int", nullable: false)
+                    Level = table.Column<int>(type: "int", nullable: false),
+                    AverageRating = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -550,7 +551,7 @@ namespace INBS.Persistence.Migrations
                 name: "PaymentDetails",
                 columns: table => new
                 {
-                    PaymentId = table.Column<int>(type: "int", nullable: false),
+                    PaymentId = table.Column<long>(type: "bigint", nullable: false),
                     BookingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>

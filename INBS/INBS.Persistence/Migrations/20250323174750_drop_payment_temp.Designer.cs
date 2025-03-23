@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    [Migration("20250323162526_remove_payment_temp")]
-    partial class remove_payment_temp
+    [Migration("20250323174750_drop_payment_temp")]
+    partial class drop_payment_temp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -142,6 +142,10 @@ namespace INBS.Persistence.Migrations
 
                     b.Property<DateTime>("LastModifiedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentDetails")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<TimeOnly>("PredictEndTime")
                         .HasColumnType("time");
