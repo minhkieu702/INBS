@@ -187,9 +187,10 @@ namespace INBS.Application.Services
         private async Task AcceptPayment(long id)
         {
             var payment = (await _unitOfWork.PaymentRepository.GetAsync(query
-                => query.Where(c => Equals(id, c.ID.ToString()))
+                => query.Where(c => Equals(id.ToString(), c.ID))
                 .Include(c => c.PaymentDetails)
-                    .ThenInclude(c => c.Booking))
+                    .ThenInclude(c => c.Booking)
+                    )
                 ).FirstOrDefault();
 
             if (payment == null)
