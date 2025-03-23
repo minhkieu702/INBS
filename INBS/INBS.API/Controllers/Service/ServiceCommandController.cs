@@ -6,31 +6,20 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using System.ComponentModel.Design;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Service
 {
     /// <summary>
     /// Controller for managing services.
     /// </summary>
     /// <remarks>
-    /// Initializes a new instance of the <see cref="ServiceController"/> class.
+    /// Initializes a new instance of the <see cref="ServiceCommandController"/> class.
     /// </remarks>
     /// <param name="service">The service service.</param>
     [ApiController]
-    [Route("api/[controller]")]
-    public class ServiceController(IServiceService service) : ODataController
+    [Route("api/Service")]
+    public class ServiceCommandController(IServiceService service) : ControllerBase
     {
         private readonly IServiceService _service = service;
-
-        /// <summary>
-        /// Gets the list of services.
-        /// </summary>
-        /// <returns>A list of services.</returns>
-        [HttpGet]
-        [EnableQuery(MaxExpansionDepth = 100)]
-        public IQueryable<ServiceResponse> Get()
-        {
-            return _service.Get();
-        }
 
         /// <summary>
         /// Creates a new service, bắt buộc để imageUrl là null, còn nếu để Image là null thì sẽ tự động lấy ảnh mặc định có sẵn

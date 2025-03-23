@@ -3,29 +3,29 @@ using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Store
 {
     /// <summary>
     /// Controller for managing store operations.
     /// </summary>
     /// <remarks>
-    /// Initializes a new instance of the <see cref="StoreController"/> class.
+    /// Initializes a new instance of the <see cref="StoreCommandController"/> class.
     /// </remarks>
     /// <param name="service">The store service.</param>
     [ApiController]
-    [Route("api/[controller]")]
-    public class StoreController(IStoreService service) : ControllerBase
+    [Route("api/Store")]
+    public class StoreCommandController(IStoreService service) : ControllerBase
     {
-        /// <summary>
-        /// Gets the list of stores.
-        /// </summary>
-        /// <returns>A list of stores.</returns>
-        [HttpGet]
-        [EnableQuery(MaxExpansionDepth = 100)]
-        public IQueryable<StoreResponse> Get()
-        {
-                return service.Get();
-        }
+        ///// <summary>
+        ///// Gets the list of stores.
+        ///// </summary>
+        ///// <returns>A list of stores.</returns>
+        //[HttpGet]
+        //[EnableQuery(MaxExpansionDepth = 100)]
+        //public IQueryable<StoreResponse> Get()
+        //{
+        //    return service.Get();
+        //}
 
         /// <summary>
         /// Creates a new store.

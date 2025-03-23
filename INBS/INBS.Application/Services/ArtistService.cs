@@ -26,7 +26,7 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task AssignService(Guid artistId, IList<Guid> serviceIds)
+        private async Task AssignService(Guid artistId, IList<ArtistServiceRequest> services)
         {
             var oldServices = await _unitOfWork.ArtistServiceRepository.GetAsync(query => query.Where(c => c.ArtistId == artistId));
             
@@ -34,12 +34,12 @@ namespace INBS.Application.Services
 
             var newServices = new List<Domain.Entities.ArtistService>();
 
-            foreach (var serviceId in serviceIds)
+            foreach (var service in services)
             {
                 newServices.Add(new Domain.Entities.ArtistService
                 {
                     ArtistId = artistId,
-                    ServiceId = serviceId
+                    ServiceId = service.ServiceId
                 });
             }
 
@@ -197,10 +197,11 @@ namespace INBS.Application.Services
 
                 artist.Username = await GetUsername(userRequest.FullName);
 
-                await AssignStore(artist.ID, artistStoreRequest);
+                if (artistStoreRequest.Count != 0) 
+                    await AssignStore(artist.ID, artistStoreRequest);
 
                 if (artistServiceRequest.Count != 0)
-                    await ValidateService(artistServiceRequest.Select(c => c.ServiceId));
+                    await AssignService(artist.ID, artistServiceRequest);
 
 
                 await _unitOfWork.ArtistRepository.InsertAsync(artist);
@@ -271,9 +272,11 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.ArtistRepository.UpdateAsync(_mapper.Map(artistRequest, artist));
 
-                await AssignService(artist.ID, artistServiceRequest.Select(c => c.ServiceId).ToList());
+                if (artistServiceRequest.Count != 0) 
+                    await AssignService(artist.ID, artistServiceRequest);
 
-                await AssignStore(artist.ID, artistStoreRequest);
+                if (artistStoreRequest.Count != 0) 
+                    await AssignStore(artist.ID, artistStoreRequest);
 
                 _mapper.Map(artistRequest, artist);
 

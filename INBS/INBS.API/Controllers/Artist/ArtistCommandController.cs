@@ -9,25 +9,25 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Newtonsoft.Json;
 using System.Diagnostics;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Artist
 {
     /// <summary>
     /// Controller for managing artists.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
-    public class ArtistController(IArtistService service) : ControllerBase
+    [Route("api/Artist")]
+    public class ArtistCommandController(IArtistService service) : ControllerBase
     {
-        /// <summary>
-        /// Gets the list of artists.
-        /// </summary>
-        /// <returns>A list of artists.</returns>
-        [HttpGet]
-        [EnableQuery(MaxExpansionDepth = 100)]
-        public IQueryable<ArtistResponse> Get()
-        {
-            return service.Get();
-        }
+        ///// <summary>
+        ///// Gets the list of artists.
+        ///// </summary>
+        ///// <returns>A list of artists.</returns>
+        //[HttpGet]
+        //[EnableQuery(MaxExpansionDepth = 100)]
+        //public IQueryable<ArtistResponse> Get()
+        //{
+        //    return service.Get();
+        //}
 
         /// <summary>
         /// Creates a new artist.
@@ -61,7 +61,7 @@ namespace INBS.API.Controllers
         /// <param name="artistStores"></param>
         /// <returns>An action result.</returns>
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ArtistRequest artist, [FromForm] UserRequest user,  [FromForm] IList<ArtistServiceRequest> artistServices, [FromForm] IList<ArtistStoreRequest> artistStores)
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ArtistRequest artist, [FromForm] UserRequest user, [FromForm] IList<ArtistServiceRequest> artistServices, [FromForm] IList<ArtistStoreRequest> artistStores)
         {
             try
             {

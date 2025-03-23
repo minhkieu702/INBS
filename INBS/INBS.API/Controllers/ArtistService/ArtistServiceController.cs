@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.ArtistService
 {
     /// <summary>
     /// Controller for handling artist services.

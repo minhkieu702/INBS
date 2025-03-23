@@ -2,7 +2,7 @@
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Authentication
 {
     /// <summary>
     /// Controller for handling authentication.
@@ -84,7 +84,7 @@ namespace INBS.API.Controllers
             {
                 return new BadRequestObjectResult(ex.Message);
             }
-        }     
+        }
 
         /// <summary>
         /// Gửi lại OTP nếu OTP đã hết hạn

@@ -1,7 +1,7 @@
 ﻿using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Admin
 {
     /// <summary>
     /// Controller for admin-related actions.

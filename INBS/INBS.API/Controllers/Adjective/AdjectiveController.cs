@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using System.Net.Http;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Adjective
 {
     /// <summary>
     /// Controller for handling category-related operations.

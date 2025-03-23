@@ -7,38 +7,38 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Design
 {
     /// <summary>
     /// Controller for managing designs.
     /// </summary>
     /// <remarks>
-    /// Initializes a new instance of the <see cref="DesignController"/> class.
+    /// Initializes a new instance of the <see cref="DesignCommandController"/> class.
     /// </remarks>
     /// <param name="service">The design service.</param>
     [ApiController]
-    [Route("api/[controller]")]
-    public class DesignController(IDesignService service) : ODataController
+    [Route("api/Design")]
+    public class DesignCommandController(IDesignService service) : ControllerBase
     {
 
-        /// <summary>
-        /// Gets the list of designs.
-        /// </summary>
-        /// <returns>A list of designs.</returns>
-        [HttpGet]
-        [EnableQuery(MaxExpansionDepth = 100)]
-        public IQueryable<DesignResponse> Get()
-        {
-            try
-            {
-                return service.Get();
-            }
-            catch (Exception)
-            {
+        ///// <summary>
+        ///// Gets the list of designs.
+        ///// </summary>
+        ///// <returns>A list of designs.</returns>
+        //[HttpGet]
+        //[EnableQuery(MaxExpansionDepth = 100)]
+        //public IQueryable<DesignResponse> Get()
+        //{
+        //    try
+        //    {
+        //        return service.Get();
+        //    }
+        //    catch (Exception)
+        //    {
 
-                throw;
-            }
-        }
+        //        throw;
+        //    }
+        //}
 
         /// <summary>
         /// Creates a new design.

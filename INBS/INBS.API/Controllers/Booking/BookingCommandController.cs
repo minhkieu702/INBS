@@ -3,38 +3,38 @@ using INBS.Application.IService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Booking
 {
     /// <summary>
     /// Controller for managing bookings.
     /// </summary>
     /// <remarks>
-    /// Initializes a new instance of the <see cref="BookingController"/> class.
+    /// Initializes a new instance of the <see cref="BookingCommandController"/> class.
     /// </remarks>
     /// <param name="service">The booking service.</param>
     [ApiController]
-    [Route("api/[controller]")]
-    public class BookingController(IBookingService service) : ControllerBase
+    [Route("api/Booking")]
+    public class BookingCommandController(IBookingService service) : ControllerBase
     {
 
-        /// <summary>
-        /// Gets all bookings.
-        /// </summary>
-        /// <returns>A list of bookings.</returns>
-        [HttpGet]
-        [EnableQuery(MaxExpansionDepth = 100)]
-        public IQueryable<BookingResponse> Get()
-        {
-            try
-            {
-                return service.Get();
-            }
-            catch (Exception)
-            {
+        ///// <summary>
+        ///// Gets all bookings.
+        ///// </summary>
+        ///// <returns>A list of bookings.</returns>
+        //[HttpGet]
+        //[EnableQuery(MaxExpansionDepth = 100)]
+        //public IQueryable<BookingResponse> Get()
+        //{
+        //    try
+        //    {
+        //        return service.Get();
+        //    }
+        //    catch (Exception)
+        //    {
 
-                throw;
-            }
-        }
+        //        throw;
+        //    }
+        //}
 
         /// <summary>
         /// Creates a new booking.

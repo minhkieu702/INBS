@@ -57,7 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Controllers\StoreController.cs">
+    <Compile Update="Controllers\Store\StoreCommandController.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>

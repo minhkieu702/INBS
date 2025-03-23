@@ -4,14 +4,14 @@ using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Customer
 {
     /// <summary>
     /// Controller for managing customers.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
-    public class CustomerController(ICustomerService service) : ControllerBase
+    [Route("api/Customer")]
+    public class CustomerCommandController(ICustomerService service) : ControllerBase
     {
         /// <summary>
         /// Updates/Create customer preferences.
@@ -31,17 +31,6 @@ namespace INBS.API.Controllers
             {
                 return new BadRequestObjectResult(ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Gets customers.
-        /// </summary>
-        /// <returns>Customer preferences.</returns>
-        [HttpGet]
-        [EnableQuery(MaxExpansionDepth = 100)]
-        public IQueryable<CustomerResponse> Get()
-        {
-            return service.Get();
         }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.NailDesignService
 {
     /// <summary>
     /// Controller for handling Nail Design Service related operations.

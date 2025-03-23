@@ -4,25 +4,26 @@ using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.CustomerSelected
+
 {
     /// <summary>
     /// Controller for managing customer selected.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
-    public class CustomerSelectedController(ICustomerSelectedService service) : ControllerBase
+    [Route("api/CustomerSelected")]
+    public class CustomerSelectedCommandController(ICustomerSelectedService service) : ControllerBase
     {
-        /// <summary>
-        /// Gets the list of customer selected.
-        /// </summary>
-        /// <returns>A list of customer selected.</returns>
-        [HttpGet]
-        [EnableQuery(MaxExpansionDepth = 100)]
-        public IQueryable<CustomerSelectedResponse> Get()
-        {
-            return service.Get();
-        }
+        ///// <summary>
+        ///// Gets the list of customer selected.
+        ///// </summary>
+        ///// <returns>A list of customer selected.</returns>
+        //[HttpGet]
+        //[EnableQuery(MaxExpansionDepth = 100)]
+        //public IQueryable<CustomerSelectedResponse> Get()
+        //{
+        //    return service.Get();
+        //}
 
         /// <summary>
         /// Creates a new customer selected.

@@ -9,24 +9,24 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Net.payOS.Types;
 using Newtonsoft.Json;
 
-namespace INBS.API.Controllers
+namespace INBS.API.Controllers.Payment
 {
     /// <summary>
     /// Controller for handling payment-related operations.
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
-    public class PaymentController : ODataController
+    [Route("api/Payment")]
+    public class PaymentCommandController : ControllerBase
     {
         private readonly IPaymentService _service;
-        private readonly ILogger<PaymentController> _logger;
+        private readonly ILogger<PaymentCommandController> _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PaymentController"/> class.
+        /// Initializes a new instance of the <see cref="PaymentCommandController"/> class.
         /// </summary>
         /// <param name="logger">The logger instance.</param>
         /// <param name="service">The payment service.</param>
-        public PaymentController(ILogger<PaymentController> logger, IPaymentService service)
+        public PaymentCommandController(ILogger<PaymentCommandController> logger, IPaymentService service)
         {
             _service = service;
             _logger = logger;
@@ -102,17 +102,6 @@ namespace INBS.API.Controllers
                 _logger.LogError("Error confirming webhook test: {Message}", ex.Message);
                 return new BadRequestObjectResult(ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Retrieves a list of payment responses.
-        /// </summary>
-        /// <returns>An IQueryable of PaymentResponse.</returns>
-        [HttpGet]
-        [EnableQuery(MaxExpansionDepth = 10)]
-        public IQueryable<PaymentResponse> Get()
-        {
-            return _service.Get();
         }
 
         /// <summary>
