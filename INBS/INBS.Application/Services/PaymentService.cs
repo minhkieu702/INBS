@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using INBS.Application.Common;
 using INBS.Application.DTOs.Payment;
 using INBS.Application.DTOs.PaymentDetail;
 using INBS.Application.DTOs.PayOS;
@@ -47,18 +48,13 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task HandlePaymentDetail(int id, IList<PaymentDetailRequest> paymentDetailRequests)
+        private async Task HandlePaymentDetail(string id, IList<PaymentDetailRequest> paymentDetailRequests)
         {
             var paymentDetails = _mapper.Map<IList<PaymentDetail>>(paymentDetailRequests).ToList();
 
             paymentDetails.ForEach(c => c.PaymentId = id);
 
             await _unitOfWork.PaymentDetailRepository.InsertRangeAsync(paymentDetails);
-        }
-        public static int GenerateOtp()
-        {
-            var random = new Random();
-            return random.Next(100000, 999999);
         }
 
         public async Task<string> CreatePayOSUrl(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests)
@@ -71,6 +67,8 @@ namespace INBS.Application.Services
 
                 var payment = new Payment
                 {
+                    ID = Utils.GetID().ToString(),
+
                     Method = (int)PaymentMethod.QRCode,
 
                     Status = (int)PaymentStatus.Pending
@@ -84,19 +82,18 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.PaymentRepository.InsertAsync(payment);
 
-                if (await _unitOfWork.SaveAsync() <= 0)
-                {
-                    throw new Exception("Something was wrong");
-                }
+                //if (await _unitOfWork.SaveAsync() <= 0)
+                //{
+                //    throw new Exception("Something was wrong");
+                //}
 
                 await HandlePaymentDetail(payment.ID, paymentDetailRequests);
-                
+
                 if (await _unitOfWork.SaveAsync() <= 0)
                 {
                     throw new Exception("Something was wrong");
                 }
-                
-                var payOSUrl = await _payOS.GetPaymentLinkAsync(payment.ID, (int)totalAmount, "", bookings.ToList());
+                var payOSUrl = await _payOS.GetPaymentLinkAsync(long.Parse(payment.ID), (int)totalAmount, "", bookings.ToList());
 
                 _unitOfWork.CommitTransaction();
 
@@ -163,9 +160,7 @@ namespace INBS.Application.Services
         private async Task RemovePayment(long id)
         {
             var payment = (await _unitOfWork.PaymentRepository.GetAsync(query
-                => query.Where(c => id == c.ID)
-                .Include(c => c.PaymentDetails)
-                    .ThenInclude(c => c.Booking))
+                => query.Where(c => Equals(c.ID, id.ToString())))
                 ).FirstOrDefault();
 
             if (payment == null)
@@ -192,9 +187,10 @@ namespace INBS.Application.Services
         private async Task AcceptPayment(long id)
         {
             var payment = (await _unitOfWork.PaymentRepository.GetAsync(query
-                => query.Where(c => id == c.ID)
+                => query.Where(c => Equals(id.ToString(), c.ID))
                 .Include(c => c.PaymentDetails)
-                    .ThenInclude(c => c.Booking))
+                    .ThenInclude(c => c.Booking)
+                    )
                 ).FirstOrDefault();
 
             if (payment == null)

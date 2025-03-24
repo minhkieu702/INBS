@@ -105,6 +105,20 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
+        #region Cart
+        private IGenericRepository<Cart>? _cartRepository;
+
+        public IGenericRepository<Cart> CartRepository
+        {
+            get
+            {
+                _cartRepository ??= new GenericRepository<Cart>(_context);
+                return _cartRepository;
+            }
+        }
+        #endregion
+
+
         #region Category
         private IGenericRepository<Category>? _categoryRepository;
 

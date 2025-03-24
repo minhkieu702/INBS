@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace INBS.Domain.Entities
 {
     public class PaymentDetail
     {
-        public int PaymentId { get; set; }
+        public string PaymentId { get; set; } = string.Empty;
         [ForeignKey(nameof(PaymentId))]
         [InverseProperty(nameof(Payment.PaymentDetails))]
         public virtual Payment? Payment { get; set; }

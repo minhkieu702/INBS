@@ -14,6 +14,10 @@ namespace INBS.Application.Common
 {
     public static class Utils
     {
+        public static long GetID()
+        {
+            return (DateTime.UtcNow.Ticks / 100000) % 1_000_000_000_000L; // Lấy 12 chữ số cuối
+        }
         public static string HashedPassword(string password)
         {
             try

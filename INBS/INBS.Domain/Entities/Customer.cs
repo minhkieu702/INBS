@@ -16,9 +16,9 @@ namespace INBS.Domain.Entities
         {
             Recommendations = [];
             Preferences = [];
-            DeviceTokens = [];
             Description = string.Empty;
             CustomerSelecteds = [];
+            Carts = [];
         }
         [Key]
         public Guid ID { get; set; }
@@ -42,8 +42,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(Preference.Customer))]
         public virtual ICollection<Preference> Preferences { get; set; }
-            
-        [InverseProperty(nameof(DeviceToken.Customer))]
-        public virtual ICollection<DeviceToken> DeviceTokens { get; set; }
+
+        [InverseProperty(nameof(Cart.Customer))]
+        public virtual ICollection<Cart> Carts { get; set; }
     }
 }

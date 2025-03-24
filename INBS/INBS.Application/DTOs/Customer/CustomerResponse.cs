@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.CustomerSelected;
+﻿using INBS.Application.DTOs.Cart;
+using INBS.Application.DTOs.CustomerSelected;
 using INBS.Application.DTOs.Feedback;
 using INBS.Application.DTOs.Preference;
 using INBS.Application.DTOs.User;
@@ -22,5 +23,7 @@ namespace INBS.Application.DTOs.Customer
         public virtual ICollection<PreferenceResponse> Preferences { get; set; } = [];
 
         public virtual ICollection<DeviceTokenResponse> DeviceTokens { get; set; } = [];
+
+        public virtual ICollection<CartResponse> Carts { get; set; } = [];
     }
 }

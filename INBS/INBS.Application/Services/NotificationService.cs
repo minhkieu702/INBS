@@ -23,5 +23,19 @@ namespace INBS.Application.Services
             _logger.LogInformation($"Sending SMS to {phoneNumber}: {message}");
             await Task.CompletedTask;
         }
+
+        public async Task AddDeviceToken(string deviceToken)
+        {
+            try
+            {
+                _logger.LogInformation($"Add device token: {deviceToken}");
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
     }
 }

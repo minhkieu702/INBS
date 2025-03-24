@@ -29,6 +29,8 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Cancellation> Cancellations { get; set; }
 
+        public virtual DbSet<Cart> Carts { get; set; }
+
         public virtual DbSet<CategoryService> CategoryServices { get; set; }
 
         public virtual DbSet<Customer> Customers { get; set; }
@@ -76,6 +78,7 @@ namespace INBS.Persistence.Data
             modelBuilder.Entity<Media>().HasKey(c => new { c.DesignId, c.NumerialOrder });
             modelBuilder.Entity<Recommendation>().HasKey(c => new { c.CustomerId, c.DesignId });
             modelBuilder.Entity<PaymentDetail>().HasKey(c => new { c.PaymentId, c.BookingId });
+            modelBuilder.Entity<Cart>().HasKey(c => new { c.NailDesignServiceId, c.CustomerId });
 
             modelBuilder.ConfigureRestrictOneToOne<Customer, User>(a => a.User, u => u.Customer, a => a.ID);
             modelBuilder.ConfigureRestrictOneToOne<Artist, User>(a => a.User, u => u.Artist, a => a.ID);
@@ -95,13 +98,5 @@ namespace INBS.Persistence.Data
 
             base.OnModelCreating(modelBuilder);
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server=tcp:inbs.database.windows.net,1433;Initial Catalog=inbsdatabase;Persist Security Info=False;User ID=inbsadmin;Password=String123!@#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
-            //optionsBuilder.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
-            //optionsBuilder.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBSDatabase; TrustServerCertificate=True");
-        }
-
     }
 }

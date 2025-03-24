@@ -132,7 +132,10 @@ namespace INBS.Application.Services
 
                 var newService = _mapper.Map<Service>(modelRequest);
 
-                newService.ImageUrl = modelRequest.NewImage != null ? await _firebaseService.UploadFileAsync(modelRequest.NewImage) : Constants.DEFAULT_IMAGE_URL;
+                if (modelRequest.NewImage != null)
+                {
+                    newService.ImageUrl = await _firebaseService.UploadFileAsync(modelRequest.NewImage);
+                }
 
                 newService.CreatedAt = DateTime.Now;
 
