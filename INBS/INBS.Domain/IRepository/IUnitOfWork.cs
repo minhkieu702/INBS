@@ -21,6 +21,8 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Cancellation> CancellationRepository { get; }
 
+        public IGenericRepository<Cart> CartRepository { get; }
+
         public IGenericRepository<CategoryService> CategoryServiceRepository { get; }
 
         public IGenericRepository<Customer> CustomerRepository { get; }

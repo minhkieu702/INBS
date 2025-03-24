@@ -5,6 +5,7 @@ using INBS.Application.DTOs.Artist;
 using INBS.Application.DTOs.ArtistService;
 using INBS.Application.DTOs.ArtistStore;
 using INBS.Application.DTOs.Booking;
+using INBS.Application.DTOs.Cart;
 using INBS.Application.DTOs.CategoryService;
 using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.CustomerSelected;
@@ -25,8 +26,6 @@ using INBS.Application.DTOs.User;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.Enums;
-using System.ComponentModel;
-using Twilio.Base;
 
 namespace INBS.Application.Mappers
 {
@@ -73,6 +72,11 @@ namespace INBS.Application.Mappers
                 //})
                 //.ForMember(dest => dest.Status, opt => opt.MapFrom(src => GetBookingStatus(src.Status)))
                 ;
+            #endregion
+
+            #region Cart
+            CreateMap<CartRequest, Cart>();
+            CreateMap<Cart, CartResponse>();
             #endregion
 
             #region CategoryService

@@ -29,6 +29,8 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Cancellation> Cancellations { get; set; }
 
+        public virtual DbSet<Cart> Carts { get; set; }
+
         public virtual DbSet<CategoryService> CategoryServices { get; set; }
 
         public virtual DbSet<Customer> Customers { get; set; }
@@ -76,6 +78,7 @@ namespace INBS.Persistence.Data
             modelBuilder.Entity<Media>().HasKey(c => new { c.DesignId, c.NumerialOrder });
             modelBuilder.Entity<Recommendation>().HasKey(c => new { c.CustomerId, c.DesignId });
             modelBuilder.Entity<PaymentDetail>().HasKey(c => new { c.PaymentId, c.BookingId });
+            modelBuilder.Entity<Cart>().HasKey(c => new { c.NailDesignServiceId, c.CustomerId });
 
             modelBuilder.ConfigureRestrictOneToOne<Customer, User>(a => a.User, u => u.Customer, a => a.ID);
             modelBuilder.ConfigureRestrictOneToOne<Artist, User>(a => a.User, u => u.Artist, a => a.ID);
