@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Artist;
+using INBS.Application.DTOs.Common;
 using INBS.Application.DTOs.Store;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,12 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.ArtistStore
 {
-    public class ArtistStoreResponse
+    public class ArtistStoreResponse : BaseEntity
     {
-        [Key]
         public Guid ArtistId { get; set; }
 
         public virtual ArtistResponse? Artist { get; set; }
 
-        [Key]
         public Guid StoreId { get; set; }
 
         public virtual StoreResponse? Store { get; set; }
