@@ -30,6 +30,8 @@ namespace INBS.Domain.Entities
 
         public int Level { get; set; }
 
+        public int AverageRating { get; set; }
+
         [InverseProperty(nameof(ArtistService.Artist))]
         public virtual ICollection<ArtistService> ArtistServices { get; set; }
 

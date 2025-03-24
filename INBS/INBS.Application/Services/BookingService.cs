@@ -212,7 +212,7 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.BookingRepository.Query().ProjectTo<BookingResponse>(_mapper.ConfigurationProvider);
+                return _unitOfWork.BookingRepository.Query().IgnoreQueryFilters().ProjectTo<BookingResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
@@ -361,8 +361,8 @@ namespace INBS.Application.Services
             var bookings = await _unitOfWork.BookingRepository.GetAsync(query => query
                 .Where(b => b.ServiceDate == today && b.StartTime >= now && b.StartTime <= targetTime)
                 .Include(b => b.CustomerSelected)
-                .ThenInclude(b => b.Customer)
-                .ThenInclude(b => b.User));
+                .ThenInclude(b => b!.Customer)
+                .ThenInclude(b => b!.User));
 
             return bookings.ToList();
         }

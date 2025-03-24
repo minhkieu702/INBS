@@ -13,7 +13,7 @@ namespace INBS.Application.DTOs.PaymentDetail
     public class PaymentDetailResponse
     {
         [Key]
-        public int PaymentId { get; set; }
+        public string PaymentId { get; set; }
         public virtual PaymentResponse? Payment { get; set; }
 
         [Key]

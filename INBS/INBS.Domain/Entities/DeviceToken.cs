@@ -17,11 +17,17 @@ namespace INBS.Domain.Entities
 
         public string Token { get; set; } = string.Empty;
 
+        public string Platform { get; set; } = string.Empty ;
+
+        public bool IsActive { get; set; }
+
+        public DateTime LastActiveAt { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
-        public Guid CustomerId { get; set; }
-        [ForeignKey(nameof(CustomerId))]
-        [InverseProperty(nameof(Customer.DeviceTokens))]
-        public virtual Customer? Customer { get; set; }
+        public Guid UserId { get; set; }
+        [ForeignKey(nameof(UserId))]
+        [InverseProperty(nameof(User.DeviceTokens))]
+        public virtual User? User{ get; set; }
     }
 }

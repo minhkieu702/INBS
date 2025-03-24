@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.Design;
+﻿using INBS.Application.DTOs.Cart;
+using INBS.Application.DTOs.Design;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.DTOs.Service;
@@ -26,5 +27,7 @@ namespace INBS.Application.DTOs.NailDesignService
         public long ExtraPrice { get; set; }
 
         public virtual ICollection<NailDesignServiceSelectedResponse> NailDesignServiceSelecteds { get; set; } = [];
+
+        public virtual ICollection<CartResponse> Carts { get; set; } = [];
     }
 }

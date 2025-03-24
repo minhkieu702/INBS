@@ -13,7 +13,7 @@ namespace INBS.Application.DTOs.Payment
     public class PaymentResponse
     {
         [Key]
-        public int ID { get; set; }
+        public string ID { get; set; } = string.Empty;
         public string Method { get; set; } = string.Empty;
 
         public long TotalAmount { get; set; }

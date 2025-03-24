@@ -42,6 +42,15 @@ namespace INBS.Infrastructure.Quartz.Jobs
 
             foreach (var booking in upcomingBookings)
             {
+                if (booking == null 
+                    || booking.CustomerSelected == null 
+                    || booking.CustomerSelected.Customer == null
+                    || booking.CustomerSelected.Customer.User == null
+                    || booking.CustomerSelected.Customer.User.PhoneNumber == null
+                    )
+                {
+                    continue;
+                }
                 string phoneNumber = booking.CustomerSelected.Customer.User.PhoneNumber;
                 string message = $"Xin chào {booking.CustomerSelected.Customer.User.FullName}, lịch hẹn của bạn sẽ diễn ra vào {booking.StartTime}. Vui lòng đến đúng giờ!";
 
