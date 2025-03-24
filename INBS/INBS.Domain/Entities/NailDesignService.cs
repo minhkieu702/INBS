@@ -6,7 +6,11 @@ namespace INBS.Domain.Entities
 {
     public class NailDesignService : BaseEntity
     {
-        public NailDesignService() :base() { }
+        public NailDesignService() :base()
+        {
+            NailDesignServiceSelecteds = [];
+            Carts = [];
+        }
 
         public Guid NailDesignId { get; set; }
         [ForeignKey(nameof(NailDesignId))]
@@ -21,6 +25,9 @@ namespace INBS.Domain.Entities
         public long ExtraPrice { get; set; }
 
         [InverseProperty(nameof(NailDesignServiceSelected.NailDesignService))]
-        public virtual ICollection<NailDesignServiceSelected> NailDesignServiceSelecteds { get; set; } = [];
+        public virtual ICollection<NailDesignServiceSelected> NailDesignServiceSelecteds { get; set; }
+
+        [InverseProperty(nameof(Cart.NailDesignService))]
+        public virtual ICollection<Cart> Carts { get; set; }
     }
 }
