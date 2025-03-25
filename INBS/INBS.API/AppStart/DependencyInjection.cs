@@ -4,6 +4,7 @@ using INBS.Application.DTOs.Artist;
 using INBS.Application.DTOs.ArtistService;
 using INBS.Application.DTOs.ArtistStore;
 using INBS.Application.DTOs.Booking;
+using INBS.Application.DTOs.Cart;
 using INBS.Application.DTOs.CategoryService;
 using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.CustomerSelected;
@@ -73,6 +74,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<BookingResponse>(nameof(Booking));
                     odataBuilder.EntitySet<Category>(nameof(Category));
                     odataBuilder.EntitySet<CategoryServiceResponse>(nameof(CategoryService));
+                    odataBuilder.EntitySet<CartResponse>(nameof(Cart));
                     odataBuilder.EntitySet<Color>(nameof(Color));
                     odataBuilder.EntitySet<CustomerResponse>(nameof(Customer));
                     odataBuilder.EntitySet<CustomerSelectedResponse>(nameof(CustomerSelected));

@@ -43,11 +43,11 @@ namespace INBS.Application.Services
 
                 var cart = _mapper.Map<Cart>(cartRequest);
 
-                cart.NailDesignServiceId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                cart.CustomerId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
-                _unitOfWork.CartRepository.Insert(cart);
+                await _unitOfWork.CartRepository.InsertAsync(cart);
 
-                if (await _unitOfWork.SaveAsync() <= 0)
+                if (await _unitOfWork.SaveAsync() ==0)
                 {
                     throw new Exception("This action failed");
                 }
