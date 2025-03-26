@@ -6,18 +6,11 @@ using INBS.Application.IService;
 using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Twilio.Http;
 
 namespace INBS.Application.Services
 {
-    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper) : IBookingService
+    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService) : IBookingService
     {
         private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly predictEndTime)
         {
@@ -130,6 +123,8 @@ namespace INBS.Application.Services
                 oldBooking.Status = (int)BookingStatus.isWaiting;
             }
 
+            await SendNotificationBookingToArtist(bookingRequest.ArtistId, "YOU ARE CHOSEN ONE", oldBooking.Status == (int)BookingStatus.isWaiting ? $"You got a overlapping booking that start at {bookingRequest.StartTime} on {bookingRequest.ServiceDate}" : $"You have new booking that start at {bookingRequest.StartTime} on {bookingRequest.ServiceDate}");
+
             oldBooking.ArtistStoreId = artistStore.ID;
 
             return oldBooking;
@@ -146,6 +141,7 @@ namespace INBS.Application.Services
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.InsertAsync(booking);
+
                 if (await _unitOfWork.SaveAsync() == 0)
                 {
                     throw new Exception("Your action failed");
@@ -204,12 +200,29 @@ namespace INBS.Application.Services
                 // Change status of wait booking to isBooked
                 waitbooking.Status = (int)BookingStatus.isConfirmed;
 
-#warning do notification with fcm or signalr here
-
                 updateList.Add(waitbooking);
             }
 
             _unitOfWork.BookingRepository.UpdateRange(updateList);
+        }
+
+        private async Task SendNotificationBookingToArtist(Guid artistId, string title, string body)
+        {
+            var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId));
+
+            if (!deviceTokenOfArtist.Any()) throw new Exception("Can't send notification to artist, because artist does not have device");
+
+            var notification = new Notification
+            {
+                CreatedAt = DateTime.Now,
+                Status = (int)NotificationStatus.Send,
+                NotificationType = (int)NotificationType.Notification,
+                UserId = artistId,
+            };
+
+            await _unitOfWork.NotificationRepository.InsertAsync(notification);
+
+            await _fcmService.SendToMultipleDevices(deviceTokenOfArtist.Select(c => c.Token).ToList(), title, body);
         }
 
         public async Task Update(Guid id, BookingRequest bookingRequest)
@@ -244,14 +257,16 @@ namespace INBS.Application.Services
             }
         }
 
-
         public async Task CancelBooking(Guid id)
         {
             try
             {
                 _unitOfWork.BeginTransaction();
 
-                var booking = await _unitOfWork.BookingRepository.GetByIdAsync(id) ?? throw new Exception($"The entity with {id} is not existed.");
+                var booking = (await _unitOfWork.BookingRepository.GetAsync(query 
+                    => query.Where(c => c.ID == id)
+                    .Include(c => c.ArtistStore))
+                    ).FirstOrDefault() ?? throw new Exception($"The entity with {id} is not existed.");
 
                 booking.Status = (int)BookingStatus.isCanceled;
 
@@ -259,6 +274,8 @@ namespace INBS.Application.Services
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
 
                 await RecheckStatusBooking(booking);
+
+                await SendNotificationBookingToArtist(booking.ArtistStore!.ArtistId, "YOUR APPOINTMENT IS CANCELED", $"A booking at {booking.StartTime} on {booking.ServiceDate} is canceled");
 
                 if (await _unitOfWork.SaveAsync() == 0)
                 {

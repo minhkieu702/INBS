@@ -6,14 +6,21 @@ using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;
+using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace INBS.Application.Services
 {
-    public class CustomerSelectedService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor) : ICustomerSelectedService
+    public class CustomerSelectedService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor, IFirebaseCloudMessageService _fcmService) : ICustomerSelectedService
     {
+        private async Task HandleCart(IEnumerable<Guid> nailDesignServiceIds)
+        {
+            var cart = await _unitOfWork.CartRepository.GetAsync(c => c.Where(c => nailDesignServiceIds.Contains(c.NailDesignServiceId)));
+
+            _unitOfWork.CartRepository.DeleteRange(cart);
+        }
         private async Task HandleNailDesignServiceSelected(Guid customerSelectedId, IList<NailDesignServiceSelectedRequest> nailDesignServiceSelectedRequests)
         {
             if (!nailDesignServiceSelectedRequests.Any())
@@ -87,7 +94,11 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.CustomerSelectedRepository.InsertAsync(entity);
 
+                await HandleCart(nailDesignServiceSelectedRequests.Select(c => c.NailDesignServiceId));
+
                 await HandleNailDesignServiceSelected(entity.ID, nailDesignServiceSelectedRequests);
+
+                await SendNotification(cusId, "ha", "ho");
 
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
@@ -136,6 +147,25 @@ namespace INBS.Application.Services
 
                 throw;
             }
+        }
+
+        private async Task SendNotification(Guid artistId, string title, string body)
+        {
+            var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId));
+
+            if (!deviceTokenOfArtist.Any()) throw new Exception("Can't send notification to artist, because artist does not have device");
+
+            var notification = new Notification
+            {
+                CreatedAt = DateTime.Now,
+                Status = (int)NotificationStatus.Send,
+                NotificationType = (int)NotificationType.Notification,
+                UserId = artistId,
+            };
+
+            await _unitOfWork.NotificationRepository.InsertAsync(notification);
+
+            await _fcmService.SendToMultipleDevices(deviceTokenOfArtist.Select(c => c.Token).ToList(), title, body);
         }
 
         public async Task Update(Guid id, CustomerSelectedRequest request, IList<NailDesignServiceSelectedRequest> nailDesignServiceSelectedRequests)

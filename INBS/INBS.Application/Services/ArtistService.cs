@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace INBS.Application.Services
 {
-    public class ArtistService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper, IAuthentication _authentication) : IArtistService
+    public class ArtistService(IUnitOfWork _unitOfWork, IFirebaseStorageService _firebaseService, IMapper _mapper, IAuthentication _authentication, IEmailSender _emailSender) : IArtistService
     {
 
         private async Task IsUniquePhoneNumber(string phoneNumber, Guid? userId = null)
@@ -203,11 +203,12 @@ namespace INBS.Application.Services
                 if (artistServiceRequest.Count != 0)
                     await AssignService(artist.ID, artistServiceRequest);
 
-
                 await _unitOfWork.ArtistRepository.InsertAsync(artist);
 
                 if (await _unitOfWork.SaveAsync() <= 0)
                     throw new Exception("This action failed");
+
+                await _emailSender.Send(null, userRequest.Email, "ACCOUNT TO LOG IN TO ARTIST PORTAL", Utils.GetHTMLForNewArtistAccount(artist.Username, "password123!@#"));
                 
                 _unitOfWork.CommitTransaction();
 

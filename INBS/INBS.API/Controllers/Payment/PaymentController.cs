@@ -14,14 +14,14 @@ namespace INBS.API.Controllers.Payment
     public class PaymentController : ODataController
     {
         private readonly IPaymentService _service;
-        private readonly ILogger<PaymentCommandController> _logger;
+        private readonly ILogger<PaymentController> _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PaymentCommandController"/> class.
+        /// Initializes a new instance of the <see cref="PaymentController"/> class.
         /// </summary>
         /// <param name="logger">The logger instance.</param>
         /// <param name="service">The payment service.</param>
-        public PaymentController(ILogger<PaymentCommandController> logger, IPaymentService service)
+        public PaymentController(ILogger<PaymentController> logger, IPaymentService service)
         {
             _service = service;
             _logger = logger;

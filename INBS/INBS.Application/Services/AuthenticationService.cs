@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace INBS.Application.Services
 {
-    public class AuthenticationService(IUnitOfWork _unitOfWork, IFirebaseService _firebaseService, IMapper _mapper, IAuthentication _authentication, ISMSService _smsService, IHttpContextAccessor _contextAccesstor) : IAuthenticationService
+    public class AuthenticationService(IUnitOfWork _unitOfWork, IFirebaseStorageService _firebaseService, IMapper _mapper, IAuthentication _authentication, ISMSService _smsService, IHttpContextAccessor _contextAccesstor) : IAuthenticationService
     {
         public async Task<bool> CheckPhoneNumberVerified(string phoneNumber)
         {
