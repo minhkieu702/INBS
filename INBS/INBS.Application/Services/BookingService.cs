@@ -7,6 +7,10 @@ using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Text;
+using NetHttpClient = System.Net.Http.HttpClient;
+
 
 namespace INBS.Application.Services
 {
@@ -134,7 +138,6 @@ namespace INBS.Application.Services
         {
             try
             {
-                logger.LogInformation(" BookingRequest: {@BookingRequest}", bookingRequest);
 
                 var booking = _mapper.Map<Booking>(bookingRequest);
 
@@ -147,7 +150,6 @@ namespace INBS.Application.Services
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);
 
-                logger.LogInformation(" BookingRequest: {@BookingRequest}", bookingRequest);
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.InsertAsync(booking);
@@ -156,7 +158,6 @@ namespace INBS.Application.Services
                 {
                     throw new Exception("Your action failed");
                 }
-                logger.LogInformation("Booking created successfully: {@Booking}", booking);
 
             }
             catch (Exception)
@@ -178,7 +179,6 @@ namespace INBS.Application.Services
                 ArtistId = bookingRequest.ArtistId.ToString(),
                 StoreId = bookingRequest.StoreId.ToString()
             });
-            Console.WriteLine($"📤 JSON Sent to FastAPI: {jsonContent}");
 
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -187,7 +187,6 @@ namespace INBS.Application.Services
             if (!response.IsSuccessStatusCode)
             {
                 var errorResponse = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"❌ FastAPI Error: {response.StatusCode}, Response: {errorResponse}");
                 throw new Exception($"FastAPI Error: {response.StatusCode} - {errorResponse}");
             }
 
