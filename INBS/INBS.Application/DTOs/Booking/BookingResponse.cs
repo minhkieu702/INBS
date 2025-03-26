@@ -3,6 +3,7 @@ using INBS.Application.DTOs.Common;
 using INBS.Application.DTOs.CustomerSelected;
 using INBS.Application.DTOs.Feedback;
 using INBS.Domain.Entities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,6 +26,9 @@ namespace INBS.Application.DTOs.Booking
         public long TotalAmount { get; set; }
 
         public Guid CustomerSelectedId { get; set; }
+
+        [JsonProperty("estimated_completion_time")]
+        public int EstimatedCompletionMinutes { get; set; }
 
         public virtual CustomerSelectedResponse? CustomerSelected { get; set; }
 
