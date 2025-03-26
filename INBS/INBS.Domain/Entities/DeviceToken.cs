@@ -19,10 +19,6 @@ namespace INBS.Domain.Entities
 
         public string Platform { get; set; } = string.Empty ;
 
-        public bool IsActive { get; set; }
-
-        public DateTime LastActiveAt { get; set; }
-
         public DateTime CreatedAt { get; set; }
 
         public Guid UserId { get; set; }
