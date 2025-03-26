@@ -13,13 +13,15 @@ namespace INBS.Infrastructure.Email
         private readonly string _username = Environment.GetEnvironmentVariable("EMAIL") ?? throw new Exception("Email not found");
         private readonly string _password = Environment.GetEnvironmentVariable("EMAIL_PASSWORD") ?? throw new Exception("App password not found");
 
-        public async Task Send(string from, string to, string subject, string messageText)
+        public async Task Send(string? from, string to, string subject, string body)
         {
+            from ??= _username; // Nếu `from` bị null thì dùng `_username` làm giá trị mặc định
+
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("", from));
             message.To.Add(new MailboxAddress("", to));
             message.Subject = subject;
-            message.Body = new TextPart("plain") { Text = messageText };
+            message.Body = new TextPart("html") { Text = body };
 
             await SendAsync(message);
         }

@@ -14,6 +14,34 @@ namespace INBS.Application.Common
 {
     public static class Utils
     {
+        public static string GetHTMLForNewArtistAccount(string username, string password)
+        {
+            return $@"
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            table {{ border-collapse: collapse; width: 100%; }}
+            th, td {{ border: 1px solid black; padding: 8px; text-align: left; }}
+            th {{ background-color: #f2f2f2; }}
+        </style>
+    </head>
+    <body>
+        <p>Hello,</p>
+        <p>INBS sends you <b>account</b> to log in to artist portal as follows:</p>
+        <table>
+            <tr>
+                <th>Username</th>
+                <td>{username}</td>
+            </tr>
+            <tr>
+                <th>Password</th>
+                <td>{password}</td>
+            </tr>
+        </table>
+    </body>
+    </html>";
+        }
         public static long GetID()
         {
             return (DateTime.UtcNow.Ticks / 100000) % 1_000_000_000_000L; // Lấy 12 chữ số cuối

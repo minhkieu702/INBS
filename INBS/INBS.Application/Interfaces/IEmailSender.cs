@@ -2,6 +2,6 @@
 {
     public interface IEmailSender
     {
-        Task Send(string from, string to, string subject, string messageText);
+        Task Send(string? from, string to, string subject, string messageText);
     }
 }
