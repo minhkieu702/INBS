@@ -104,6 +104,13 @@ yJhE6Mz5f6UxBjZyGfbfvg==\n-----END PRIVATE KEY-----\n"", ""client_email"": ""fir
             services.AddMemoryCache();
             services.AddHttpClient();
 
+            // Đăng ký HttpClient cho TogetherAI với tên "TogetherAI"
+            services.AddHttpClient("TogetherAI", client =>
+            {
+                client.BaseAddress = new Uri("https://api.together.ai/");
+                client.Timeout = TimeSpan.FromSeconds(10); // Cấu hình timeout
+            });
+
             return services;
         }
 
