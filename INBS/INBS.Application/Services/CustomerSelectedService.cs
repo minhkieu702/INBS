@@ -98,8 +98,6 @@ namespace INBS.Application.Services
 
                 await HandleNailDesignServiceSelected(entity.ID, nailDesignServiceSelectedRequests);
 
-                await SendNotification(cusId, "ha", "ho");
-
                 if (await _unitOfWork.SaveAsync() == 0) throw new Exception("This action failed");
 
                 _unitOfWork.CommitTransaction();
@@ -147,25 +145,6 @@ namespace INBS.Application.Services
 
                 throw;
             }
-        }
-
-        private async Task SendNotification(Guid artistId, string title, string body)
-        {
-            var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId));
-
-            if (!deviceTokenOfArtist.Any()) throw new Exception("Can't send notification to artist, because artist does not have device");
-
-            var notification = new Notification
-            {
-                CreatedAt = DateTime.Now,
-                Status = (int)NotificationStatus.Send,
-                NotificationType = (int)NotificationType.Notification,
-                UserId = artistId,
-            };
-
-            await _unitOfWork.NotificationRepository.InsertAsync(notification);
-
-            await _fcmService.SendToMultipleDevices(deviceTokenOfArtist.Select(c => c.Token).ToList(), title, body);
         }
 
         public async Task Update(Guid id, CustomerSelectedRequest request, IList<NailDesignServiceSelectedRequest> nailDesignServiceSelectedRequests)
