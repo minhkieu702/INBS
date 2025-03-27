@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Google.Apis.Http;
+using INBS.Application.Common.MyJsonConverters;
 using INBS.Application.DTOs.Booking;
 using INBS.Application.Interfaces;
 using INBS.Application.IService;
@@ -14,17 +16,17 @@ using Quartz.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Twilio.Http;
-using NetHttpClient = System.Net.Http.HttpClient;
-using TwilioHttpClient = Twilio.Http.HttpClient;
 
 namespace INBS.Application.Services
 {
-    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, ILogger<BookingService> logger) : IBookingService
+    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, ILogger<BookingService> logger, HttpClient httpClient) : IBookingService
     {
-        private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly predictEndTime)
+        private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly? predictEndTime)
         {
             var artistStores = await _unitOfWork.ArtistStoreRepository.GetAsync(c => c.Where(c
                => c.StoreId == request.StoreId
@@ -147,13 +149,6 @@ namespace INBS.Application.Services
                 logger.LogInformation(" BookingRequest: {@BookingRequest}", bookingRequest);
 
                 var booking = _mapper.Map<Booking>(bookingRequest);
-
-                int estimatedMinutes = await PredictCompletionTime(bookingRequest);
-
-                // Tính toán `PredictEndTime`
-                TimeOnly endTime = bookingRequest.StartTime.Add(TimeSpan.FromMinutes(estimatedMinutes));
-                booking.PredictEndTime = endTime;
-
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);
 
@@ -172,40 +167,6 @@ namespace INBS.Application.Services
             {
                 throw;
             }
-        }
-        public async Task<int> PredictCompletionTime(BookingRequest bookingRequest)
-        {
-            using var httpClient = new NetHttpClient();
-
-            var fastApiUrl = "http://100.115.78.81:8001/api/booking"; // URL FastAPI
-
-            var jsonContent = JsonConvert.SerializeObject(new
-            {
-                ServiceDate = bookingRequest.ServiceDate.ToString("yyyy-MM-dd"),
-                StartTime = bookingRequest.StartTime.ToString(@"HH\:mm"),
-                CustomerSelectedId = bookingRequest.CustomerSelectedId.ToString(),
-                ArtistId = bookingRequest.ArtistId.ToString(),
-                StoreId = bookingRequest.StoreId.ToString()
-            });
-            Console.WriteLine($"📤 JSON Sent to FastAPI: {jsonContent}");
-
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await httpClient.PostAsync(fastApiUrl, content);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorResponse = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"❌ FastAPI Error: {response.StatusCode}, Response: {errorResponse}");
-                throw new Exception($"FastAPI Error: {response.StatusCode} - {errorResponse}");
-            }
-
-            var responseData = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"✅ FastAPI Response Data: {responseData}");
-
-            var result = JsonConvert.DeserializeObject<BookingResponse>(responseData);
-
-            return result.EstimatedCompletionMinutes;
         }
 
         public IQueryable<BookingResponse> Get()
@@ -366,5 +327,5 @@ namespace INBS.Application.Services
 
             return bookings.ToList();
         }
-    }
+    } 
 }
