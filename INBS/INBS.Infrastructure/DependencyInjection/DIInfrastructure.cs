@@ -74,7 +74,6 @@ namespace Infrastructure.DependencyInjection
             services.AddQuartz();
             services.AddMemoryCache();
             services.AddHttpClient();
-
             return services;
         }
 
