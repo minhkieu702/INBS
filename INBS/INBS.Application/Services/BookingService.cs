@@ -48,18 +48,18 @@ namespace INBS.Application.Services
         {
             var breaktime = artistStore.BreakTime;
 
-            var bookings = await _unitOfWork.BookingRepository.GetAsync(c => c.Where(oldBooking
-                => oldBooking.ArtistStoreId == booking.ArtistStoreId
+            var bookings = await _unitOfWork.BookingRepository.GetAsync(c => c.Where(otherBooking
+                => otherBooking.ArtistStoreId == booking.ArtistStoreId
 
-                && oldBooking.ServiceDate == booking.ServiceDate
+                && otherBooking.ServiceDate == booking.ServiceDate
 
 
-                && (booking.StartTime < oldBooking.PredictEndTime.AddMinutes(breaktime)
-                && oldBooking.StartTime < booking.PredictEndTime.AddMinutes(breaktime))
-                && !new[] { (int)BookingStatus.isCanceled, (int)BookingStatus.isCompleted }.Contains(oldBooking.Status)
+                && (booking.StartTime < otherBooking.PredictEndTime.AddMinutes(breaktime)
+                && otherBooking.StartTime < booking.PredictEndTime.AddMinutes(breaktime))
+                && !new[] { (int)BookingStatus.isCanceled, (int)BookingStatus.isCompleted }.Contains(otherBooking.Status)
 
-                && oldBooking.ID != booking.ID
-                && !oldBooking.IsDeleted
+                && otherBooking.ID != booking.ID
+                && !otherBooking.IsDeleted
                 ));
 
             if (bookings.Any()) return bookings;
@@ -113,11 +113,11 @@ namespace INBS.Application.Services
             foreach (var item in nailDesignServiceSelecteds)
             {
                 var servicePrice = item.NailDesignService!.Service!.ServicePriceHistories.FirstOrDefault(c => c.EffectiveTo == null) ?? throw new Exception("Some service do not have price");
-                totalDuration += item.NailDesignService!.Service!.AverageDuration;
+                //totalDuration += item.NailDesignService!.Service!.AverageDuration;
                 totalAmount += servicePrice.Price + item.NailDesignService!.ExtraPrice;
             }
             oldBooking.Status = (int)BookingStatus.isConfirmed;
-            oldBooking.PredictEndTime = oldBooking.StartTime.AddMinutes(totalDuration);
+            //oldBooking.PredictEndTime = oldBooking.StartTime.AddMinutes(totalDuration);
             oldBooking.TotalAmount = totalAmount;
 
             var artistStore = await ValidateArtistStore(bookingRequest, oldBooking.PredictEndTime);
@@ -133,6 +133,8 @@ namespace INBS.Application.Services
 
             return oldBooking;
         }
+
+        //
 
         public async Task Create(BookingRequest bookingRequest)
         {
@@ -219,7 +221,8 @@ namespace INBS.Application.Services
                 && new[] { (int)BookingStatus.isWaiting, (int)BookingStatus.isConfirmed }.Contains(c.Status)
                 && c.ID != bookingReq.ID
                 && !c.IsDeleted
-                ).Include(x => x.ArtistStore));
+                ).Include(x => x.ArtistStore)
+                .Include(x => x.CustomerSelected));
 
             if (!pendingBookings.Any()) return;
 
@@ -249,6 +252,26 @@ namespace INBS.Application.Services
             }
 
             _unitOfWork.BookingRepository.UpdateRange(updateList);
+        }
+
+        private async Task HandleNotification(Guid userId)
+        {
+            var deviceTokens = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.Platform == (int)DevicePlatformType.App && c.UserId == userId));
+            if (deviceTokens.Count() == 0)
+            {
+#warning Set Thrown
+                return;
+            }
+
+            var tasks = new List<Task>();
+            var content = "Your booking is approved";
+            
+            var notifications = new List<Notification>();
+
+            foreach (var deviceToken in deviceTokens)
+            {
+                
+            }
         }
 
         private async Task SendNotificationBookingToArtist(Guid artistId, string title, string body)

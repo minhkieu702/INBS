@@ -115,6 +115,8 @@ namespace Infrastructure.DependencyInjection
           
             services.AddScoped<IJob, AutoNotificationBooking>();
 
+            services.AddScoped<IJob, PushNotificationJob>();
+
             services.AddScoped<IEmailSender, EmailSender>();
 
             services.AddScoped<IPayOSHandler, PayOSHandler>();
