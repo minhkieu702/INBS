@@ -20,6 +20,7 @@ using Quartz;
 using INBS.Infrastructure.Quartz.Jobs;
 using INBS.Infrastructure.Payment.PayOSIntegration;
 using INBS.Infrastructure.Email;
+using INBS.Infrastructure.Expo;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -110,6 +111,8 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IFirebaseCloudMessageService, FirebaseCloudMessageService>();
 
             services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
+
+            services.AddScoped<IExpoNotification, ExpoNotification>();
 
             services.AddScoped<IAuthentication, Authentication>();
           
