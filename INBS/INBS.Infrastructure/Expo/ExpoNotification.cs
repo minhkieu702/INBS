@@ -15,7 +15,7 @@ namespace INBS.Infrastructure.Expo
         {
             var payload = new
             {
-                to,
+                to = $"ExponentPushToken[{to}]",
                 title,
                 body,
                 sound = "default",

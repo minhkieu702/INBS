@@ -14,7 +14,7 @@ using NetHttpClient = System.Net.Http.HttpClient;
 
 namespace INBS.Application.Services
 {
-    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService) : IBookingService
+    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification) : IBookingService
     {
         private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly predictEndTime)
         {
@@ -143,7 +143,7 @@ namespace INBS.Application.Services
 
                 var booking = _mapper.Map<Booking>(bookingRequest);
 
-                int estimatedMinutes = await PredictCompletionTime(bookingRequest);
+                int estimatedMinutes = /*await PredictCompletionTime(bookingRequest)*/ 30;
 
                 // Tính toán `PredictEndTime`
                 TimeOnly endTime = bookingRequest.StartTime.Add(TimeSpan.FromMinutes(estimatedMinutes));
@@ -278,7 +278,8 @@ namespace INBS.Application.Services
         {
             var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId));
 
-            if (!deviceTokenOfArtist.Any()) throw new Exception("Can't send notification to artist, because artist does not have device");
+#warning ADD THROWN EXCEPTION
+            if (!deviceTokenOfArtist.Any()) return /*throw new Exception("Can't send notification to artist, because artist does not have device")*/;
 
             var notification = new Notification
             {
@@ -359,15 +360,50 @@ namespace INBS.Application.Services
             }
         }
 
+        private async Task NotificationToCustomer(Guid userId, string content)
+        {
+            var devieTokens = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == userId));
+            
+            var notification = new Notification
+            {
+                UserId = userId,
+                Content = content,
+                CreatedAt = DateTime.UtcNow,
+                NotificationType = (int)NotificationType.Reminder,
+                Status = (int)NotificationStatus.Send,
+            };
+            var check = true;
+            foreach (var deviceToken in devieTokens)
+            {
+                if (!(await _expoNotification.SendPushNotificationAsync(deviceToken.Token,"YOUR BOOKING IS SERVING", content, "BookingDetail")))
+            {
+                    check = false; break;
+                }
+            }
+
+            if (check)
+            {
+                await _unitOfWork.NotificationRepository.InsertAsync(notification);
+            }
+        }
+
         public async Task SetBookingIsServicing(Guid id)
         {
             try
             {
                 _unitOfWork.BeginTransaction();
 
-                var booking = await _unitOfWork.BookingRepository.GetByIdAsync(id) ?? throw new Exception($"The entity with {id} is not existed.");
+                var booking = (await _unitOfWork.BookingRepository.GetAsync(
+                    query => query
+                    .Where(c => c.ID == id)
+                    .Include(c => c.CustomerSelected)
+                    )).FirstOrDefault() ?? throw new Exception($"The entity with {id} is not existed.");
 
                 booking.Status = (int)BookingStatus.isServing;
+
+                var customerSelected = booking.CustomerSelected;
+
+                if (customerSelected != null) await NotificationToCustomer(customerSelected.CustomerID, "Your booking is serving");
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);

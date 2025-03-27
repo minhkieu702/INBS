@@ -16,11 +16,12 @@ namespace INBS.Application.Services
         {
             try
             {
-                var isDeviceTokenExist = _unitOfWork.DeviceTokenRepository.Query().Where(c => c.Token.Equals(deviceTokenRequest.Token));
+                var isDeviceTokenExist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.Token.Equals(deviceTokenRequest.Token)));
 
                 if (isDeviceTokenExist.Any())
                 {
-                    throw new Exception("This device already have device token");
+                    //throw new Exception("This device already have device token");
+                    return;
                 }
                 var newToken = _mapper.Map<DeviceToken>(deviceTokenRequest);
 
