@@ -8,23 +8,15 @@ using INBS.Application.IService;
 using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Quartz.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using NetHttpClient = System.Net.Http.HttpClient;
+
 
 namespace INBS.Application.Services
 {
-    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, ILogger<BookingService> logger, HttpClient httpClient) : IBookingService
+    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification) : IBookingService
     {
         private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly? predictEndTime)
         {
@@ -58,18 +50,18 @@ namespace INBS.Application.Services
         {
             var breaktime = artistStore.BreakTime;
 
-            var bookings = await _unitOfWork.BookingRepository.GetAsync(c => c.Where(oldBooking
-                => oldBooking.ArtistStoreId == booking.ArtistStoreId
+            var bookings = await _unitOfWork.BookingRepository.GetAsync(c => c.Where(otherBooking
+                => otherBooking.ArtistStoreId == booking.ArtistStoreId
 
-                && oldBooking.ServiceDate == booking.ServiceDate
+                && otherBooking.ServiceDate == booking.ServiceDate
 
 
-                && (booking.StartTime < oldBooking.PredictEndTime.AddMinutes(breaktime)
-                && oldBooking.StartTime < booking.PredictEndTime.AddMinutes(breaktime))
-                && !new[] { (int)BookingStatus.isCanceled, (int)BookingStatus.isCompleted }.Contains(oldBooking.Status)
+                && (booking.StartTime < otherBooking.PredictEndTime.AddMinutes(breaktime)
+                && otherBooking.StartTime < booking.PredictEndTime.AddMinutes(breaktime))
+                && !new[] { (int)BookingStatus.isCanceled, (int)BookingStatus.isCompleted }.Contains(otherBooking.Status)
 
-                && oldBooking.ID != booking.ID
-                && !oldBooking.IsDeleted
+                && otherBooking.ID != booking.ID
+                && !otherBooking.IsDeleted
                 ));
 
             if (bookings.Any()) return bookings;
@@ -123,11 +115,11 @@ namespace INBS.Application.Services
             foreach (var item in nailDesignServiceSelecteds)
             {
                 var servicePrice = item.NailDesignService!.Service!.ServicePriceHistories.FirstOrDefault(c => c.EffectiveTo == null) ?? throw new Exception("Some service do not have price");
-                totalDuration += item.NailDesignService!.Service!.AverageDuration;
+                //totalDuration += item.NailDesignService!.Service!.AverageDuration;
                 totalAmount += servicePrice.Price + item.NailDesignService!.ExtraPrice;
             }
             oldBooking.Status = (int)BookingStatus.isConfirmed;
-            oldBooking.PredictEndTime = oldBooking.StartTime.AddMinutes(totalDuration);
+            //oldBooking.PredictEndTime = oldBooking.StartTime.AddMinutes(totalDuration);
             oldBooking.TotalAmount = totalAmount;
 
             var artistStore = await ValidateArtistStore(bookingRequest, oldBooking.PredictEndTime);
@@ -137,30 +129,32 @@ namespace INBS.Application.Services
                 oldBooking.Status = (int)BookingStatus.isWaiting;
             }
 
+            await SendNotificationBookingToArtist(bookingRequest.ArtistId, "YOU ARE CHOSEN ONE", oldBooking.Status == (int)BookingStatus.isWaiting ? $"You got a overlapping booking that start at {bookingRequest.StartTime} on {bookingRequest.ServiceDate}" : $"You have new booking that start at {bookingRequest.StartTime} on {bookingRequest.ServiceDate}");
+
             oldBooking.ArtistStoreId = artistStore.ID;
 
             return oldBooking;
         }
 
+        //
+
         public async Task Create(BookingRequest bookingRequest)
         {
             try
             {
-                logger.LogInformation(" BookingRequest: {@BookingRequest}", bookingRequest);
 
                 var booking = _mapper.Map<Booking>(bookingRequest);
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);
 
-                logger.LogInformation(" BookingRequest: {@BookingRequest}", bookingRequest);
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.InsertAsync(booking);
+
                 if (await _unitOfWork.SaveAsync() == 0)
                 {
                     throw new Exception("Your action failed");
                 }
-                logger.LogInformation("Booking created successfully: {@Booking}", booking);
 
             }
             catch (Exception)
@@ -190,7 +184,8 @@ namespace INBS.Application.Services
                 && new[] { (int)BookingStatus.isWaiting, (int)BookingStatus.isConfirmed }.Contains(c.Status)
                 && c.ID != bookingReq.ID
                 && !c.IsDeleted
-                ).Include(x => x.ArtistStore));
+                ).Include(x => x.ArtistStore)
+                .Include(x => x.CustomerSelected));
 
             if (!pendingBookings.Any()) return;
 
@@ -216,12 +211,50 @@ namespace INBS.Application.Services
                 // Change status of wait booking to isBooked
                 waitbooking.Status = (int)BookingStatus.isConfirmed;
 
-#warning do notification with fcm or signalr here
-
                 updateList.Add(waitbooking);
             }
 
             _unitOfWork.BookingRepository.UpdateRange(updateList);
+        }
+
+        private async Task HandleNotification(Guid userId)
+        {
+            var deviceTokens = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.Platform == (int)DevicePlatformType.App && c.UserId == userId));
+            if (deviceTokens.Count() == 0)
+            {
+#warning Set Thrown
+                return;
+            }
+
+            var tasks = new List<Task>();
+            var content = "Your booking is approved";
+            
+            var notifications = new List<Notification>();
+
+            foreach (var deviceToken in deviceTokens)
+            {
+                
+            }
+        }
+
+        private async Task SendNotificationBookingToArtist(Guid artistId, string title, string body)
+        {
+            var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId));
+
+#warning ADD THROWN EXCEPTION
+            if (!deviceTokenOfArtist.Any()) return /*throw new Exception("Can't send notification to artist, because artist does not have device")*/;
+
+            var notification = new Notification
+            {
+                CreatedAt = DateTime.Now,
+                Status = (int)NotificationStatus.Send,
+                NotificationType = (int)NotificationType.Notification,
+                UserId = artistId,
+            };
+
+            await _unitOfWork.NotificationRepository.InsertAsync(notification);
+
+            await _fcmService.SendToMultipleDevices(deviceTokenOfArtist.Select(c => c.Token).ToList(), title, body);
         }
 
         public async Task Update(Guid id, BookingRequest bookingRequest)
@@ -256,14 +289,16 @@ namespace INBS.Application.Services
             }
         }
 
-
         public async Task CancelBooking(Guid id)
         {
             try
             {
                 _unitOfWork.BeginTransaction();
 
-                var booking = await _unitOfWork.BookingRepository.GetByIdAsync(id) ?? throw new Exception($"The entity with {id} is not existed.");
+                var booking = (await _unitOfWork.BookingRepository.GetAsync(query 
+                    => query.Where(c => c.ID == id)
+                    .Include(c => c.ArtistStore))
+                    ).FirstOrDefault() ?? throw new Exception($"The entity with {id} is not existed.");
 
                 booking.Status = (int)BookingStatus.isCanceled;
 
@@ -271,6 +306,8 @@ namespace INBS.Application.Services
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
 
                 await RecheckStatusBooking(booking);
+
+                await SendNotificationBookingToArtist(booking.ArtistStore!.ArtistId, "YOUR APPOINTMENT IS CANCELED", $"A booking at {booking.StartTime} on {booking.ServiceDate} is canceled");
 
                 if (await _unitOfWork.SaveAsync() == 0)
                 {
@@ -286,15 +323,50 @@ namespace INBS.Application.Services
             }
         }
 
+        private async Task NotificationToCustomer(Guid userId, string content)
+        {
+            var devieTokens = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == userId));
+            
+            var notification = new Notification
+            {
+                UserId = userId,
+                Content = content,
+                CreatedAt = DateTime.UtcNow,
+                NotificationType = (int)NotificationType.Reminder,
+                Status = (int)NotificationStatus.Send,
+            };
+            var check = true;
+            foreach (var deviceToken in devieTokens)
+            {
+                if (!(await _expoNotification.SendPushNotificationAsync(deviceToken.Token,"YOUR BOOKING IS SERVING", content, "BookingDetail")))
+            {
+                    check = false; break;
+                }
+            }
+
+            if (check)
+            {
+                await _unitOfWork.NotificationRepository.InsertAsync(notification);
+            }
+        }
+
         public async Task SetBookingIsServicing(Guid id)
         {
             try
             {
                 _unitOfWork.BeginTransaction();
 
-                var booking = await _unitOfWork.BookingRepository.GetByIdAsync(id) ?? throw new Exception($"The entity with {id} is not existed.");
+                var booking = (await _unitOfWork.BookingRepository.GetAsync(
+                    query => query
+                    .Where(c => c.ID == id)
+                    .Include(c => c.CustomerSelected)
+                    )).FirstOrDefault() ?? throw new Exception($"The entity with {id} is not existed.");
 
                 booking.Status = (int)BookingStatus.isServing;
+
+                var customerSelected = booking.CustomerSelected;
+
+                if (customerSelected != null) await NotificationToCustomer(customerSelected.CustomerID, "Your booking is serving");
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);

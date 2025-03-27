@@ -4,10 +4,12 @@ using INBS.Application.DTOs.Artist;
 using INBS.Application.DTOs.ArtistService;
 using INBS.Application.DTOs.ArtistStore;
 using INBS.Application.DTOs.Booking;
+using INBS.Application.DTOs.Cart;
 using INBS.Application.DTOs.CategoryService;
 using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.CustomerSelected;
 using INBS.Application.DTOs.Design;
+using INBS.Application.DTOs.DeviceToken;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignService;
@@ -73,10 +75,12 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<BookingResponse>(nameof(Booking));
                     odataBuilder.EntitySet<Category>(nameof(Category));
                     odataBuilder.EntitySet<CategoryServiceResponse>(nameof(CategoryService));
+                    odataBuilder.EntitySet<CartResponse>(nameof(Cart));
                     odataBuilder.EntitySet<Color>(nameof(Color));
                     odataBuilder.EntitySet<CustomerResponse>(nameof(Customer));
                     odataBuilder.EntitySet<CustomerSelectedResponse>(nameof(CustomerSelected));
                     odataBuilder.EntitySet<DesignResponse>(nameof(Design));
+                    odataBuilder.EntitySet<DeviceTokenResponse>(nameof(DeviceToken));
 #warning feedback
                     odataBuilder.EntitySet<MediaResponse>(nameof(Media));
                     odataBuilder.EntitySet<NailDesignResponse>(nameof(NailDesign));

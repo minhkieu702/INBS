@@ -8,7 +8,7 @@ using FirebaseAdmin.Messaging;
 
 namespace INBS.Infrastructure.Integrations
 {
-    public class FirebaseService(FirebaseMessaging _firebaseMessaging) : IFirebaseService
+    public class FirebaseStorageService : IFirebaseStorageService
     {
         // Lấy các biến môi trường
         private readonly string _apiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey") ?? string.Empty;
@@ -16,34 +16,6 @@ namespace INBS.Infrastructure.Integrations
         private readonly string _email = Environment.GetEnvironmentVariable("FirebaseSettings:email") ?? string.Empty;
         private readonly string _password = Environment.GetEnvironmentVariable("FirebaseSettings:password") ?? string.Empty;
 
-        public async Task<string> SendNotificationToDevice(string deviceToken, string title, string body)
-        {
-            var message = new Message
-            {
-                Token = deviceToken,
-                Notification = new Notification
-                {
-                    Title = title,
-                    Body = body
-                }
-            };
-            return await _firebaseMessaging.SendAsync(message);
-        }
-
-        public async Task<BatchResponse> SendToMultipleDevices(List<string> deviceTokens, string title, string body)
-        {
-            var messages = new MulticastMessage
-            {
-                Tokens = deviceTokens,
-                Notification = new Notification
-                {
-                    Title = title,
-                    Body = body
-                }
-            };
-            return await _firebaseMessaging.SendEachForMulticastAsync(messages);
-        }
-        
         //private static string ExtractFileNameFromUrl(string imageUrl)
         //{
         //    try
@@ -59,7 +31,7 @@ namespace INBS.Infrastructure.Integrations
         //    }
         //}
 
-        async Task<string> IFirebaseService.UploadFileAsync(IFormFile file)
+        async Task<string> IFirebaseStorageService.UploadFileAsync(IFormFile file)
         {
             try
             {

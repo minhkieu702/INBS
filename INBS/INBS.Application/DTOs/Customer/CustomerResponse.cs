@@ -1,5 +1,6 @@
 ﻿using INBS.Application.DTOs.Cart;
 using INBS.Application.DTOs.CustomerSelected;
+using INBS.Application.DTOs.DeviceToken;
 using INBS.Application.DTOs.Feedback;
 using INBS.Application.DTOs.Preference;
 using INBS.Application.DTOs.User;

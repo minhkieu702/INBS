@@ -19,6 +19,8 @@ using INBS.Infrastructure.Authentication;
 using Quartz;
 using INBS.Infrastructure.Quartz.Jobs;
 using INBS.Infrastructure.Payment.PayOSIntegration;
+using INBS.Infrastructure.Email;
+using INBS.Infrastructure.Expo;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -26,12 +28,6 @@ namespace Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            //MediatR
-            //services.AddMediatR(NewMethod().Assembly);
-
-            // CORS
-            //services.AddCORS();
-
             // Repository
             services.AddRepositories();
 
@@ -50,54 +46,29 @@ namespace Infrastructure.DependencyInjection
             services.AddAutoMapper(typeof(MappingProfile));
 
             //Firebase
-            services.Configure<FirebaseConfig>(
-                options => options.ApiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey"));
+            //services.Configure<Firebase>(
+            //    options => options.ApiKey = Environment.GetEnvironmentVariable("FirebaseSettings:apiKey"));
+            //// Initialize Firebase if not initialized
+            //if (FirebaseApp.DefaultInstance == null)
+            //{
+            //    try
+            //    {
+            //        FirebaseApp.Create(new AppOptions()
+            //        {
+            //            Credential = GoogleCredential.FromJson(Environment.GetEnvironmentVariable("FirebaseSettings:config"))
+            //        });
 
-            // Initialize Firebase if not initialized
-            if (FirebaseApp.DefaultInstance == null)
-            {
-                try
-                {
-                    FirebaseApp.Create(new AppOptions()
-                    {
-                        Credential = GoogleCredential.FromJson(@"{ ""type"": ""service_account"", ""project_id"": ""fir-realtime-database-49344"", ""private_key_id"": ""68e5538a2f222569b9cf5ac62eeded8925e8588e"", ""private_key"": ""-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCUpk3Bw3/VUwPP
-2PjDnEQCoxusqCFQaVKsZa6dEYlW2ZLmXyTroC2t6sHWyl3ABm6rAMknlwjJaJ4O
-06rok5AYZ1/uG24fczrA6ov3aTqGfQwT5rUPREwlNEjXcbDO/NDZ1KXFM/M8NgXm
-PuUxfh1MXkKUgBBsvn2h+cD60Qrpq9xnnWG+wJc8xYnV8R62Ud92S4TxhDxSqzxU
-ERAIyTcxuusGqMvb+Zutg6xsmoOgbD0/xsAaVig6KIB3dSsWwR4ox68kWOHiGbsE
-2mkMUmzbD+8Sd4y0FkNJdzG1aFILLJHYP4AV5J+8aimJeDf1hCIQcn4qhmNxR6pB
-C6+OAqJNAgMBAAECgf8jGWSCakiJjGNV2ZEZMlhq8ah2kjQlEv+7NHK/biQxD+HP
-kQO1zIAtPDZsd/e2uUg810B14/ULNUHF+d+DdJxUjOOxSnbQJR/G8b+uJQ8TkPrH
-azxYwGDFTwrOUB1E5B6bShC6lKb3o+SzU3o10fNkXACVgAVifh4YA64AHoeIXQ5s
-YDBzVPFYCF01rmz5kPRpgMWFMfUr3O9jkzC6k0bkGkzOmTl0kAF+JubASKLppmWg
-zW3mj2GdGi63c39CrvJ2uv/EoEYYYY/n5B/gU6muqMhm5S22yFDClL86g0Qs6dal
-GLvS9qbQ8ABbTSgRgx/lVrN3XMb0qvymEyBs9T8CgYEAtdqhjJJ0cBjYRKq9bEwJ
-ag+G9F53dnJFfmCnSfYV3bJkJY9ElVps9azd9hrpz0Ejr4wINNAU94opjxGLeN8W
-RejVAg56GvMaddwrHoCXtXdz7rwmLOALDFfL8LysqEM8OVZ4MB45dGGwZuqbtHab
-5j8DmSFYAC4P+hdOhPIbrtMCgYEA0UHl9YUFIn5PTfDsMXS9Jt4cIMlHJZCbfSn0
-rtKFJ6LEZGoT7ofurRqCsDYATgmB+rSE2cZx9XosERkE0TVsC4NRFZIGg7dXMazD
-z+XB9Iml2eESZKcThLmVl4DfC9uFxgoWc7hYextcp9cAZo3N4Z/HPaLCQyKGR53U
-3uqK9l8CgYEAn7X8jW2OT2iyf1QIelUpK3mph3JzrpXbTItsQHucZpEmfQofLKA2
-82i3o02trDTEN4dfKarZzzELILhC6ovajtlWQbEfMg3xXjNXtzkug9P+AFxDlsPJ
-UDTHSo0ZgclS2fSEJ5ZT1U96UliXGN3WO1d6PIFZPQc3RugzMHVFNLsCgYAFr8nF
-C1FhZ5dWIeb5TRfa14xiI7YoQi7Hjv1URupRcm3t4KgcAlutHpxQl5cYh8+ddYxq
-sqbkKebKrChiWxZNlcr9UBOXPsNC2VQU8UR9FcSJEEHEtHmmULjM/jaRhuyyvhFw
-IaFd7xdshD5Bizb+G655cVPgKS8HATYIvMz79wKBgQCBySZ30RPLf1s2jL6AFnTL
-30YtuMHCZn6BFaLhdiMWRPog+IxvkpZSpZtyqFstdezMQpS8kEV6Oo1/P14e3waw
-Kxvd7oGrzXcouiFM5WpuIG0yfaVEt2xQ2ZIkMQ3Dd1WbchZ9YcF2mtjfsfXq09yI
-yJhE6Mz5f6UxBjZyGfbfvg==\n-----END PRIVATE KEY-----\n"", ""client_email"": ""firebase-adminsdk-rmr22@fir-realtime-database-49344.iam.gserviceaccount.com"", ""client_id"": ""101163161102248416750"", ""auth_uri"": ""https://accounts.google.com/o/oauth2/auth"", ""token_uri"": ""https://oauth2.googleapis.com/token"", ""auth_provider_x509_cert_url"": ""https://www.googleapis.com/oauth2/v1/certs"", ""client_x509_cert_url"": ""https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-rmr22%40fir-realtime-database-49344.iam.gserviceaccount.com"", ""universe_domain"": ""googleapis.com"" }")
-                    });
+            //        services.AddSingleton(FirebaseMessaging.DefaultInstance);
 
-                    services.AddSingleton(FirebaseMessaging.DefaultInstance);
-
-                    Console.WriteLine("Firebase initialized successfully!");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error initializing Firebase: {ex.Message}");
-                    throw;
-                }
-            }
+            //        Console.WriteLine("Firebase initialized successfully!");
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine($"Error initializing Firebase: {ex.Message}");
+            //        throw;
+            //    }
+            //}
+            services.AddFirebaseCloudMessage();
 
             //Quartz
             services.AddQuartz();
@@ -106,16 +77,49 @@ yJhE6Mz5f6UxBjZyGfbfvg==\n-----END PRIVATE KEY-----\n"", ""client_email"": ""fir
             return services;
         }
 
+        public static void AddFirebaseCloudMessage(this IServiceCollection services)
+        {
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                //var credentialFilePath = Environment.GetEnvironmentVariable("FirebaseSettings:credentialFile");
+
+                //if (string.IsNullOrEmpty(credentialFilePath))
+                //{
+                //    throw new Exception("FirebaseSettings:credentialFile environment variable is not set.");
+                //}
+
+                try
+                {
+                    FirebaseApp.Create(new AppOptions
+                    {
+                        Credential = GoogleCredential.FromJson(Environment.GetEnvironmentVariable("FirebaseSettings:config"))
+                    });
+
+                    services.AddSingleton(FirebaseMessaging.DefaultInstance);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Failed to initialize FirebaseApp: {ex.Message}");
+                }
+            }
+        }
 
 
         public static void AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IFirebaseService, FirebaseService>();
+            services.AddScoped<IFirebaseCloudMessageService, FirebaseCloudMessageService>();
+
+            services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
+
+            services.AddScoped<IExpoNotification, ExpoNotification>();
 
             services.AddScoped<IAuthentication, Authentication>();
           
             services.AddScoped<IJob, AutoNotificationBooking>();
 
+            services.AddScoped<IJob, PushNotificationJob>();
+
+            services.AddScoped<IEmailSender, EmailSender>();
 
             services.AddScoped<IPayOSHandler, PayOSHandler>();
 
