@@ -138,10 +138,11 @@ namespace INBS.Application.Services
 
         //
 
-        public async Task<BookingResponse> Create(BookingRequest bookingRequest)
+        public async Task<Guid> Create(BookingRequest bookingRequest)
         {
             try
-            {             
+            {
+                _unitOfWork.BeginTransaction();          
                 var booking = _mapper.Map<Booking>(bookingRequest);
 
                 booking.PredictEndTime.AddMinutes(bookingRequest.EstimateDuration);
@@ -155,10 +156,12 @@ namespace INBS.Application.Services
                 {
                     throw new Exception("Your action failed");
                 }
-                return _mapper.Map<BookingResponse>(booking);
+                booking.ArtistStore.Artist.User.Artist = null;
+                return booking.ID;
             }
             catch (Exception)
             {
+                _unitOfWork.RollBack();
                 throw;
             }
         }
