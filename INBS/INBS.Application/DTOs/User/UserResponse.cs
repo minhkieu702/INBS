@@ -16,6 +16,7 @@ namespace INBS.Application.DTOs.User
     public class UserResponse : BaseEntity
     {
         public string? FullName { get; set; }
+        public string? Email {  get; set; }
 
         public string PasswordHash { get; set; } = string.Empty;
 
