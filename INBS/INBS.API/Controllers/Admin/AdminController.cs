@@ -40,7 +40,7 @@ namespace INBS.API.Controllers.Admin
         /// <param name="password">The password.</param>
         /// <returns>An <see cref="IActionResult"/> representing the result of the action.</returns>
         [HttpPost("/Login")]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login([FromForm] string username, [FromForm] string password)
         {
             try
             {

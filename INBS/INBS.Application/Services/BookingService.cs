@@ -85,7 +85,7 @@ namespace INBS.Application.Services
 
         private async Task<Booking> AssignBooking(Booking oldBooking, BookingRequest bookingRequest)
         {
-            var totalDuration = 0L;
+            //var totalDuration = 0L;
             var totalAmount = 0L;
 
             var customerSelectedId = oldBooking.CustomerSelectedId;
@@ -143,7 +143,13 @@ namespace INBS.Application.Services
             try
             {
 
+                if (bookingRequest.PredictEndTime == null || bookingRequest.PredictEndTime == bookingRequest.StartTime)
+                {
+                    bookingRequest.PredictEndTime = bookingRequest.StartTime.AddMinutes(30);
+                }
+
                 var booking = _mapper.Map<Booking>(bookingRequest);
+
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);
 
@@ -182,38 +188,44 @@ namespace INBS.Application.Services
                 && c.ArtistStoreId == bookingReq.ArtistStoreId
                 && c.ID != bookingReq.ID
                 && new[] { (int)BookingStatus.isWaiting, (int)BookingStatus.isConfirmed }.Contains(c.Status)
-                && c.ID != bookingReq.ID
                 && !c.IsDeleted
                 ).Include(x => x.ArtistStore)
                 .Include(x => x.CustomerSelected));
 
             if (!pendingBookings.Any()) return;
 
-            var waitbookings = pendingBookings.OrderBy(c => c.LastModifiedAt).Where(c => c.Status == (int)BookingStatus.isWaiting);
-            var bookedlist = pendingBookings.OrderBy(c => c.LastModifiedAt).Where(c => c.Status == (int)BookingStatus.isConfirmed);
-            var artistStore = pendingBookings.First().ArtistStore ?? throw new Exception("Artist is not at this store");
+            // Sắp xếp lại các booking chờ và đã xác nhận theo thời gian bắt đầu
+            var waitbookings = pendingBookings.Where(c => c.Status == (int)BookingStatus.isWaiting)
+                                              .OrderBy(c => c.StartTime)
+                                              .ToList();
 
+            var confirmBookings = pendingBookings.Where(c => c.Status == (int)BookingStatus.isConfirmed)
+                                            .OrderBy(c => c.StartTime)
+                                            .ToList();
+
+            var artistStore = pendingBookings.First().ArtistStore ?? throw new Exception("Artist is not at this store");
             var updateList = new List<Booking>();
 
             foreach (var waitbooking in waitbookings)
             {
-                var changeBooking = bookedlist.FirstOrDefault(booking
-                    => (
-                    // "book with isBooked" start time is between wait booking start time and end time
-                    // "book with isBooked" end time is between wait booking start time and end time
-                    IsStuckTime(waitbooking.StartTime, waitbooking.PredictEndTime.AddMinutes(artistStore.BreakTime), booking.StartTime, booking.PredictEndTime.AddMinutes(artistStore.BreakTime))
-                    ||
-                    IsOverlapping(booking.StartTime, booking.PredictEndTime.AddMinutes(artistStore.BreakTime), waitbooking.StartTime, waitbooking.PredictEndTime.AddMinutes(artistStore.BreakTime))
-                    ));
-                // If there is a booking in wait booking time, next to wait booking
-                if (changeBooking == null) continue;
+                // Tìm các booking đã xác nhận có thời gian giao nhau
+                var conflictingBooking = confirmBookings.FirstOrDefault(
+                    confirmBooking => waitbooking.StartTime < confirmBooking.PredictEndTime.AddMinutes(artistStore.BreakTime)
+                                && confirmBooking.StartTime < waitbooking.PredictEndTime.AddMinutes(artistStore.BreakTime));
 
-                // Change status of wait booking to isBooked
-                waitbooking.Status = (int)BookingStatus.isConfirmed;
+                // Nếu không có booking nào bị xung đột, chuyển trạng thái booking chờ thành đã xác nhận
+                if (conflictingBooking == null)
+                {
+                    waitbooking.Status = (int)BookingStatus.isConfirmed;
+                    updateList.Add(waitbooking);
 
-                updateList.Add(waitbooking);
+                    // Thêm vào danh sách đã xác nhận để tránh xung đột với các booking chờ tiếp theo
+                    confirmBookings.Add(waitbooking);
+                    confirmBookings = confirmBookings.OrderBy(c => c.StartTime).ToList();
+                }
             }
 
+            // Cập nhật danh sách booking
             _unitOfWork.BookingRepository.UpdateRange(updateList);
         }
 

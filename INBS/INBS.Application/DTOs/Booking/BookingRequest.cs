@@ -19,6 +19,8 @@ namespace INBS.Application.DTOs.Booking
 
         public Guid CustomerSelectedId { get; set; }
 
+        public TimeOnly? PredictEndTime { get; set; }
+
         public Guid ArtistId { get; set; }
 
         public Guid StoreId { get; set; }

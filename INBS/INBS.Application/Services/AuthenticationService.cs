@@ -67,7 +67,8 @@ namespace INBS.Application.Services
             {
                 var user = await _unitOfWork.UserRepository.GetAsync(x => x
                     .Include(x => x.Artist)
-                    .Where(x => x.Artist!.Username == username));
+                    .Include(x => x.Admin)
+                    .Where(x => x.Artist!.Username == username || x.Admin!.Username == username));
 
                 if(user == null || !user.Any())
                     throw new Exception("Invalid username or password");
