@@ -138,21 +138,15 @@ namespace INBS.Application.Services
 
         //
 
-        public async Task Create(BookingRequest bookingRequest)
+        public async Task<BookingResponse> Create(BookingRequest bookingRequest)
         {
             try
-            {
-
-                if (bookingRequest.PredictEndTime == null || bookingRequest.PredictEndTime == bookingRequest.StartTime)
-                {
-                    bookingRequest.PredictEndTime = bookingRequest.StartTime.AddMinutes(30);
-                }
-
+            {             
                 var booking = _mapper.Map<Booking>(bookingRequest);
 
+                booking.PredictEndTime.AddMinutes(bookingRequest.EstimateDuration);
                 // Assign booking details
-                booking = await AssignBooking(booking, bookingRequest);
-
+                booking = await AssignBooking(booking, bookingRequest);             
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.InsertAsync(booking);
@@ -161,7 +155,7 @@ namespace INBS.Application.Services
                 {
                     throw new Exception("Your action failed");
                 }
-
+                return _mapper.Map<BookingResponse>(booking);
             }
             catch (Exception)
             {

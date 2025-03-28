@@ -27,9 +27,6 @@ namespace INBS.Application.DTOs.Booking
 
         public Guid CustomerSelectedId { get; set; }
 
-        [JsonProperty("estimated_completion_time")]
-        public int EstimatedCompletionMinutes { get; set; }
-
         public virtual CustomerSelectedResponse? CustomerSelected { get; set; }
 
         public Guid ArtistStoreId { get; set; }

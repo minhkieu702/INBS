@@ -10,7 +10,7 @@ namespace INBS.Application.IService
 {
     public interface IBookingService
     {
-        Task Create(BookingRequest request);
+        Task<BookingResponse> Create(BookingRequest request);
 
         Task CancelBooking(Guid id);
 
