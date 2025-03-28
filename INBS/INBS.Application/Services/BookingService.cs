@@ -145,7 +145,7 @@ namespace INBS.Application.Services
                 _unitOfWork.BeginTransaction();          
                 var booking = _mapper.Map<Booking>(bookingRequest);
 
-                booking.StartTime.AddMinutes(bookingRequest.EstimateDuration);
+                booking.PredictEndTime = booking.StartTime.AddMinutes(bookingRequest.EstimateDuration);
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);             
 
