@@ -20,6 +20,7 @@ namespace INBS.Application.DTOs.Artist
         public int Level { get; set; }
 
         public int AverageRating { get; set; }
+        
 
         public virtual ICollection<ArtistStoreResponse> ArtistStores { get; set; } = [];
 
