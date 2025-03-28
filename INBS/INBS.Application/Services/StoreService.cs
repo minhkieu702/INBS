@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class StoreService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService) : IStoreService
+    public class StoreService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseStorageService _firebaseService) : IStoreService
     {
         public async Task Create(StoreRequest modelRequest)
         {

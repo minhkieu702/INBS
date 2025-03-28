@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class PaymentService(IPayOSHandler _payOS, IUnitOfWork _unitOfWork, IMapper _mapper) : IPaymentService
+    public class PaymentService(IPayOSHandler _payOS, IUnitOfWork _unitOfWork, IMapper _mapper, IExpoNotification _expoNotification) : IPaymentService
     {
         private async Task<IEnumerable<Booking>> ValidatePaymentRequest(IEnumerable<Guid> bookingIds)
         {
@@ -82,11 +82,6 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.PaymentRepository.InsertAsync(payment);
 
-                //if (await _unitOfWork.SaveAsync() <= 0)
-                //{
-                //    throw new Exception("Something was wrong");
-                //}
-
                 await HandlePaymentDetail(payment.ID, paymentDetailRequests);
 
                 if (await _unitOfWork.SaveAsync() <= 0)
@@ -117,6 +112,25 @@ namespace INBS.Application.Services
             _unitOfWork.BookingRepository.UpdateRange(bookings);
         }
 
+        private async Task<List<Guid>> GetUserId(IEnumerable<Guid> bookingIds)
+        {
+            var bookings = await _unitOfWork.BookingRepository.GetAsync(query
+                => query.Where(c => bookingIds.Contains(c.ID))
+                .Include(c => c.CustomerSelected));
+
+            var userIds = new List<Guid>();
+
+            foreach (var booking in bookings)
+            {
+                if (booking.CustomerSelected != null && !booking.CustomerSelected.IsDeleted)
+                {
+                    userIds.Add(booking.CustomerSelected.CustomerID);
+                }
+            }
+
+            return userIds;
+        }
+
         public async Task CreatePaymentForCash(PaymentRequest paymentRequest, IList<PaymentDetailRequest> paymentDetailRequests)
         {
             try
@@ -135,11 +149,8 @@ namespace INBS.Application.Services
                 await UpdateBookingStatus(paymentDetailRequests.Select(c => c.BookingId), (int)BookingStatus.isCompleted);
 
                 await _unitOfWork.PaymentRepository.InsertAsync(payment);
-                                
-                if (await _unitOfWork.SaveAsync() <= 0)
-                {
-                    throw new Exception("Something was wrong");
-                }
+
+                await HandleNotification(paymentDetailRequests.Select(c => c.BookingId));
 
                 await HandlePaymentDetail(payment.ID, paymentDetailRequests);
 
@@ -155,6 +166,55 @@ namespace INBS.Application.Services
                 _unitOfWork.RollBack();
                 throw;
             }
+        }
+
+        private async Task HandleNotification(IEnumerable<Guid> bookingIds)
+        {
+            var userIds = await GetUserId(bookingIds);
+
+            var deviceTokens = await _unitOfWork.DeviceTokenRepository.GetAsync(query
+                => query.Where(c 
+                    => userIds.Contains(c.UserId)
+                    && c.Platform == (int)DevicePlatformType.App));
+
+            if (!deviceTokens.Any())
+            {
+                throw new Exception("Device token is not exist");
+            }
+
+            var notifications = new List<Notification>();
+
+            var content = "You are payment successfully";
+
+            foreach (var userid in userIds)
+            {
+                var notification = new Notification
+                {
+                    CreatedAt = DateTime.Now,
+                    NotificationType = (int)NotificationType.Notification,
+                    Status = (int)NotificationStatus.Send,
+                    UserId = userid,
+                    Content = content
+                };
+
+                notifications.Add(notification);
+            }
+
+            await _unitOfWork.NotificationRepository.InsertRangeAsync(notifications);
+
+            // Tạo danh sách các Task để chạy song song
+            var tasks = new List<Task>();
+
+            foreach (var token in deviceTokens)
+            {
+                tasks.Add(_expoNotification.SendPushNotificationAsync(token.Token,
+                    "PAYMENT SUCCESSFULLY",
+                    content,
+                    "BookingDetail"));
+            }
+
+            // Chờ tất cả các task hoàn thành
+            await Task.WhenAll(tasks);
         }
 
         private async Task RemovePayment(long id)
@@ -191,22 +251,24 @@ namespace INBS.Application.Services
                 .Include(c => c.PaymentDetails)
                     .ThenInclude(c => c.Booking)
                     )
-                ).FirstOrDefault();
-
-            if (payment == null)
-            {
-                return;
-            }
+                ).FirstOrDefault() ?? throw new Exception("Payment not found");
 
             payment.Status = (int)PaymentStatus.Success;
 
             var bookings = payment.PaymentDetails.Select(c => c.Booking).ToList();
-            
+
+            if (bookings.Count == 0)
+            {
+                throw new Exception("Bookings not found");
+            }
+
             bookings.ForEach(c => c!.Status = (int)BookingStatus.isCompleted);
 
             _unitOfWork.BookingRepository.UpdateRange(bookings!);
 
             await _unitOfWork.PaymentRepository.UpdateAsync(payment);
+
+            await HandleNotification(bookings.Select(c => c!.ID));
         }
 
         public async Task ConfirmWebHook(WebhookBody webhookBody)

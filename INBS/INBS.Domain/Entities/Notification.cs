@@ -13,11 +13,13 @@ namespace INBS.Domain.Entities
     {
         public Notification() : base()
         {
-            
+            Content = string.Empty;
         }
         public int Status { get; set; } //Sent, Read, Removed
 
         public int NotificationType { get; set; } //Reminder, Promotion, Alert
+
+        public string Content { get; set; }
 
         public Guid UserId { get; set; }
         [ForeignKey(nameof(UserId))]

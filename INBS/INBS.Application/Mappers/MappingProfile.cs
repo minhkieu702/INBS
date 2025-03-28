@@ -10,6 +10,7 @@ using INBS.Application.DTOs.CategoryService;
 using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.CustomerSelected;
 using INBS.Application.DTOs.Design;
+using INBS.Application.DTOs.DeviceToken;
 using INBS.Application.DTOs.Feedback;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
@@ -108,6 +109,7 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region DeviceToken
+            CreateMap<DeviceTokenRequest, DeviceToken>();
             CreateMap<DeviceToken, DeviceTokenResponse>();
             #endregion
 

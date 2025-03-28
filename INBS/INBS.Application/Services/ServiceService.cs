@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class ServiceService(IMapper _mapper, IUnitOfWork _unitOfWork, IFirebaseService _firebaseService) : IServiceService
+    public class ServiceService(IMapper _mapper, IUnitOfWork _unitOfWork, IFirebaseStorageService _firebaseService) : IServiceService
     {
         private async Task InsertCategoryService(
             Guid serviceId, 

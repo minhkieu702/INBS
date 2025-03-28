@@ -16,7 +16,7 @@ using AutoMapper.QueryableExtensions;
 
 namespace INBS.Application.Services
 {
-    public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseService _firebaseService) : IDesignService
+    public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseStorageService _firebaseService) : IDesignService
     {
         private async Task HandleNailDesign(Guid designId, IList<NailDesignRequest> newList)
         {

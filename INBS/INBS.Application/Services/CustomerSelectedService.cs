@@ -6,14 +6,21 @@ using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;
+using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace INBS.Application.Services
 {
-    public class CustomerSelectedService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor) : ICustomerSelectedService
+    public class CustomerSelectedService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor, IFirebaseCloudMessageService _fcmService) : ICustomerSelectedService
     {
+        private async Task HandleCart(IEnumerable<Guid> nailDesignServiceIds)
+        {
+            var cart = await _unitOfWork.CartRepository.GetAsync(c => c.Where(c => nailDesignServiceIds.Contains(c.NailDesignServiceId)));
+
+            _unitOfWork.CartRepository.DeleteRange(cart);
+        }
         private async Task HandleNailDesignServiceSelected(Guid customerSelectedId, IList<NailDesignServiceSelectedRequest> nailDesignServiceSelectedRequests)
         {
             if (!nailDesignServiceSelectedRequests.Any())
@@ -86,6 +93,8 @@ namespace INBS.Application.Services
                 entity.CustomerID = cusId;
 
                 await _unitOfWork.CustomerSelectedRepository.InsertAsync(entity);
+
+                await HandleCart(nailDesignServiceSelectedRequests.Select(c => c.NailDesignServiceId));
 
                 await HandleNailDesignServiceSelected(entity.ID, nailDesignServiceSelectedRequests);
 

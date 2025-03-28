@@ -33,17 +33,16 @@ namespace INBS.Application.DependencyInjection
             services.AddScoped<ICustomerSelectedService, CustomerSelectedService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IDesignService, DesignService>();
+            services.AddScoped<IDeviceTokenService, DeviceTokenService>();
             services.AddScoped<INailDesignServiceSelectedService, NailDesignServiceSelectedService>();
             services.AddScoped<INailDesignServiceService, NailDesignServiceService>();
+            services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IPaymentDetailService, PaymentDetailService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IStoreService, StoreService>();
 
             services.AddScoped<ISMSService, SMSService>();
-            services.AddScoped<INotificationService, NotificationService>();
-
-
         }
     }
 }

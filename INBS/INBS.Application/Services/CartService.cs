@@ -34,20 +34,24 @@ namespace INBS.Application.Services
         {
             try
             {
-                var isExist = await _unitOfWork.CartRepository.GetAsync(c => c.Where(c => c.NailDesignServiceId == cartRequest.NailDesignServiceId));
+                var customerId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+
+                var isExist = await _unitOfWork.CartRepository.GetAsync(c => c.Where(c => c.NailDesignServiceId == cartRequest.NailDesignServiceId && customerId == c.CustomerId));
 
                 if (isExist.Any())
                 {
                     throw new Exception("This nail design service already exist in cart");
                 }
 
+                var isValidate = await _unitOfWork.NailDesignServiceRepository.GetByIdAsync(cartRequest.NailDesignServiceId) ?? throw new Exception("This nail design service not found");
+
                 var cart = _mapper.Map<Cart>(cartRequest);
 
-                cart.NailDesignServiceId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                cart.CustomerId = customerId;
 
-                _unitOfWork.CartRepository.Insert(cart);
+                await _unitOfWork.CartRepository.InsertAsync(cart);
 
-                if (await _unitOfWork.SaveAsync() <= 0)
+                if (await _unitOfWork.SaveAsync() ==0)
                 {
                     throw new Exception("This action failed");
                 }
