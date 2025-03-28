@@ -46,8 +46,7 @@ namespace INBS.API.Controllers.Booking
         {
             try
             {
-                await service.Create(booking);
-                return Ok();
+                return Ok(await service.Create(booking));
             }
             catch (Exception ex)
             {
