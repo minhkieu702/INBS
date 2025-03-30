@@ -15,9 +15,9 @@ namespace INBS.Application.DTOs.Store
 
         public string? ImageUrl { get; set; }
 
-        public long Latitude { get; set; }
+        public float Latitude { get; set; }
 
-        public long Longitude { get; set; }
+        public float Longtitude { get; set; }
 
         public IFormFile? NewImage { get; set; }
 

@@ -26,9 +26,9 @@ namespace INBS.Domain.Entities
 
         public int AverageRating { get; set; }
 
-        public long Latitude { get; set; }
+        public float Latitude { get; set; }
 
-        public long Longitude { get; set; }
+        public float Longtitude { get; set; }
 
         public int Status { get; set; } // 0: inactive, 1: active
 
