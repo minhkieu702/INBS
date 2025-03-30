@@ -11,6 +11,7 @@ using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace INBS.Application.Services
 {
@@ -144,7 +145,7 @@ namespace INBS.Application.Services
         {
             var username = Utils.TransToUsername(fullname);
             
-            var users = await _unitOfWork.ArtistRepository.GetAsync(c => c.Where(c => c.Username.Equals(username)));
+            var users = await _unitOfWork.ArtistRepository.GetAsync(c => c.Where(c => c.Username.Contains(username)));
 
             return users.Any() ? username += users.Count() : username;
         }
