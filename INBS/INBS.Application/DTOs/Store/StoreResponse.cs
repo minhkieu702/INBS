@@ -18,6 +18,10 @@ namespace INBS.Application.DTOs.Store
 
         public string Status { get; set; } = "active";// 0: inactive, 1: active
 
+        public long Latitude { get; set; }
+
+        public long Longitude { get; set; }
+
         public int AverageRating { get; set; }
 
         public virtual ICollection<ArtistStoreResponse> ArtistStores { get; set; } = [];
