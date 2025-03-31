@@ -119,7 +119,7 @@ namespace INBS.Application.Services
 
                 _unitOfWork.BeginTransaction();
 
-                entity.IsDeleted = true;
+                entity.IsDeleted = !entity.IsDeleted;
 
                 await _unitOfWork.CustomerSelectedRepository.UpdateAsync(entity);
 

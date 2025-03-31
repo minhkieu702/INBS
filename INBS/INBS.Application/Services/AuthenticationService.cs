@@ -322,7 +322,9 @@ namespace INBS.Application.Services
 
                 var result = await _unitOfWork.UserRepository.GetByIdAsync(id) ?? throw new Exception("This user not found");
 
-                await _unitOfWork.UserRepository.DeleteAsync(id);
+                result.IsDeleted = !result.IsDeleted;
+
+                await _unitOfWork.UserRepository.UpdateAsync(result);
 
                 if (await _unitOfWork.SaveAsync() <= 0)
                     throw new Exception("Action failed");

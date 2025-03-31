@@ -228,9 +228,11 @@ namespace INBS.Application.Services
         {
             try
             {
-                var artist = await _unitOfWork.ArtistRepository.GetByIdAsync(id) ?? throw new Exception("This artist not found");
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(id) ?? throw new Exception("This artist not found");
 
-                await _unitOfWork.ArtistRepository.DeleteAsync(id);
+                user.IsDeleted = !user.IsDeleted;
+
+                await _unitOfWork.UserRepository.UpdateAsync(user);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                 {

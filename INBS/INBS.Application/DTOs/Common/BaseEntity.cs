@@ -21,6 +21,8 @@ namespace INBS.Application.DTOs.Common
 
         public DateTime CreatedAt { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public DateTime LastModifiedAt { get; set; }
     }
 }

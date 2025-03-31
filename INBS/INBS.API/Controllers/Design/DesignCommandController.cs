@@ -91,7 +91,7 @@ namespace INBS.API.Controllers.Design
         /// </summary>
         /// <param name="id">The design ID.</param>
         /// <returns>An action result.</returns>
-        [HttpDelete]
+        [HttpPatch]
         public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
             try

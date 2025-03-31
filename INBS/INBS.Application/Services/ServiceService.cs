@@ -174,7 +174,7 @@ namespace INBS.Application.Services
 
                 var isExist = await _unitOfWork.ServiceRepository.GetByIdAsync(id) ?? throw new Exception("Service not found");
 
-                isExist.IsDeleted = true;
+                isExist.IsDeleted = !isExist.IsDeleted;
 
                 await _unitOfWork.ServiceRepository.UpdateAsync(isExist);
 
