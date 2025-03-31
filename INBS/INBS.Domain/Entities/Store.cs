@@ -24,7 +24,7 @@ namespace INBS.Domain.Entities
         
         public string ImageUrl { get; set; }
 
-        public int AverageRating { get; set; }
+        public float AverageRating { get; set; }
 
         public float Latitude { get; set; }
 

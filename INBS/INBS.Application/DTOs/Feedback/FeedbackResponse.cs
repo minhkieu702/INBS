@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 namespace INBS.Application.DTOs.Feedback
 {
     public class FeedbackResponse : BaseEntity
-    {        public int FeedbackType { get; set; }
+    {        
+        public int FeedbackType { get; set; }
 
         public int Rating { get; set; }
 
@@ -18,7 +19,8 @@ namespace INBS.Application.DTOs.Feedback
 
         public Guid TypeId { get; set; }
 
-        public Guid BookingId { get; set; }
-        public virtual BookingResponse? Booking { get; set; }
+        public Guid CustomerId { get; set; }
+
+        public virtual CustomerResponse? Customer { get; set; }
     }
 }

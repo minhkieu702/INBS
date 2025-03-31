@@ -83,7 +83,6 @@ namespace INBS.Persistence.Data
             modelBuilder.ConfigureRestrictOneToOne<Customer, User>(a => a.User, u => u.Customer, a => a.ID);
             modelBuilder.ConfigureRestrictOneToOne<Artist, User>(a => a.User, u => u.Artist, a => a.ID);
             modelBuilder.ConfigureRestrictOneToOne<Admin, User>(a => a.User, u => u.Admin, a => a.ID);
-            modelBuilder.ConfigureRestrictOneToMany<Feedback, Booking>(s => s.Booking, a => a.Feedbacks, s => s.BookingId);
 
             //modelBuilder.Entity<ArtistStore>().HasQueryFilter(p => !p.IsDeleted);
             //modelBuilder.Entity<Booking>().HasQueryFilter(p => !p.IsDeleted);

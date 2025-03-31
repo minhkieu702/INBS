@@ -8,7 +8,6 @@ namespace INBS.Domain.Entities
         public Booking() : base()
         {
             Cancellations = [];
-            Feedbacks = [];
             PaymentDetails = [];
         }
         public DateOnly ServiceDate { get; set; }
@@ -33,9 +32,6 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(Cancellation.Booking))]
         public virtual ICollection<Cancellation> Cancellations { get; set; }
-
-        [InverseProperty(nameof(Feedback.Booking))]
-        public virtual ICollection<Feedback> Feedbacks { get; set; }
 
         [InverseProperty(nameof(PaymentDetail.Booking))]
         public virtual ICollection<PaymentDetail> PaymentDetails { get; set; }
