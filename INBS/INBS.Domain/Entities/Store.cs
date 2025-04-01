@@ -16,7 +16,9 @@ namespace INBS.Domain.Entities
             Address = string.Empty;
             ImageUrl = string.Empty;
             ArtistStores = [];
+            Province = string.Empty;
         }
+        public string Province { get; set; }
 
         public string Address { get; set; }
 
