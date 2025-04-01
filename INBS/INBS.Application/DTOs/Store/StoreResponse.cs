@@ -24,7 +24,7 @@ namespace INBS.Application.DTOs.Store
 
         public float Longtitude { get; set; }
 
-        public int AverageRating { get; set; }
+        public float AverageRating { get; set; }
 
         public virtual ICollection<ArtistStoreResponse> ArtistStores { get; set; } = [];
     }

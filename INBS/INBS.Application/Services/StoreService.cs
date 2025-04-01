@@ -81,9 +81,9 @@ namespace INBS.Application.Services
             {
                 return _unitOfWork.StoreRepository.Query().ProjectTo<StoreResponse>(_mapper.ConfigurationProvider);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Enumerable.Empty<StoreResponse>().AsQueryable();
+                throw new Exception(ex.Message);
             }
         }
 
