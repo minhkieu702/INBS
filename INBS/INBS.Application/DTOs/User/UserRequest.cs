@@ -20,7 +20,6 @@ namespace INBS.Application.DTOs.User
 
         public string Email { get; set; } = string.Empty;
 
-        [JsonConverter(typeof(DateOnlyJsonConverter))]
         public DateOnly DateOfBirth { get; set; }
     }
 }
