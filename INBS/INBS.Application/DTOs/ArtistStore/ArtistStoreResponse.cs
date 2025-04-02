@@ -23,6 +23,8 @@ namespace INBS.Application.DTOs.ArtistStore
 
         public DateOnly WorkingDate { get; set; }
 
+        public long BreakTime { get; set; }
+
         public TimeOnly StartTime { get; set; }
 
         public TimeOnly EndTime { get; set; }
