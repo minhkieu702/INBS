@@ -21,5 +21,7 @@ namespace INBS.Application.IService
         Task SetBookingIsServicing(Guid id);
 
         Task<List<Booking>> GetBookingsWithinNextMinutes(int minutes);
+
+        Task<int> PredictBookingCancel(Guid BookingId);
     }
 }

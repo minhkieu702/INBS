@@ -11,15 +11,13 @@ using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Text;
-using NetHttpClient = System.Net.Http.HttpClient;
 
 
 namespace INBS.Application.Services
 {
-    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification) : IBookingService
+    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification, HttpClient _httpClient) : IBookingService
     {
 
-        private readonly HttpClient _httpClient;
         private const string ApiKey = "469acea901a9fff8210792874151eaa2582149dbf8fa1a28db48ebb4c5901382";
         private const string TogetherAIUrl = "https://api.together.xyz/v1/chat/completions";
 
@@ -434,8 +432,7 @@ namespace INBS.Application.Services
                 return await PredictCancellationProbability(
                     daysBeforeService,
                     booking.Status,
-                    booking.TotalAmount,
-                    booking.CustomerSelectedId
+                    booking.TotalAmount
                 );
             }
             catch (Exception)
@@ -445,21 +442,28 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<int> PredictCancellationProbability(int daysBeforeService, int status, long totalAmount, Guid customerSelectedId)
+        public async Task<int> PredictCancellationProbability(int daysBeforeService, int status, long totalAmount)
         {
             var requestBody = new
             {
                 model = "meta-llama/Llama-Vision-Free",
                 messages = new[]
                 {
-                new { role = "Bạn là một hệ thống dự đoán khả năng hủy Booking dựa trên dữ liệu khách hàng.", 
-                    content = $"Dự đoán tỷ lệ hủy của Booking với các thông tin sau: " +
-                                           $"Số ngày trước khi sử dụng dịch vụ: {daysBeforeService}, " +
-                                           $"Trạng thái Booking: {status}, " +
-                                           $"Tổng tiền Booking: {totalAmount}, " +
-                                           $"Mẫu Nail khách chọn: {customerSelectedId}. " +
-                                           $"Trả về chỉ một số từ 0 đến 100, không giải thích." }
-            },
+                new
+                {
+                    role = "system",
+                    content = "Bạn là một hệ thống dự đoán khả năng hủy Booking dựa trên các thông tin khách hàng cung cấp."
+                },
+                new
+                {
+                    role = "user",
+                    content = $"Dự đoán phần trăm hủy của Booking với các thông tin sau: " +
+                      $"Số ngày trước khi sử dụng dịch vụ: {daysBeforeService}, " +
+                      $"Trạng thái Booking: {status}, " +
+                      $"Tổng tiền Booking: {totalAmount}, " +                    
+                      $"Trả về chỉ một số từ 0 đến 100, không giải thích."
+                }
+                },
                 temperature = 0.7
             };
 
@@ -475,6 +479,8 @@ namespace INBS.Application.Services
             {
                 var response = await _httpClient.PostAsync(TogetherAIUrl, content);
                 var responseBody = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine("Response Body: " + responseBody);
 
                 var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
                 if (responseData?.choices?.Count > 0)
