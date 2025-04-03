@@ -413,16 +413,14 @@ namespace INBS.Application.Services
             return bookings.ToList();
         }
 
-        public async Task<Booking> PredictBookingCancel(Guid BookingId)
+        public async Task<int> PredictBookingCancel(Guid BookingId)
         {
             _unitOfWork.BeginTransaction();
 
             try
             {
-                var booking = await _unitOfWork.BookingRepository.GetAsync(q => q
-                    .Where(b => b.ID == BookingId)
-                    .FirstOrDefaultAsync());
-            
+                var booking = _unitOfWork.BookingRepository.Query()
+                    .Where(b => b.ID == BookingId).FirstOrDefault();
                 if (booking == null)
                 {
                     throw new Exception("Booking not found");
@@ -434,7 +432,7 @@ namespace INBS.Application.Services
                 _unitOfWork.CommitTransaction();
 
                 return await PredictCancellationProbability(
-                    booking.DaysBeforeService,
+                    daysBeforeService,
                     booking.Status,
                     booking.TotalAmount,
                     booking.CustomerSelectedId
@@ -454,8 +452,8 @@ namespace INBS.Application.Services
                 model = "meta-llama/Llama-Vision-Free",
                 messages = new[]
                 {
-            new { role = "system", content = "Bạn là một hệ thống dự đoán khả năng hủy Booking dựa trên dữ liệu khách hàng." },
-            new { role = "user", content = $"Dự đoán tỷ lệ hủy của Booking với các thông tin sau: " +
+                new { role = "Bạn là một hệ thống dự đoán khả năng hủy Booking dựa trên dữ liệu khách hàng.", 
+                    content = $"Dự đoán tỷ lệ hủy của Booking với các thông tin sau: " +
                                            $"Số ngày trước khi sử dụng dịch vụ: {daysBeforeService}, " +
                                            $"Trạng thái Booking: {status}, " +
                                            $"Tổng tiền Booking: {totalAmount}, " +
