@@ -1,5 +1,6 @@
 ﻿using INBS.Application.DTOs.Booking;
 using INBS.Application.IService;
+using INBS.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
@@ -128,6 +129,20 @@ namespace INBS.API.Controllers.Booking
             catch (Exception ex)
             {
                 return new BadRequestObjectResult(ex.Message);
+            }
+        }
+
+        [HttpGet("PredictCancel")]
+        public async Task<IActionResult> PredictCancellation([FromQuery] Guid bookingId)
+        {
+            try
+            {
+                int probability = await service.PredictBookingCancel(bookingId);
+                return Ok(new { CancellationProbability = probability });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
             }
         }
     }

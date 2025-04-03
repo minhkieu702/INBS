@@ -11,13 +11,16 @@ using INBS.Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Text;
-using NetHttpClient = System.Net.Http.HttpClient;
 
 
 namespace INBS.Application.Services
 {
-    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification) : IBookingService
+    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification, HttpClient _httpClient) : IBookingService
     {
+
+        private const string ApiKey = "469acea901a9fff8210792874151eaa2582149dbf8fa1a28db48ebb4c5901382";
+        private const string TogetherAIUrl = "https://api.together.xyz/v1/chat/completions";
+
         private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly? predictEndTime)
         {
             var artistStores = await _unitOfWork.ArtistStoreRepository.GetAsync(c => c.Where(c
@@ -407,6 +410,92 @@ namespace INBS.Application.Services
                 .ThenInclude(b => b!.User));
 
             return bookings.ToList();
+        }
+
+        public async Task<int> PredictBookingCancel(Guid BookingId)
+        {
+            _unitOfWork.BeginTransaction();
+
+            try
+            {
+                var booking = _unitOfWork.BookingRepository.Query()
+                    .Where(b => b.ID == BookingId).FirstOrDefault();
+                if (booking == null)
+                {
+                    throw new Exception("Booking not found");
+                }
+
+                var today = DateOnly.FromDateTime(DateTime.Now);
+                int daysBeforeService = (booking.ServiceDate.DayNumber - today.DayNumber);
+
+                _unitOfWork.CommitTransaction();
+
+                return await PredictCancellationProbability(
+                    daysBeforeService,
+                    booking.Status,
+                    booking.TotalAmount
+                );
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
+        public async Task<int> PredictCancellationProbability(int daysBeforeService, int status, long totalAmount)
+        {
+            var requestBody = new
+            {
+                model = "meta-llama/Llama-Vision-Free",
+                messages = new[]
+                {
+                new
+                {
+                    role = "system",
+                    content = "Bạn là một hệ thống dự đoán khả năng hủy Booking dựa trên các thông tin khách hàng cung cấp."
+                },
+                new
+                {
+                    role = "user",
+                    content = $"Dự đoán phần trăm hủy của Booking với các thông tin sau: " +
+                      $"Số ngày trước khi sử dụng dịch vụ: {daysBeforeService}, " +
+                      $"Trạng thái Booking: {status}, " +
+                      $"Tổng tiền Booking: {totalAmount}, " +                    
+                      $"Trả về chỉ một số từ 0 đến 100, không giải thích."
+                }
+                },
+                temperature = 0.7
+            };
+
+            var jsonRequest = JsonConvert.SerializeObject(requestBody);
+            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+            if (!_httpClient.DefaultRequestHeaders.Contains("Authorization"))
+            {
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
+            }
+
+            try
+            {
+                var response = await _httpClient.PostAsync(TogetherAIUrl, content);
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine("Response Body: " + responseBody);
+
+                var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                if (responseData?.choices?.Count > 0)
+                {
+                    string aiResponse = responseData.choices[0].message.content;
+                    return int.TryParse(aiResponse, out int probability) ? probability : -1;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API error: {ex.Message}");
+            }
+
+            return -1;
         }
     } 
 }
