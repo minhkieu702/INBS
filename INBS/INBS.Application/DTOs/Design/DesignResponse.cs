@@ -14,7 +14,7 @@ namespace INBS.Application.DTOs.Design
 
         public string? Description { get; set; }
 
-        public int AverageRating { get; set; }
+        public float AverageRating { get; set; }
 
         public virtual ICollection<MediaResponse> Medias { get; set; } = [];
 

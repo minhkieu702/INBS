@@ -16,7 +16,9 @@ namespace INBS.Domain.Entities
             Address = string.Empty;
             ImageUrl = string.Empty;
             ArtistStores = [];
+            Province = string.Empty;
         }
+        public string Province { get; set; }
 
         public string Address { get; set; }
 
@@ -24,7 +26,11 @@ namespace INBS.Domain.Entities
         
         public string ImageUrl { get; set; }
 
-        public int AverageRating { get; set; }
+        public float AverageRating { get; set; }
+
+        public float Latitude { get; set; }
+
+        public float Longtitude { get; set; }
 
         public int Status { get; set; } // 0: inactive, 1: active
 

@@ -22,7 +22,8 @@ namespace INBS.API.Controllers.Store
         {
             try
             {
-                return service.Get();
+                var stores = service.Get();
+                return stores;
             }
             catch (Exception)
             {

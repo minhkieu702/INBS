@@ -1,11 +1,5 @@
 ﻿using INBS.Domain.Entities.Common;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INBS.Domain.Entities
 {
@@ -24,9 +18,9 @@ namespace INBS.Domain.Entities
 
         public Guid TypeId { get; set; }
 
-        public Guid BookingId { get; set; }
-        [ForeignKey(nameof(BookingId))]
-        [InverseProperty(nameof(Booking.Feedbacks))]
-        public virtual Booking? Booking { get; set; }
+        public Guid CustomerId { get; set; }
+        [ForeignKey(nameof(CustomerId))]
+        [InverseProperty(nameof(Customer.Feedbacks))]
+        public virtual Customer? Customer { get; set; }
     }
 }

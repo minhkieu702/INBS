@@ -19,6 +19,7 @@ namespace INBS.Domain.Entities
             Description = string.Empty;
             CustomerSelecteds = [];
             Carts = [];
+            Feedbacks = [];
         }
         [Key]
         public Guid ID { get; set; }
@@ -45,5 +46,8 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(Cart.Customer))]
         public virtual ICollection<Cart> Carts { get; set; }
+
+        [InverseProperty(nameof(Feedback.Customer))]
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }

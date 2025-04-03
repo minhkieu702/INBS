@@ -30,7 +30,7 @@ namespace INBS.API.Controllers.Cart
         /// </summary>
         /// <returns>An <see cref="IQueryable{CartResponse}"/> of cart responses.</returns>
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth =100)]
         public IQueryable<CartResponse> Get()
         {
             try

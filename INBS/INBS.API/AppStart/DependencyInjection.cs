@@ -10,6 +10,7 @@ using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.CustomerSelected;
 using INBS.Application.DTOs.Design;
 using INBS.Application.DTOs.DeviceToken;
+using INBS.Application.DTOs.Feedback;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignService;
@@ -81,7 +82,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<CustomerSelectedResponse>(nameof(CustomerSelected));
                     odataBuilder.EntitySet<DesignResponse>(nameof(Design));
                     odataBuilder.EntitySet<DeviceTokenResponse>(nameof(DeviceToken));
-#warning feedback
+                    odataBuilder.EntitySet<FeedbackResponse>(nameof(Feedback));
                     odataBuilder.EntitySet<MediaResponse>(nameof(Media));
                     odataBuilder.EntitySet<NailDesignResponse>(nameof(NailDesign));
                     odataBuilder.EntitySet<NailDesignServiceResponse>(nameof(NailDesignService));

@@ -47,9 +47,9 @@ namespace INBS.Application.Services
         {
             try
             {
-                var existedToken = await _unitOfWork.DeviceTokenRepository.GetAsync(c => c.Where(c => Equals(deviceToken, c.Token)));
+                var userId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
-                if (!existedToken.Any()) throw new Exception("Device token not found");
+                var existedToken = (await _unitOfWork.DeviceTokenRepository.GetAsync(c => c.Where(c => Equals(deviceToken, c.Token) && Equals(userId,c.UserId)))).FirstOrDefault() ??throw new Exception("Device token not found");
 
                 await _unitOfWork.DeviceTokenRepository.DeleteAsync(existedToken);
 

@@ -4,6 +4,7 @@ using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    partial class INBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250330063332_add_location_store")]
+    partial class add_location_store
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,8 +47,8 @@ namespace INBS.Persistence.Migrations
                     b.Property<Guid>("ID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<float>("AverageRating")
-                        .HasColumnType("real");
+                    b.Property<int>("AverageRating")
+                        .HasColumnType("int");
 
                     b.Property<int>("Level")
                         .HasColumnType("int");
@@ -268,8 +271,8 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<float>("AverageRating")
-                        .HasColumnType("real");
+                    b.Property<int>("AverageRating")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -329,15 +332,15 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("FeedbackType")
                         .HasColumnType("int");
@@ -356,7 +359,7 @@ namespace INBS.Persistence.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("BookingId");
 
                     b.ToTable("Feedbacks");
                 });
@@ -482,10 +485,6 @@ namespace INBS.Persistence.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -651,8 +650,8 @@ namespace INBS.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("AverageRating")
-                        .HasColumnType("real");
+                    b.Property<int>("AverageRating")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -670,15 +669,11 @@ namespace INBS.Persistence.Migrations
                     b.Property<DateTime>("LastModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<float>("Latitude")
-                        .HasColumnType("real");
+                    b.Property<long>("Latitude")
+                        .HasColumnType("bigint");
 
-                    b.Property<float>("Longtitude")
-                        .HasColumnType("real");
-
-                    b.Property<string>("Province")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long>("Longitude")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -887,13 +882,13 @@ namespace INBS.Persistence.Migrations
 
             modelBuilder.Entity("INBS.Domain.Entities.Feedback", b =>
                 {
-                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
+                    b.HasOne("INBS.Domain.Entities.Booking", "Booking")
                         .WithMany("Feedbacks")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Customer");
+                    b.Navigation("Booking");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Media", b =>
@@ -1047,6 +1042,8 @@ namespace INBS.Persistence.Migrations
                 {
                     b.Navigation("Cancellations");
 
+                    b.Navigation("Feedbacks");
+
                     b.Navigation("PaymentDetails");
                 });
 
@@ -1055,8 +1052,6 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Carts");
 
                     b.Navigation("CustomerSelecteds");
-
-                    b.Navigation("Feedbacks");
 
                     b.Navigation("Preferences");
 

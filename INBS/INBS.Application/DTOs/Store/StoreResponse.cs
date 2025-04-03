@@ -10,6 +10,8 @@ namespace INBS.Application.DTOs.Store
 {
     public class StoreResponse : BaseEntity
     {
+        public string Province { get; set; } = string.Empty;
+
         public string Address { get; set; } = string.Empty;
 
         public string? Description { get; set; }
@@ -18,7 +20,11 @@ namespace INBS.Application.DTOs.Store
 
         public string Status { get; set; } = "active";// 0: inactive, 1: active
 
-        public int AverageRating { get; set; }
+        public float Latitude { get; set; }
+
+        public float Longtitude { get; set; }
+
+        public float AverageRating { get; set; }
 
         public virtual ICollection<ArtistStoreResponse> ArtistStores { get; set; } = [];
     }

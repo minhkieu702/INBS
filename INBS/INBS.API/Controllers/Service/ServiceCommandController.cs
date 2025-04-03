@@ -67,7 +67,7 @@ namespace INBS.API.Controllers.Service
         /// </summary>
         /// <param name="id">The service ID.</param>
         /// <returns>An action result.</returns>
-        [HttpDelete]
+        [HttpPatch]
         public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
             try
