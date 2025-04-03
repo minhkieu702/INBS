@@ -198,7 +198,7 @@ namespace INBS.API.Controllers.Authentication
         /// </summary>
         /// <param name="id">để null khi người dùng tự xóa chính mình (đã đăng nhập)</param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpPatch]
         public async Task<IActionResult> Delete([FromQuery] Guid? id)
         {
             try

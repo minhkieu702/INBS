@@ -79,7 +79,7 @@ namespace INBS.API.Controllers.Artist
         /// </summary>
         /// <param name="id">The artist ID.</param>
         /// <returns>An action result.</returns>
-        [HttpDelete]
+        [HttpPatch]
         public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
             try

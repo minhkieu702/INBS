@@ -20,7 +20,7 @@ namespace INBS.Domain.Entities
 
         public string? Description { get; set; }
 
-        public int AverageRating { get; set; }
+        public float AverageRating { get; set; }
 
         [InverseProperty(nameof(Media.Design))]
         public virtual ICollection<Media> Medias { get; set; }

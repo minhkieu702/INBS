@@ -221,7 +221,7 @@ namespace INBS.Application.Services
             {
                 var existedEntity = await _unitOfWork.DesignRepository.GetByIdAsync(designId) ?? throw new Exception("Design " + designId + " is not found");
 
-                existedEntity.IsDeleted = true;
+                existedEntity.IsDeleted = !existedEntity.IsDeleted;
 
                 await _unitOfWork.DesignRepository.UpdateAsync(existedEntity);
 

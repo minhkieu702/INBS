@@ -179,7 +179,8 @@ namespace INBS.Application.Services
 
             if (!deviceTokens.Any())
             {
-                throw new Exception("Device token is not exist");
+                //throw new Exception("Device token is not exist");
+                return;
             }
 
             var notifications = new List<Notification>();

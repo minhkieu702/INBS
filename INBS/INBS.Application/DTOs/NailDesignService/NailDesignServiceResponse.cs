@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Cart;
+using INBS.Application.DTOs.Common;
 using INBS.Application.DTOs.Design;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignServiceSelected;
@@ -13,11 +14,8 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.NailDesignService
 {
-    public class NailDesignServiceResponse
+    public class NailDesignServiceResponse : BaseEntity
     {
-        [Key]
-        public Guid ID { get; set; }
-
         public Guid NailDesignId { get; set; }
         public virtual NailDesignResponse? NailDesign { get; set; }
 

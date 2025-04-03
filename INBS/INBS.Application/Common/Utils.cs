@@ -42,6 +42,40 @@ namespace INBS.Application.Common
     </body>
     </html>";
         }
+
+        //public static void AddRating(int newRating, ref int count, ref double averageRating)
+        //{
+        //    count++; // Tăng số lượng feedback
+        //    averageRating = (averageRating * (count - 1) + newRating) / count;
+        //}
+
+        public static void UpdateRating(int newRating, ref int count, ref float averageRating, int? oldRating = null)
+        {
+            if (int.TryParse(oldRating.ToString(), out int result))
+            {
+                averageRating = (averageRating * count - result + newRating) / count;
+                return;
+            }
+            count++; // Tăng số lượng feedback
+            averageRating = (averageRating * (count - 1) + newRating) / count;
+        }
+
+        public static void DeleteRating(int oldRating, ref int count, ref float averageRating)
+        {
+            if (count > 1)
+            {
+                count--;
+                averageRating = (averageRating * (count + 1) - oldRating) / count;
+            }
+            else
+            {
+                // Nếu đây là feedback cuối cùng, set averageRating về mặc định (0 hoặc null)
+                count = 0;
+                averageRating = 0;
+            }
+        }
+
+
         public static long GetID()
         {
             return (DateTime.UtcNow.Ticks / 100000) % 1_000_000_000_000L; // Lấy 12 chữ số cuối

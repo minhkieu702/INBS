@@ -18,7 +18,7 @@ namespace INBS.API.Controllers.Design
         /// </summary>
         /// <returns>A list of designs.</returns>
         [HttpGet]
-        [EnableQuery(MaxExpansionDepth = 100)]
+        [EnableQuery(MaxAnyAllExpressionDepth = 100, MaxExpansionDepth =100)]
         public IQueryable<DesignResponse> Get()
         {
             try

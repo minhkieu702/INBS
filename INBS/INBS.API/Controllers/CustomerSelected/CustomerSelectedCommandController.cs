@@ -71,7 +71,7 @@ namespace INBS.API.Controllers.CustomerSelected
         /// </summary>
         /// <param name="id">The ID of the customer selected to delete.</param>
         /// <returns>An IActionResult indicating the result of the operation.</returns>
-        [HttpDelete]
+        [HttpPatch]
         public async Task<IActionResult> Delete([FromQuery] Guid id)
         {
             try

@@ -8,7 +8,7 @@ namespace INBS.Domain.Enums
 {
     public enum FeedbackType
     {
-        Service = 1,
+        Artist = 1,
         Design = 2,
         Store = 3
     }

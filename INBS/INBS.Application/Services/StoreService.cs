@@ -59,7 +59,7 @@ namespace INBS.Application.Services
 
                 var existingEntity = await _unitOfWork.StoreRepository.GetByIdAsync(id) ?? throw new Exception("Store not found");
 
-                existingEntity.IsDeleted = true;
+                existingEntity.IsDeleted = !existingEntity.IsDeleted;
 
                 await _unitOfWork.StoreRepository.UpdateAsync(existingEntity);
 
@@ -81,9 +81,9 @@ namespace INBS.Application.Services
             {
                 return _unitOfWork.StoreRepository.Query().ProjectTo<StoreResponse>(_mapper.ConfigurationProvider);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return Enumerable.Empty<StoreResponse>().AsQueryable();
+                throw new Exception(ex.Message);
             }
         }
 

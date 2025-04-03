@@ -15,5 +15,7 @@ namespace INBS.Application.DTOs.ArtistStore
         public TimeOnly StartTime { get; set; }
 
         public TimeOnly EndTime { get; set; }
+
+        public long BreakTime { get; set; }
     }
 }

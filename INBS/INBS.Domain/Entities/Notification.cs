@@ -1,4 +1,5 @@
 ﻿using INBS.Domain.Entities.Common;
+using INBS.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,11 +14,16 @@ namespace INBS.Domain.Entities
     {
         public Notification() : base()
         {
+            Title = string.Empty;
+            Status = (int)NotificationStatus.Send;
             Content = string.Empty;
+            NotificationType = (int)Enums.NotificationType.Notification;
         }
-        public int Status { get; set; } //Sent, Read, Removed
+        public int Status { get; set; } 
 
-        public int NotificationType { get; set; } //Reminder, Promotion, Alert
+        public int NotificationType { get; set; } 
+
+        public string Title { get; set; }
 
         public string Content { get; set; }
 

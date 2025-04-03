@@ -48,63 +48,103 @@ namespace INBS.Application.Services
 
         private async Task AssignStore(Guid artistId, IList<ArtistStoreRequest> aSRs)
         {
-            await ValidateTime(artistId, aSRs);
+            var tomorrow = DateOnly.FromDateTime(DateTime.Now).AddDays(1);
 
-            var storeIds = aSRs.Select(c => c.StoreId).ToList();
-            var today = DateOnly.FromDateTime(DateTime.Now);
-            var minDateAllowed = today.AddDays(1); // Chỉ cho phép đổi lịch từ ngày mai trở đi
+            // Lấy danh sách lịch làm việc hiện tại từ DB
+            var currentASs = await _unitOfWork.ArtistStoreRepository.GetAsync(query =>
+                query.Where(c => c.ArtistId == artistId && c.WorkingDate >= tomorrow)
+                     .Include(c => c.Bookings)
+            );
 
-            // Lấy danh sách lịch làm cũ
-            var oldArtistStores = await _unitOfWork.ArtistStoreRepository.GetAsync(query =>
-                query.Where(c => c.ArtistId == artistId && storeIds.Contains(c.StoreId) && c.WorkingDate >= minDateAllowed));
+            var holdList = new List<ArtistStore>();
+            var deleteList = new List<ArtistStore>();
+            var updateList = new List<ArtistStore>();
+            var insertList = new List<ArtistStore>();
 
-            var newArtistStores = _mapper.Map<List<ArtistStore>>(aSRs);
-
-            foreach (var old in oldArtistStores.OrderBy(c => c.WorkingDate).ThenBy(c => c.StartTime))
+            foreach (var currAS in currentASs)
             {
-                var matchingNew = newArtistStores.FirstOrDefault(newAS =>
-                    newAS.StoreId == old.StoreId && newAS.WorkingDate == old.WorkingDate);
+                // Tìm ASR tương ứng trong danh sách mới
+                var matchingASR = aSRs.FirstOrDefault(asr =>
+                    asr.StoreId == currAS.StoreId &&
+                    asr.WorkingDate == currAS.WorkingDate &&
+                    asr.StartTime == currAS.StartTime &&
+                    asr.EndTime == currAS.EndTime);
 
-                if (matchingNew != null)
+                if (matchingASR != null)
                 {
-                    // Nếu lịch mới trùng ngày & Store → Cập nhật StartTime, EndTime và đánh dấu không bị xóa
-                    old.StartTime = matchingNew.StartTime;
-                    old.EndTime = matchingNew.EndTime;
-                    old.IsDeleted = false;
-
-                    // Xóa khỏi danh sách mới để tránh chèn trùng
-                    newArtistStores.Remove(matchingNew);
+                    // Trùng hoàn toàn => Giữ nguyên
+                    holdList.Add(currAS);
+                    continue;
                 }
-                else
+
+                // Nếu không có booking => Đưa vào danh sách xóa
+                if (!currAS.Bookings.Any())
                 {
-                    // Nếu lịch cũ không còn khớp với lịch mới nào → Đánh dấu xóa
-                    old.IsDeleted = true;
+                    deleteList.Add(currAS);
+                    continue;
+                }
+
+                // Nếu có booking => Kiểm tra trùng lặp thời gian
+                var conflictingASR = aSRs.FirstOrDefault(asr =>
+                    asr.StoreId == currAS.StoreId &&
+                    asr.WorkingDate == currAS.WorkingDate);
+
+                if (conflictingASR != null)
+                {
+                    var isBookingInsideNewTime = currAS.Bookings.All(booking =>
+                        booking.StartTime >= conflictingASR.StartTime &&
+                        booking.PredictEndTime <= conflictingASR.EndTime);
+
+                    if (isBookingInsideNewTime)
+                    {
+                        // Nếu booking nằm trong giờ mới => Đưa vào updateList
+                        updateList.Add(currAS);
+                    }
+                    else
+                    {
+                        throw new Exception($"Conflict booking at store {currAS.StoreId} on {currAS.WorkingDate}.");
+                    }
                 }
             }
 
-            // Cập nhật các lịch cũ bị thay đổi (nếu có)
-            if (oldArtistStores.Any())
+            // Các ASR không nằm trong holdList, updateList => Đưa vào insertList
+            foreach (var asr in aSRs)
             {
-                _unitOfWork.ArtistStoreRepository.UpdateRange(oldArtistStores.ToList());
+                var exists = holdList.Any(h => h.StoreId == asr.StoreId && h.WorkingDate == asr.WorkingDate) ||
+                             updateList.Any(u => u.StoreId == asr.StoreId && u.WorkingDate == asr.WorkingDate);
+
+                if (!exists)
+                {
+                    var newAS = _mapper.Map<ArtistStore>(asr);
+                    newAS.ArtistId = artistId;
+                    insertList.Add(newAS);
+                }
             }
 
-            // Thêm mới nếu có lịch mới chưa tồn tại trong DB
-            if (newArtistStores.Count != 0)
-            {
-                newArtistStores.ForEach(c => c.ArtistId = artistId);
-                await _unitOfWork.ArtistStoreRepository.InsertRangeAsync(newArtistStores);
-            }
+            // Thực hiện cập nhật trong DB
+            _unitOfWork.ArtistStoreRepository.UpdateRange(updateList);
+            _unitOfWork.ArtistStoreRepository.DeleteRange(deleteList);
+            _unitOfWork.ArtistStoreRepository.InsertRange(insertList);
         }
+
 
         private async Task ValidateStore(IEnumerable<Guid> ids)
         {
-            var stores = await _unitOfWork.StoreRepository.GetAsync( query => query.Where(c => !c.IsDeleted && ids.Contains(c.ID)));
-            if (stores.Count() != ids.Count())
+            // Lấy danh sách ID từ database
+            var existingIds = (await _unitOfWork.StoreRepository.GetAsync(
+                query => query
+                .Where(c => !c.IsDeleted && ids.Contains(c.ID)))).Select(c => c.ID);
+
+            // Tìm các ID không tồn tại
+            var missingIds = ids.Except(existingIds);
+
+            if (missingIds.Any())
             {
-                throw new Exception("Some store is not existed");
+                var missingIdsString = string.Join(", ", missingIds);
+                throw new Exception($"The following stores do not exist: {missingIdsString}");
             }
         }
-        
+
         private async Task ValidateTime(Guid artistId, IEnumerable<ArtistStoreRequest> aSR)
         {
             var changeDate = aSR.Select(c => c.WorkingDate).Distinct().Min();
@@ -144,7 +184,7 @@ namespace INBS.Application.Services
         {
             var username = Utils.TransToUsername(fullname);
             
-            var users = await _unitOfWork.ArtistRepository.GetAsync(c => c.Where(c => c.Username.Equals(username)));
+            var users = await _unitOfWork.ArtistRepository.GetAsync(c => c.Where(c => c.Username.Contains(username)));
 
             return users.Any() ? username += users.Count() : username;
         }
@@ -227,9 +267,11 @@ namespace INBS.Application.Services
         {
             try
             {
-                var artist = await _unitOfWork.ArtistRepository.GetByIdAsync(id) ?? throw new Exception("This artist not found");
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(id) ?? throw new Exception("This artist not found");
 
-                await _unitOfWork.ArtistRepository.DeleteAsync(id);
+                user.IsDeleted = !user.IsDeleted;
+
+                await _unitOfWork.UserRepository.UpdateAsync(user);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                 {
@@ -276,7 +318,7 @@ namespace INBS.Application.Services
                 if (artistServiceRequest.Count != 0) 
                     await AssignService(artist.ID, artistServiceRequest);
 
-                if (artistStoreRequest.Count != 0) 
+                //if (artistStoreRequest.Count != 0) 
                     await AssignStore(artist.ID, artistStoreRequest);
 
                 _mapper.Map(artistRequest, artist);

@@ -148,7 +148,7 @@ namespace INBS.Application.Services
                 _unitOfWork.BeginTransaction();          
                 var booking = _mapper.Map<Booking>(bookingRequest);
 
-                booking.PredictEndTime.AddMinutes(bookingRequest.EstimateDuration);
+                booking.PredictEndTime = booking.StartTime.AddMinutes(bookingRequest.EstimateDuration);
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);             
 
@@ -159,6 +159,7 @@ namespace INBS.Application.Services
                 {
                     throw new Exception("Your action failed");
                 }
+                _unitOfWork.CommitTransaction();
                 return booking.ID;
             }
             catch (Exception)
