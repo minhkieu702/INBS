@@ -114,6 +114,7 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region Feedback
+            CreateMap<FeedbackRequest, Feedback>();
             CreateMap<Feedback, FeedbackResponse>();
             #endregion
 
