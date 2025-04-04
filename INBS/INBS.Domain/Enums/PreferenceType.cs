@@ -8,9 +8,9 @@ namespace INBS.Domain.Enums
 {
     public enum PreferenceType
     {
-        Color,
-        Occasion,
-        PaintType,
-        SkinTone 
+        Color = 0,
+        Occasion = 1,
+        PaintType =2,
+        SkinTone =3
     }
 }
