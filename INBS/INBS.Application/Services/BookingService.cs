@@ -122,7 +122,6 @@ namespace INBS.Application.Services
                 totalAmount += servicePrice.Price + item.NailDesignService!.ExtraPrice;
             }
             oldBooking.Status = (int)BookingStatus.isConfirmed;
-            //oldBooking.PredictEndTime = oldBooking.StartTime.AddMinutes(totalDuration);
             oldBooking.TotalAmount = totalAmount;
 
             var artistStore = await ValidateArtistStore(bookingRequest, oldBooking.PredictEndTime);
@@ -279,6 +278,8 @@ namespace INBS.Application.Services
 
                 _mapper.Map(bookingRequest, booking);
 
+                booking.PredictEndTime = booking.StartTime.AddMinutes(bookingRequest.EstimateDuration);
+                
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);
 
