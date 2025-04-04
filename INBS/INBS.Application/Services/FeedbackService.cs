@@ -20,20 +20,27 @@ namespace INBS.Application.Services
     {
         private async Task NotifyArtist(Guid artistId)
         {
-            var deviceTokens = _unitOfWork.DeviceTokenRepository.Query().Where(c => c.UserId == artistId).Select(c => c.Token);
-
-            var notification = new Notification
+            try
             {
-                UserId = artistId,
-                Content = "You have a feedback",
-                Title = "YOU ARE RATED",
-                CreatedAt = DateTime.Now,
-                NotificationType = (int)NotificationType.Alert,
-            };
+                var deviceTokens = _unitOfWork.DeviceTokenRepository.Query().Where(c => c.UserId == artistId).Select(c => c.Token);
 
-            await _unitOfWork.NotificationRepository.InsertAsync(notification);
+                var notification = new Notification
+                {
+                    UserId = artistId,
+                    Content = "You have a feedback",
+                    Title = "YOU ARE RATED",
+                    CreatedAt = DateTime.Now,
+                    NotificationType = (int)NotificationType.Alert,
+                };
 
-            await _firebaseCloudMessageService.SendToMultipleDevices(deviceTokens.ToList(), notification.Title, notification.Content);
+                await _unitOfWork.NotificationRepository.InsertAsync(notification);
+
+                await _firebaseCloudMessageService.SendToMultipleDevices(deviceTokens.ToList(), notification.Title, notification.Content);
+            }
+            catch (Exception)
+            {
+                return;
+            }
         }
         private async Task HandleAritst(Guid artistId, int newRating, int count, int? oldRating = null, bool isDelete = false)
         {
