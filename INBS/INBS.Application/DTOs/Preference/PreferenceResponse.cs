@@ -14,7 +14,7 @@ namespace INBS.Application.DTOs.Preference
         public Guid CustomerId { get; set; }
         public Guid DesignId { get; set; }
         public int PreferenceId { get; set; }
-        public string PreferenceType { get; set; } = string.Empty;
+        public int PreferenceType { get; set; } 
 
         public virtual object? Data { get; set; }
     }

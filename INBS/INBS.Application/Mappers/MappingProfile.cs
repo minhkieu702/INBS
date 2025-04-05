@@ -114,6 +114,7 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region Feedback
+            CreateMap<FeedbackRequest, Feedback>();
             CreateMap<Feedback, FeedbackResponse>();
             #endregion
 
@@ -158,7 +159,7 @@ namespace INBS.Application.Mappers
             CreateMap<Preference, PreferenceResponse>()
                 .ForMember(dest => dest.Data, opt => opt.MapFrom(src =>
                 GetPreferenceData((PreferenceType)src.PreferenceType, src.PreferenceId)))
-                .ForMember(dest => dest.PreferenceType, opt => opt.MapFrom(src => GetPreferenceType(src.PreferenceType)))
+                //.ForMember(dest => dest.PreferenceType, opt => opt.MapFrom(src => GetPreferenceType(src.PreferenceType)))
                 ;
             #endregion
 

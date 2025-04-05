@@ -15,6 +15,10 @@ namespace INBS.Application.DTOs.Notification
 
         public int NotificationType { get; set; } //Reminder, Promotion, Alert
 
+        public string Title { get; set; } = string.Empty;
+
+        public string Content { get; set; } = string.Empty;
+
         public Guid UserId { get; set; }
         public virtual UserResponse? User { get; set; }
     }

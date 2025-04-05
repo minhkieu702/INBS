@@ -34,7 +34,7 @@ namespace INBS.API.Controllers.DeviceToken
             catch (Exception ex)
             {
                 _logger.LogError("An error occurred while adding device tokens: {Message}", ex.Message);
-                throw;
+                return new BadRequestObjectResult(ex.Message);
             }
         }
 
@@ -54,7 +54,7 @@ namespace INBS.API.Controllers.DeviceToken
             catch (Exception ex)
             {
                 _logger.LogError("An error occurred while deleting device tokens: {Message}", ex.Message);
-                throw;
+                return new BadRequestObjectResult(ex.Message);
             }
         }
     }

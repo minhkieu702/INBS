@@ -51,7 +51,7 @@ namespace INBS.Application.Services
 
                 var existedToken = (await _unitOfWork.DeviceTokenRepository.GetAsync(c => c.Where(c => Equals(deviceToken, c.Token) && Equals(userId,c.UserId)))).FirstOrDefault() ??throw new Exception("Device token not found");
 
-                await _unitOfWork.DeviceTokenRepository.DeleteAsync(existedToken);
+                await _unitOfWork.DeviceTokenRepository.DeleteAsync(existedToken.ID);
 
                 if (await _unitOfWork.SaveAsync() == 0)
                 {

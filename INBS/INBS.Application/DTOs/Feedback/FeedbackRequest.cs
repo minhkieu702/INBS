@@ -13,7 +13,7 @@ namespace INBS.Application.DTOs.Feedback
 
         public int Rating { get; set; }
 
-        public Guid Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         public Guid TypeId { get; set; }
     }
