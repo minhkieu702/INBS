@@ -23,5 +23,6 @@ namespace INBS.Application.IService
         Task<List<Booking>> GetBookingsWithinNextMinutes(int minutes);
 
         Task<int> PredictBookingCancel(Guid BookingId);
+        Task<string?> SuggestOffPeakTimeAsync(Guid bookingId);
     }
 }
