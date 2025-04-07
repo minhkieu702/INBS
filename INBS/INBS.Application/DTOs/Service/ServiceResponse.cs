@@ -29,8 +29,6 @@ namespace INBS.Application.DTOs.Service
 
         public long AverageDuration { get; set; }
 
-        public int AverateRating { get; set; }
-
         public virtual ICollection<CategoryServiceResponse> CategoryServices { get; set; } = [];
 
         public virtual ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];
