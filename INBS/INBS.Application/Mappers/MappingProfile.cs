@@ -165,8 +165,7 @@ namespace INBS.Application.Mappers
 
             #region Payment
             CreateMap<PaymentRequest, Payment>();
-            CreateMap<Payment, PaymentResponse>()
-                .ForMember(c => c.Status, c => c.MapFrom(src => GetPaymentStatus(src.Status)));
+            CreateMap<Payment, PaymentResponse>();
             #endregion
 
             #region PaymentDetail
@@ -201,9 +200,7 @@ namespace INBS.Application.Mappers
                     dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
                     dest.LastModifiedAt = DateTime.Now;
                 });
-            CreateMap<Store, StoreResponse>()
-                .ForMember(dst => dst.Status, opt => opt.MapFrom(c => GetStoreStatus(c.Status)))
-                ;
+            CreateMap<Store, StoreResponse>();
             #endregion
 
             #region User
