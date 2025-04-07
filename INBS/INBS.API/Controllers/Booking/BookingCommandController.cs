@@ -1,6 +1,7 @@
 ﻿using INBS.Application.DTOs.Booking;
 using INBS.Application.IService;
 using INBS.Application.Services;
+using INBS.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
@@ -139,6 +140,24 @@ namespace INBS.API.Controllers.Booking
             {
                 int probability = await service.PredictBookingCancel(bookingId);
                 return Ok(new { CancellationProbability = probability });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpGet("SuggestOffPeakTime")]
+        public async Task<IActionResult> SuggestOffPeakTime([FromQuery] Guid bookingId)
+        {
+            try
+            {
+                var offPeakTime = await service.SuggestOffPeakTimeAsync(bookingId);
+                if (string.IsNullOrEmpty(offPeakTime))
+                {
+                    return NotFound(new { Message = "Không tìm thấy khung giờ ít cao điểm." });
+                }
+                return Ok(new { SuggestedOffPeakTime = offPeakTime });
             }
             catch (Exception ex)
             {

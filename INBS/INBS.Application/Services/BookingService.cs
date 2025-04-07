@@ -498,5 +498,101 @@ namespace INBS.Application.Services
 
             return -1;
         }
-    } 
+
+        public async Task<string?> SuggestOffPeakTimeAsync(Guid bookingId)
+        {
+            _unitOfWork.BeginTransaction();
+
+            try
+            {
+                var booking = _unitOfWork.BookingRepository.Query()
+                    .Include(b => b.ArtistStore)
+                    .ThenInclude(a => a.Store)
+                    .FirstOrDefault(b => b.ID == bookingId);
+
+                if (booking == null || booking.ArtistStore == null || booking.ArtistStore.Store == null)
+                {
+                    throw new Exception("Thông tin booking không hợp lệ.");
+                }
+
+                var dto = new SuggestBooking
+                {
+                    StoreName = booking.ArtistStore.Store.Address,
+                    WorkingDate = booking.ArtistStore.WorkingDate,
+                    StartTime = booking.ArtistStore.StartTime,
+                    EndTime = booking.ArtistStore.EndTime,
+                    BreakTime = booking.ArtistStore.BreakTime,
+                    TotalAmount = booking.TotalAmount
+                };
+
+                _unitOfWork.CommitTransaction();
+
+                return await SuggestOffPeakTimeFromAI(dto);
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
+        public async Task<string?> SuggestOffPeakTimeFromAI(SuggestBooking dto)
+        {
+            var prompt = $"Tôi muốn đặt lịch vào ngày {dto.WorkingDate:dd/MM/yyyy} " +
+             $"tại chi nhánh {dto.StoreName}, với thời gian làm việc từ {dto.StartTime} đến {dto.EndTime}. " +
+             $"Thời gian nghỉ trưa là {dto.BreakTime} phút. " +
+             $"Tổng giá trị booking là {dto.TotalAmount} VND. " +
+             $"Xin hãy đề xuất một khung giờ ít cao điểm nhất trong khoảng thời gian làm việc, tránh giờ nghỉ trưa, " +
+             $"và không trùng với giờ cao điểm thông thường. " +
+             $"Vui lòng chỉ trả về một giờ duy nhất dạng HH:mm, không giải thích gì thêm.";
+
+            var requestBody = new
+            {
+                model = "meta-llama/Llama-Vision-Free",
+                messages = new[]
+                {
+            new
+            {
+                role = "system",
+                content = "Bạn là một hệ thống AI đề xuất giờ đặt lịch ít cao điểm trong ngày."
+            },
+            new
+            {
+                role = "user",
+                content = prompt
+            }
+                },
+                temperature = 0.7
+            };
+
+            var jsonRequest = JsonConvert.SerializeObject(requestBody);
+            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+            if (!_httpClient.DefaultRequestHeaders.Contains("Authorization"))
+            {
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
+            }
+
+            try
+            {
+                var response = await _httpClient.PostAsync(TogetherAIUrl, content);
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine("AI Suggest Response: " + responseBody);
+
+                var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                if (responseData?.choices?.Count > 0)
+                {
+                    string aiResponse = responseData.choices[0].message.content;
+                    return aiResponse.Trim();
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"AI error: {ex.Message}");
+            }
+
+            return "Không tìm thấy khung giờ";
+        }
+    }
 }
