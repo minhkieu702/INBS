@@ -19,5 +19,7 @@ namespace INBS.Application.DTOs.CategoryService
         [Key]
         public Guid ServiceId { get; set; } = Guid.Empty;
         public virtual ServiceResponse? Service { get; set; }
+
+        public virtual object? Data { get; set; }
     }
 }
