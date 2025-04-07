@@ -86,7 +86,9 @@ namespace INBS.Application.Mappers
                 .AfterMap((source, dest) =>
                 {
                     dest.Category = Utils.GetCategories().FirstOrDefault(c => c.ID == source.CategoryId);
-                });
+                })
+                .ForMember(dest => dest.Data, opt => opt.MapFrom(src =>
+                GetCategory(src.CategoryId)));
             #endregion
 
             #region Customer
@@ -257,6 +259,11 @@ namespace INBS.Application.Mappers
                 PreferenceType.SkinTone => Utils.GetSkinTones().FirstOrDefault(c => c.ID == preferenceId),
                 _ => null
             };
+        }
+
+        private static object? GetCategory(int preferenceId)
+        {
+            return Utils.GetCategories().FirstOrDefault(c => c.ID == preferenceId);
         }
 
         private static string GetBookingStatus(int bookingStatus)
