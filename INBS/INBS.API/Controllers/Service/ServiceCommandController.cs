@@ -42,6 +42,25 @@ namespace INBS.API.Controllers.Service
         }
 
         /// <summary>
+        /// Updates the duration of a service.
+        /// </summary>
+        /// <param name="serviceDuration">The service duration request.</param>
+        /// <returns>An action result.</returns>
+        [HttpPost("Time")]
+        public async Task<IActionResult> UpdateTime([FromForm] ServiceDurationRequest serviceDuration)
+        {
+            try
+            {
+                await _service.UpdateTime(serviceDuration);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Updates an existing service.
         /// </summary>
         /// <param name="id">The service ID.</param>
