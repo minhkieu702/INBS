@@ -8,14 +8,16 @@ using INBS.Application.IService;
 using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 
 
 namespace INBS.Application.Services
 {
-    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification, HttpClient _httpClient) : IBookingService
+    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification, HttpClient _httpClient, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : IBookingService
     {
 
         private const string ApiKey = "469acea901a9fff8210792874151eaa2582149dbf8fa1a28db48ebb4c5901382";
@@ -144,12 +146,12 @@ namespace INBS.Application.Services
         {
             try
             {
-                _unitOfWork.BeginTransaction();          
+                _unitOfWork.BeginTransaction();
                 var booking = _mapper.Map<Booking>(bookingRequest);
 
                 booking.PredictEndTime = booking.StartTime.AddMinutes(bookingRequest.EstimateDuration);
                 // Assign booking details
-                booking = await AssignBooking(booking, bookingRequest);             
+                booking = await AssignBooking(booking, bookingRequest);
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.InsertAsync(booking);
@@ -239,12 +241,12 @@ namespace INBS.Application.Services
 
             var tasks = new List<Task>();
             var content = "Your booking is approved";
-            
+
             var notifications = new List<Notification>();
 
             foreach (var deviceToken in deviceTokens)
             {
-                
+
             }
         }
 
@@ -281,7 +283,7 @@ namespace INBS.Application.Services
                 _mapper.Map(bookingRequest, booking);
 
                 booking.PredictEndTime = booking.StartTime.AddMinutes(bookingRequest.EstimateDuration);
-                
+
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);
 
@@ -310,7 +312,7 @@ namespace INBS.Application.Services
             {
                 _unitOfWork.BeginTransaction();
 
-                var booking = (await _unitOfWork.BookingRepository.GetAsync(query 
+                var booking = (await _unitOfWork.BookingRepository.GetAsync(query
                     => query.Where(c => c.ID == id)
                     .Include(c => c.ArtistStore))
                     ).FirstOrDefault() ?? throw new Exception($"The entity with {id} is not existed.");
@@ -341,7 +343,7 @@ namespace INBS.Application.Services
         private async Task NotificationToCustomer(Guid userId, string content)
         {
             var devieTokens = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == userId));
-            
+
             var notification = new Notification
             {
                 UserId = userId,
@@ -353,8 +355,8 @@ namespace INBS.Application.Services
             var check = true;
             foreach (var deviceToken in devieTokens)
             {
-                if (!(await _expoNotification.SendPushNotificationAsync(deviceToken.Token,"YOUR BOOKING IS SERVING", content, "BookingDetail")))
-            {
+                if (!(await _expoNotification.SendPushNotificationAsync(deviceToken.Token, "YOUR BOOKING IS SERVING", content, "BookingDetail")))
+                {
                     check = false; break;
                 }
             }
@@ -464,7 +466,7 @@ namespace INBS.Application.Services
                     content = $"Dự đoán phần trăm hủy của Booking với các thông tin sau: " +
                       $"Số ngày trước khi sử dụng dịch vụ: {daysBeforeService}, " +
                       $"Trạng thái Booking: {status}, " +
-                      $"Tổng tiền Booking: {totalAmount}, " +                    
+                      $"Tổng tiền Booking: {totalAmount}, " +
                       $"Trả về chỉ một số từ 0 đến 100, không giải thích."
                 }
                 },
@@ -538,6 +540,163 @@ namespace INBS.Application.Services
             }
         }
 
+        private async Task<float> PercentOfCanceled()
+        {
+            var customerId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+            var oldBooking = await _unitOfWork.BookingRepository.Query()
+                .Where(c => c.CustomerSelected!.CustomerID == customerId && (c.Status == (int)BookingStatus.isCanceled || c.Status == (int)BookingStatus.isCompleted))
+                .ToListAsync();
+            if (oldBooking.Count == 0)
+            {
+                return 0;
+            }
+            var percent = oldBooking.Count(c => c.Status == (int)BookingStatus.isCanceled) / (float)oldBooking.Count;
+            return percent;
+        }
+        private bool IsInPeakTimes((TimeOnly, TimeOnly) slot, List<(TimeOnly, TimeOnly)> peakTimes)
+        {
+            foreach (var peak in peakTimes)
+            {
+                if (slot.Item1 < peak.Item2 && slot.Item2 > peak.Item1)
+                    return true;
+            }
+            return false;
+        }
+
+        private bool IsOverlappingWithExistingBooking((TimeOnly, TimeOnly) slot, List<Booking> bookings)
+        {
+            foreach (var booking in bookings)
+            {
+                if (slot.Item1 < booking.PredictEndTime && slot.Item2 > booking.StartTime)
+                    return true;
+            }
+            return false;
+        }
+
+        private List<(TimeOnly, TimeOnly)> GenerateSlots(TimeOnly start, TimeOnly end, TimeSpan duration)
+        {
+            var result = new List<(TimeOnly, TimeOnly)>();
+            var current = start;
+
+            while (current.Add(duration) <= end)
+            {
+                result.Add((current, current.Add(duration)));
+                current = current.Add(duration);
+            }
+
+            return result;
+        }
+    
+        public async Task<List<SuggestSlot>> SuggestTimeSlots(DateOnly date, Guid storeId)
+        {
+            var peakTimeRanges = await ExtractPeakHours(await CallTogetherAIToGetPeakTime(date));
+
+            var artistStores = await _unitOfWork.ArtistStoreRepository.Query()
+                .Where(c => c.StoreId == storeId && c.WorkingDate == date)
+                .Include(c => c.Bookings.Where(b => !b.IsDeleted && (b.Status == (int)BookingStatus.isWaiting || b.Status == (int)BookingStatus.isConfirmed))) // Waiting or Confirmed
+                .ToListAsync();
+
+            var slotDuration = TimeSpan.FromMinutes(30); // hoặc dùng dynamic từ service duration
+            var allSlots = new List<(TimeOnly start, TimeOnly end)>();
+
+            // Tạo tất cả các slot có thể trong ngày dựa trên giờ làm của artist
+            foreach (var artistStore in artistStores)
+            {
+                var slots = GenerateSlots(artistStore.StartTime, artistStore.EndTime, slotDuration);
+
+                foreach (var slot in slots)
+                {
+                    if (IsInPeakTimes(slot, peakTimeRanges)) continue;
+                    if (IsOverlappingWithExistingBooking(slot, artistStore.Bookings.ToList())) continue;
+
+                    allSlots.Add(slot);
+                }
+            }
+
+            // Chỉ giữ lại những slot mà có ít nhất 1 artist rảnh
+            var groupedSlots = allSlots
+                .GroupBy(s => $"{s.start}-{s.end}")
+                .Where(g => g.Count() >= 1) // Có ít nhất 1 artist rảnh
+                .Select(g => new SuggestSlot
+                {
+                    Start = g.First().start,
+                    End = g.First().end
+                })
+                .Distinct()
+                .ToList();
+
+            return groupedSlots;
+        }
+
+
+        int CalculateSlotScore(bool isPeak, bool isArtistFree, int recentBookings, double cancelRate)
+        {
+            if (!isArtistFree) return int.MaxValue; // không thể chọn
+
+            int score = 0;
+            if (isPeak) score += 3;
+            if (recentBookings >= 5) score += 2;
+            if (cancelRate > 0.2) score += 4;
+
+            return score;
+        }
+
+        public async Task<string> CallTogetherAIToGetPeakTime(DateOnly date)
+        {
+            var prompt = $"Identify peak time on {date:dd/MM/yyyy}, based on booking history of nail salon store in Vietnam.\n " +
+             $"Peak hours are time ranges with high booking frequency, long waiting time, or high cancellation rate.\n " +
+             $"Your output must in this format:\n " +
+             $"[ \"\"hh:mm - hh:mm\"\", \"\"hh:mm - hh:mm\"\",... ]\n" + 
+             $"No explanation or code block, just the array.";
+            var requestBody = new
+            {
+                model = "meta-llama/Llama-Vision-Free",
+                messages = new[]
+                {
+            new
+            {
+                role = "data analyst",
+                content = "You are a data analyst about booking at nail salon"
+            },
+            new
+            {
+                role = "user",
+                content = prompt
+            }
+                },
+                temperature = 0.7
+            };
+
+            var jsonRequest = JsonConvert.SerializeObject(requestBody);
+            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+            if (!_httpClient.DefaultRequestHeaders.Contains("Authorization"))
+            {
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
+            }
+
+            try
+            {
+                var response = await _httpClient.PostAsync(TogetherAIUrl, content);
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine("AI Suggest Response: " + responseBody);
+
+                var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+
+                response.EnsureSuccessStatusCode();
+
+                Console.WriteLine("AI Peak Time Response: " + responseBody);
+                
+                return responseBody;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"AI error: {ex.Message}");
+            }
+            return "Không tìm thấy khung giờ";
+        }
+
         public async Task<string?> SuggestOffPeakTimeFromAI(SuggestBooking dto)
         {
             var prompt = $"Tôi muốn đặt lịch vào ngày {dto.WorkingDate:dd/MM/yyyy} " +
@@ -595,6 +754,25 @@ namespace INBS.Application.Services
             }
 
             return "Không tìm thấy khung giờ";
+        }
+
+
+        public async Task<List<(TimeOnly Start, TimeOnly End)>> ExtractPeakHours(string text)
+        {
+            var timeRanges = new List<(TimeOnly Start, TimeOnly End)>();
+            // Regex to match time ranges in the format "HH:mm - HH:mm"
+            var regex = new Regex(@"(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})");
+            var matches = regex.Matches(text);
+            foreach (Match match in matches)
+            {
+                if (match.Groups.Count == 3)
+                {
+                    var startTime = TimeOnly.Parse(match.Groups[1].Value);
+                    var endTime = TimeOnly.Parse(match.Groups[2].Value);
+                    timeRanges.Add((startTime, endTime));
+                }
+            }
+            return timeRanges;
         }
     }
 }
