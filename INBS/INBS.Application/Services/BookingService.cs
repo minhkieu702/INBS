@@ -260,6 +260,8 @@ namespace INBS.Application.Services
                 CreatedAt = DateTime.Now,
                 Status = (int)NotificationStatus.Send,
                 NotificationType = (int)NotificationType.Notification,
+                Content = body,
+                Title = title,
                 UserId = artistId,
             };
 
