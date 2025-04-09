@@ -165,7 +165,7 @@ namespace INBS.API.Controllers.Booking
             }
         }
 
-        [HttpGet("SuggestTimeSlots")]
+        [HttpPost("SuggestTimeSlots")]
         public async Task<IActionResult> SuggestTimeSlots([FromForm] DateOnly date, [FromForm] Guid storeId)
         {
             try
