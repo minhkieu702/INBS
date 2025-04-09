@@ -11,6 +11,7 @@ using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -589,14 +590,14 @@ namespace INBS.Application.Services
     
         public async Task<List<SuggestSlot>> SuggestTimeSlots(DateOnly date, Guid storeId)
         {
-            var peakTimeRanges = await ExtractPeakHours(await CallTogetherAIToGetPeakTime(date));
+            var peakTimeRanges = ExtractPeakHours(await CallTogetherAIToGetPeakTime(date));
 
             var artistStores = await _unitOfWork.ArtistStoreRepository.Query()
                 .Where(c => c.StoreId == storeId && c.WorkingDate == date)
                 .Include(c => c.Bookings.Where(b => !b.IsDeleted && (b.Status == (int)BookingStatus.isWaiting || b.Status == (int)BookingStatus.isConfirmed))) // Waiting or Confirmed
                 .ToListAsync();
 
-            var slotDuration = TimeSpan.FromMinutes(30); // hoặc dùng dynamic từ service duration
+            var slotDuration = TimeSpan.FromMinutes(60); // hoặc dùng dynamic từ service duration
             var allSlots = new List<(TimeOnly start, TimeOnly end)>();
 
             // Tạo tất cả các slot có thể trong ngày dựa trên giờ làm của artist
@@ -619,8 +620,8 @@ namespace INBS.Application.Services
                 .Where(g => g.Count() >= 1) // Có ít nhất 1 artist rảnh
                 .Select(g => new SuggestSlot
                 {
-                    Start = g.First().start,
-                    End = g.First().end
+                    Start = g.First().start.ToString("HH:mm"),
+                    End = g.First().end.ToString("HH:mm")
                 })
                 .Distinct()
                 .ToList();
@@ -757,12 +758,12 @@ namespace INBS.Application.Services
         }
 
 
-        public async Task<List<(TimeOnly Start, TimeOnly End)>> ExtractPeakHours(string text)
+        public List<(TimeOnly Start, TimeOnly End)> ExtractPeakHours(string text)
         {
             var timeRanges = new List<(TimeOnly Start, TimeOnly End)>();
-            // Regex to match time ranges in the format "HH:mm - HH:mm"
             var regex = new Regex(@"(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})");
             var matches = regex.Matches(text);
+
             foreach (Match match in matches)
             {
                 if (match.Groups.Count == 3)
@@ -772,6 +773,7 @@ namespace INBS.Application.Services
                     timeRanges.Add((startTime, endTime));
                 }
             }
+
             return timeRanges;
         }
     }
