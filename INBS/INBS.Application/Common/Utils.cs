@@ -53,11 +53,11 @@ namespace INBS.Application.Common
         {
             if (int.TryParse(oldRating.ToString(), out int result))
             {
-                averageRating = (averageRating * count - result + newRating) / count;
+                averageRating = (float)Math.Round(((averageRating * count - result + newRating) / count), 2);
                 return;
             }
             count++; // Tăng số lượng feedback
-            averageRating = (averageRating * (count - 1) + newRating) / count;
+            averageRating = (float)Math.Round(((averageRating * (count - 1) + newRating) / count), 2);
         }
 
         public static void DeleteRating(int oldRating, ref int count, ref float averageRating)
@@ -65,7 +65,7 @@ namespace INBS.Application.Common
             if (count > 1)
             {
                 count--;
-                averageRating = (averageRating * (count + 1) - oldRating) / count;
+                averageRating = (float)Math.Round(((averageRating * (count + 1) - oldRating) / count), 2);
             }
             else
             {
