@@ -86,7 +86,9 @@ namespace INBS.Application.Mappers
                 .AfterMap((source, dest) =>
                 {
                     dest.Category = Utils.GetCategories().FirstOrDefault(c => c.ID == source.CategoryId);
-                });
+                })
+                .ForMember(dest => dest.Data, opt => opt.MapFrom(src =>
+                GetCategory(src.CategoryId)));
             #endregion
 
             #region Customer
@@ -165,8 +167,7 @@ namespace INBS.Application.Mappers
 
             #region Payment
             CreateMap<PaymentRequest, Payment>();
-            CreateMap<Payment, PaymentResponse>()
-                .ForMember(c => c.Status, c => c.MapFrom(src => GetPaymentStatus(src.Status)));
+            CreateMap<Payment, PaymentResponse>();
             #endregion
 
             #region PaymentDetail
@@ -201,9 +202,7 @@ namespace INBS.Application.Mappers
                     dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
                     dest.LastModifiedAt = DateTime.Now;
                 });
-            CreateMap<Store, StoreResponse>()
-                .ForMember(dst => dst.Status, opt => opt.MapFrom(c => GetStoreStatus(c.Status)))
-                ;
+            CreateMap<Store, StoreResponse>();
             #endregion
 
             #region User
@@ -260,6 +259,11 @@ namespace INBS.Application.Mappers
                 PreferenceType.SkinTone => Utils.GetSkinTones().FirstOrDefault(c => c.ID == preferenceId),
                 _ => null
             };
+        }
+
+        private static object? GetCategory(int preferenceId)
+        {
+            return Utils.GetCategories().FirstOrDefault(c => c.ID == preferenceId);
         }
 
         private static string GetBookingStatus(int bookingStatus)

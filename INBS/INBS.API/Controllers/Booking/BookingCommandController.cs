@@ -164,5 +164,19 @@ namespace INBS.API.Controllers.Booking
                 return BadRequest(new { Message = ex.Message });
             }
         }
+
+        [HttpGet("SuggestTimeSlots")]
+        public async Task<IActionResult> SuggestTimeSlots([FromForm] DateOnly date, [FromForm] Guid storeId)
+        {
+            try
+            {
+                var suggestedSlots = await service.SuggestTimeSlots(date, storeId);
+                return Ok(suggestedSlots);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 }
