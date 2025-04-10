@@ -9,7 +9,7 @@ namespace INBS.Application.DTOs.Booking
 {
     public class SuggestSlot
     {
-        public TimeOnly Start { get; set; }
-        public TimeOnly End { get; set; }
+        public string Start { get; set; } = string.Empty;
+        public string End { get; set; } = string.Empty;
     }
 }

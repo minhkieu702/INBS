@@ -16,7 +16,8 @@ namespace INBS.Application.Services
         {
             try
             {
-                var isDeviceTokenExist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.Token.Equals(deviceTokenRequest.Token)));
+                var userId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var isDeviceTokenExist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.Token.Equals(deviceTokenRequest.Token) && c.UserId==userId));
 
                 if (isDeviceTokenExist.Any())
                 {
@@ -25,7 +26,7 @@ namespace INBS.Application.Services
                 }
                 var newToken = _mapper.Map<DeviceToken>(deviceTokenRequest);
 
-                newToken.UserId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                newToken.UserId = userId;
 
                 newToken.CreatedAt = DateTime.UtcNow;
 
