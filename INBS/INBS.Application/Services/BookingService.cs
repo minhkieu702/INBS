@@ -291,15 +291,11 @@ namespace INBS.Application.Services
 
         private async Task SendNotificationBookingToArtist(Guid artistId, string title, string body)
         {
-            var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId));
-
-#warning ADD THROWN EXCEPTION
-            if (!deviceTokenOfArtist.Any()) return /*throw new Exception("Can't send notification to artist, because artist does not have device")*/;
+            var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId && c.Platform == (int)DevicePlatformType.Web));
 
             var notification = new Notification
             {
                 CreatedAt = DateTime.Now,
-                Status = (int)NotificationStatus.Send,
                 NotificationType = (int)NotificationType.Notification,
                 Content = body,
                 Title = title,
@@ -307,6 +303,8 @@ namespace INBS.Application.Services
             };
 
             await _unitOfWork.NotificationRepository.InsertAsync(notification);
+
+            if (!deviceTokenOfArtist.Any()) return /*throw new Exception("Can't send notification to artist, because artist does not have device")*/;
 
             await _fcmService.SendToMultipleDevices(deviceTokenOfArtist.Select(c => c.Token).ToList(), title, body);
         }
@@ -490,7 +488,7 @@ namespace INBS.Application.Services
 
         private async Task NotificationToCustomer(Guid userId, string title, string content)
         {
-            var devieTokens = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == userId));
+            var devieTokens = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == userId && c.Platform == (int)DevicePlatformType.App));
 
             var notification = new Notification
             {
