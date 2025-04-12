@@ -42,6 +42,7 @@ namespace Infrastructure.DependencyInjection
             services.AddSignalR();
 
             services.AddSingleton<IConnectionMapping, ConnectionMapping>();
+            services.AddSingleton<INotificationHubService, NotificationHubService>();
 
             services.AddAutoMapper(typeof(MappingProfile));
 

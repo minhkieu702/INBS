@@ -9,42 +9,36 @@ namespace INBS.Infrastructure.SignalR
 {
     public class NotificationHub : Hub
     {
-        private readonly IConnectionMapping _connectionMapping;
-
-        public NotificationHub(IConnectionMapping connectionMapping)
-        {
-            _connectionMapping = connectionMapping;
-        }
+        private readonly static ConnectionMapping _connections = new();
 
         public override async Task OnConnectedAsync()
         {
-            var httpContext = Context.Features.Get<IHttpContextFeature>()?.HttpContext; // Update this line
-            if (httpContext != null)
+            var userId = Context.GetHttpContext()?.Request.Query["userId"].ToString();
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
             {
-                var accountIdStr = httpContext.Request.Query["userId"].ToString();
-
-                if (string.IsNullOrEmpty(accountIdStr))
-                {
-                    throw new HubException("UserId is required");
-                }
-
-                var userId = Guid.Parse(accountIdStr);
-                _connectionMapping.Add(Context.ConnectionId, userId);
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
-                Console.WriteLine($"User {userId} connected");
+                throw new HubException("UserId is required");
             }
+
+            _connections.Add(Context.ConnectionId, userGuid);
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userGuid}");
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            _connectionMapping.Remove(Context.ConnectionId);
+            var connectionId = Context.ConnectionId;
+            var userId = Context.GetHttpContext()?.Request.Query["userId"].ToString();
+            if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out Guid userGuid))
+            {
+                _connections.Remove(connectionId);
+                await Groups.RemoveFromGroupAsync(connectionId, $"user_{userGuid}");
+            }
             await base.OnDisconnectedAsync(exception);
         }
 
         public async Task RequestUnreadCount()
         {
-            var accountId = _connectionMapping.GetUserId(Context.ConnectionId);
+            var accountId = _connections.GetUserId(Context.ConnectionId);
             if (accountId.HasValue)
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{accountId}");
