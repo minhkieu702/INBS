@@ -1,4 +1,5 @@
-﻿using INBS.Domain.Entities.Common;
+﻿using INBS.Domain.Common;
+using INBS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,7 +16,8 @@ namespace INBS.Domain.Entities
         public Service() : base()
         {
             Name = string.Empty;
-            ImageUrl = string.Empty;
+            ImageUrl = Constants.DEFAULT_IMAGE_URL;
+            ImageDescriptionUrl = Constants.DEFAULT_IMAGE_URL;
             NailDesignServices = [];
             CategoryServices = [];
             ArtistServices = [];
@@ -26,7 +28,9 @@ namespace INBS.Domain.Entities
 
         public string? Description { get; set; }
 
-        public string? ImageUrl { get; set; }
+        public string ImageDescriptionUrl { get; set; }
+
+        public string ImageUrl { get; set; }
 
         public long AverageDuration { get; set; }
 

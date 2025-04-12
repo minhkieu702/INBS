@@ -45,6 +45,8 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Feedback> Feedbacks { get; set; }
 
+        public virtual DbSet<FeedbackImage> FeedbackImages { get; set; }
+
         public virtual DbSet<Media> Medias { get; set; }
 
         public virtual DbSet<NailDesign> NailDesigns { get; set; }
