@@ -34,5 +34,35 @@ namespace INBS.Infrastructure.SignalR
             await _hubContext.Clients.Group($"user_{artistId}")
                 .SendAsync("ReceiveBookingCancellation", title, message, bookingId);
         }
+
+        public async Task NotifyArtistStoreAccepted(Guid artistId, string title, string message)
+        {
+            await _hubContext.Clients.Group($"user_{artistId}")
+                .SendAsync("ReceiveArtistStoreAccepted", title, message);
+        }
+
+        public async Task NotifyArtistStoreRejected(Guid artistId, string title, string message)
+        {
+            await _hubContext.Clients.Group($"user_{artistId}")
+                .SendAsync("ReceiveArtistStoreRejected", title, message);
+        }
+
+        public async Task NotifyArtistStoreUpdated(Guid artistId, string title, string message)
+        {
+            await _hubContext.Clients.Group($"user_{artistId}")
+                .SendAsync("ReceiveArtistStoreUpdated", title, message);
+        }
+
+        public async Task NotifyArtistStoreIsCreated(Guid adminId, string title, string message)
+        {
+            await _hubContext.Clients.Group($"user_{adminId}")
+                .SendAsync("ReceiveArtistStoreIsCreated", title, message);
+        }
+
+        public async Task NotifyFeedback(Guid artistId, string title, string message)
+        {
+            await _hubContext.Clients.Group($"user_{artistId}")
+                .SendAsync("ReceiveFeedback", title, message);
+        }
     }
 }
