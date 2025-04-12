@@ -18,11 +18,12 @@ using System.Text.RegularExpressions;
 
 namespace INBS.Application.Services
 {
-    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification, HttpClient _httpClient, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : IBookingService
+    public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification, HttpClient _httpClient, IAuthentication _authentication, IHttpContextAccessor _contextAccessor, INotificationHubService _notificationHubService) : IBookingService
     {
 
         private const string ApiKey = "469acea901a9fff8210792874151eaa2582149dbf8fa1a28db48ebb4c5901382";
         private const string TogetherAIUrl = "https://api.together.xyz/v1/chat/completions";
+
 
         private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly? predictEndTime)
         {
@@ -148,9 +149,22 @@ namespace INBS.Application.Services
             try
             {
                 _unitOfWork.BeginTransaction();
-                var booking = _mapper.Map<Booking>(bookingRequest);
 
+                // Validate booking request
+                if (bookingRequest == null)
+                    throw new Exception("Booking request cannot be null");
+
+                // Validate booking time
+                if (bookingRequest.ServiceDate < DateOnly.FromDateTime(DateTime.Now) ||
+                    (bookingRequest.ServiceDate == DateOnly.FromDateTime(DateTime.Now) && 
+                     bookingRequest.StartTime < TimeOnly.FromDateTime(DateTime.Now)))
+                {
+                    throw new Exception("Cannot create booking in the past");
+                }
+
+                var booking = _mapper.Map<Booking>(bookingRequest);
                 booking.PredictEndTime = booking.StartTime.AddMinutes(bookingRequest.EstimateDuration);
+                
                 // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);
 
@@ -159,15 +173,34 @@ namespace INBS.Application.Services
 
                 if (await _unitOfWork.SaveAsync() == 0)
                 {
-                    throw new Exception("Your action failed");
+                    throw new Exception("Failed to create booking");
                 }
+
+                // Send notification to artist
+                await _notificationHubService.NotifyBookingCreated(
+                    bookingRequest.ArtistId,
+                    "New Booking",
+                    $"You have a new booking at {booking.StartTime} on {booking.ServiceDate}",
+                    new { booking.ID, booking.StartTime, booking.ServiceDate }
+                );
+
+                // Send notification to customer
+                if (booking.CustomerSelected?.CustomerID != null)
+                {
+                    await NotificationToCustomer(
+                        booking.CustomerSelected.CustomerID,
+                        "Booking Confirmation",
+                        $"Your booking has been created successfully for {booking.StartTime} on {booking.ServiceDate}"
+                    );
+                }
+
                 _unitOfWork.CommitTransaction();
                 return booking.ID;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw;
+                throw new Exception($"Error creating booking: {ex.Message}");
             }
         }
 
@@ -175,7 +208,12 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.BookingRepository.Query().IgnoreQueryFilters().ProjectTo<BookingResponse>(_mapper.ConfigurationProvider);
+                var role = _authentication.GetUserRoleFromHttpContext(_contextAccessor.HttpContext);
+                if (role == 2)
+                {
+                    return _unitOfWork.BookingRepository.Query().ProjectTo<BookingResponse>(_mapper.ConfigurationProvider);
+                }
+                return _unitOfWork.BookingRepository.Query().Where(c => !c.IsDeleted).ProjectTo<BookingResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
@@ -279,69 +317,178 @@ namespace INBS.Application.Services
             {
                 _unitOfWork.BeginTransaction();
 
-                var booking = await _unitOfWork.BookingRepository.GetByIdAsync(id) ?? throw new Exception($"The booking with {id} is not existed.");
+                // Get and validate booking with artist store information
+                var booking = await _unitOfWork.BookingRepository.Query()
+                    .Include(c => c.ArtistStore)
+                    .FirstOrDefaultAsync(c => c.ID == id) ?? throw new Exception($"The booking with {id} is not existed.");
 
+                // Validate booking status
+                if (booking.Status == (int)BookingStatus.isCompleted || 
+                    booking.Status == (int)BookingStatus.isCanceled)
+                {
+                    throw new Exception("Cannot update completed or canceled booking");
+                }
+
+                // Validate new booking time
+                if (bookingRequest.ServiceDate < DateOnly.FromDateTime(DateTime.Now) ||
+                    (bookingRequest.ServiceDate == DateOnly.FromDateTime(DateTime.Now) && 
+                     bookingRequest.StartTime < TimeOnly.FromDateTime(DateTime.Now)))
+                {
+                    throw new Exception("Cannot update booking to past time");
+                }
+
+                // Store old data for notification
+                var oldStartTime = booking.StartTime;
+                var oldServiceDate = booking.ServiceDate;
+                var oldArtistId = booking.ArtistStore?.ArtistId;
+
+                // Update booking
                 _mapper.Map(bookingRequest, booking);
-
                 booking.PredictEndTime = booking.StartTime.AddMinutes(bookingRequest.EstimateDuration);
-
-                // Assign booking details
                 booking = await AssignBooking(booking, bookingRequest);
 
-                await _unitOfWork.BookingRepository.UpdateAsync(booking);
+                // If artist has changed, notify both old and new artists
+                if (oldArtistId.HasValue && oldArtistId != bookingRequest.ArtistId)
+                {
+                    // Notify old artist about cancellation
+                    await _notificationHubService.NotifyBookingUpdated(
+                        oldArtistId.Value,
+                        "Booking Reassigned",
+                        $"A booking at {oldStartTime} on {oldServiceDate} has been reassigned",
+                        new { booking.ID, oldStartTime, oldServiceDate }
+                    );
 
+                    // Notify new artist about new booking
+                    await _notificationHubService.NotifyBookingUpdated(
+                        bookingRequest.ArtistId,
+                        "Booking Updated",
+                        $"You have been assigned a new booking at {booking.StartTime} on {booking.ServiceDate}",
+                        new { booking.ID, booking.StartTime, booking.ServiceDate }
+                    );
+                }
+                // If only time changed but same artist, notify the artist about the change
+                else if (oldStartTime != booking.StartTime || oldServiceDate != booking.ServiceDate)
+                {
+                    await SendNotificationBookingToArtist(
+                        booking.ArtistStore!.ArtistId,
+                        "BOOKING TIME CHANGED",
+                        $"Your booking has been rescheduled from {oldStartTime} {oldServiceDate} to {booking.StartTime} {booking.ServiceDate}"
+                    );
+                }
+
+                await _unitOfWork.BookingRepository.UpdateAsync(booking);
                 await RecheckStatusBooking(booking);
 
-                // Save booking to the repository
+                // Save changes
                 if (await _unitOfWork.SaveAsync() == 0)
                 {
-                    throw new Exception("Your action failed");
+                    throw new Exception("Failed to update booking");
+                }
+
+                // Send notification to customer about booking changes
+                if (booking.CustomerSelected?.CustomerID != null)
+                {
+                    var notificationMessage = oldArtistId != bookingRequest.ArtistId
+                        ? $"Your booking has been updated with a new artist and scheduled for {booking.StartTime} {booking.ServiceDate}"
+                        : $"Your booking has been rescheduled from {oldStartTime} {oldServiceDate} to {booking.StartTime} {booking.ServiceDate}";
+
+                    await NotificationToCustomer(
+                        booking.CustomerSelected.CustomerID,
+                        "You got new information",
+                        notificationMessage
+                    );
                 }
 
                 _unitOfWork.CommitTransaction();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw;
+                // Log error
+                throw new Exception($"Error updating booking {id}: {ex.Message}");
             }
         }
 
-        public async Task CancelBooking(Guid id)
+        private async Task HandleCancel(Guid bookingId, string cancelReason)
+        {
+            var cancelation = new Cancellation
+            {
+                BookingId = bookingId,
+                CancelledAt = DateTime.UtcNow,
+                Reason = cancelReason,
+                Percent = 1
+            };
+            await _unitOfWork.CancellationRepository.InsertAsync(cancelation);
+        }
+
+        public async Task CancelBooking(Guid id, string cancelReason)
         {
             try
             {
                 _unitOfWork.BeginTransaction();
 
-                var booking = (await _unitOfWork.BookingRepository.GetAsync(query
-                    => query.Where(c => c.ID == id)
-                    .Include(c => c.ArtistStore))
-                    ).FirstOrDefault() ?? throw new Exception($"The entity with {id} is not existed.");
+                var booking = await _unitOfWork.BookingRepository.Query()
+                    .Include(c => c.ArtistStore)
+                    .Include(c => c.CustomerSelected)
+                    .FirstOrDefaultAsync(c => c.ID == id) ?? throw new Exception($"Booking with ID {id} not found");
 
+                // Validate booking status
+                if (booking.Status == (int)BookingStatus.isCompleted)
+                {
+                    throw new Exception("Cannot cancel completed booking");
+                }
+
+                if (booking.Status == (int)BookingStatus.isCanceled)
+                {
+                    throw new Exception("Booking is already canceled");
+                }
+
+                // Update booking status
                 booking.Status = (int)BookingStatus.isCanceled;
+
+                await HandleCancel(booking.ID, cancelReason);
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
 
+                // Recheck other bookings' status
                 await RecheckStatusBooking(booking);
 
-                await SendNotificationBookingToArtist(booking.ArtistStore!.ArtistId, "YOUR APPOINTMENT IS CANCELED", $"A booking at {booking.StartTime} on {booking.ServiceDate} is canceled");
+                // Notify artist
+                await _notificationHubService.NotifyBookingCanceled(
+                    booking.ArtistStore!.ArtistId,
+                    "Booking Canceled",
+                    $"Booking at {booking.StartTime} on {booking.ServiceDate} has been canceled" +
+                    (cancelReason != null ? $". Reason: {cancelReason}" : ""),
+                    booking.ID
+                );
+
+                // Notify customer
+                if (booking.CustomerSelected?.CustomerID != null)
+                {
+                    await NotificationToCustomer(
+                        booking.CustomerSelected.CustomerID,
+                        "Your booking has been canceled",
+                        $"Your booking at {booking.StartTime} on {booking.ServiceDate} has been canceled" +
+                        (cancelReason != null ? $". Reason: {cancelReason}" : "")
+                    );
+                }
 
                 if (await _unitOfWork.SaveAsync() == 0)
                 {
-                    throw new Exception("Your action failed");
+                    throw new Exception("Failed to cancel booking");
                 }
 
                 _unitOfWork.CommitTransaction();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw;
+                throw new Exception($"Error canceling booking: {ex.Message}");
             }
         }
 
-        private async Task NotificationToCustomer(Guid userId, string content)
+        private async Task NotificationToCustomer(Guid userId, string title, string content)
         {
             var devieTokens = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == userId));
 
@@ -356,7 +503,7 @@ namespace INBS.Application.Services
             var check = true;
             foreach (var deviceToken in devieTokens)
             {
-                if (!(await _expoNotification.SendPushNotificationAsync(deviceToken.Token, "YOUR BOOKING IS SERVING", content, "BookingDetail")))
+                if (!(await _expoNotification.SendPushNotificationAsync(deviceToken.Token, title, content, "BookingDetail")))
                 {
                     check = false; break;
                 }
@@ -384,7 +531,7 @@ namespace INBS.Application.Services
 
                 var customerSelected = booking.CustomerSelected;
 
-                if (customerSelected != null) await NotificationToCustomer(customerSelected.CustomerID, "Your booking is serving");
+                if (customerSelected != null) await NotificationToCustomer(customerSelected.CustomerID, "YOUR BOOKING IS SERVING", "Your booking is serving");
 
                 // Save booking to the repository
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
@@ -627,19 +774,6 @@ namespace INBS.Application.Services
                 .ToList();
 
             return groupedSlots;
-        }
-
-
-        int CalculateSlotScore(bool isPeak, bool isArtistFree, int recentBookings, double cancelRate)
-        {
-            if (!isArtistFree) return int.MaxValue; // không thể chọn
-
-            int score = 0;
-            if (isPeak) score += 3;
-            if (recentBookings >= 5) score += 2;
-            if (cancelRate > 0.2) score += 4;
-
-            return score;
         }
 
         public async Task<string> CallTogetherAIToGetPeakTime(DateOnly date)

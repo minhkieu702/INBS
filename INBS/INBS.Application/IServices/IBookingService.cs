@@ -12,7 +12,7 @@ namespace INBS.Application.IService
     {
         Task<Guid> Create(BookingRequest request);
 
-        Task CancelBooking(Guid id);
+        Task CancelBooking(Guid id, string cancelation);
 
         Task Update(Guid id, BookingRequest request);
 

@@ -9,13 +9,14 @@ using INBS.Application.IServices;
 using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.IRepository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class ServiceService(IMapper _mapper, IUnitOfWork _unitOfWork, IFirebaseStorageService _firebaseService) : IServiceService
+    public class ServiceService(IMapper _mapper, IUnitOfWork _unitOfWork, IFirebaseStorageService _firebaseService, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor) : IServiceService
     {
         private async Task InsertCategoryService(
             Guid serviceId, 
@@ -194,7 +195,12 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.ServiceRepository.Query().Include(c => c.ServicePriceHistories).ProjectTo<ServiceResponse>(_mapper.ConfigurationProvider);
+                var role = _authentication.GetUserRoleFromHttpContext(_contextAccesstor.HttpContext);
+                if (role == 2)
+                {
+                    return _unitOfWork.ServiceRepository.Query().Include(c => c.ServicePriceHistories).ProjectTo<ServiceResponse>(_mapper.ConfigurationProvider);
+                }
+                return _unitOfWork.ServiceRepository.Query().Where(c => !c.IsDeleted).Include(c => c.ServicePriceHistories).ProjectTo<ServiceResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
