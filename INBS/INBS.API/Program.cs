@@ -1,4 +1,5 @@
 using INBS.API.AppStart;
+using INBS.Infrastructure.SignalR;
 using Infrastructure.DependencyInjection;
 using Microsoft.Extensions.Logging.AzureAppServices;
 using Serilog;
@@ -25,6 +26,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
 app.Use(async (context, next) =>
 {
     Log.Information("🚀 Request: {Method} {Path}", context.Request.Method, context.Request.Path);
@@ -43,6 +45,12 @@ app.UseCors("AllowAnyOrigins");
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notificationHub");
+});
 
 app.MapControllers();
 

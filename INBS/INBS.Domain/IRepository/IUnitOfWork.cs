@@ -35,6 +35,8 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Feedback> FeedbackRepository { get; }
 
+        public IGenericRepository<FeedbackImage> FeedbackImageRepository { get; }
+
         public IGenericRepository<Media> MediaRepository { get; }
 
         public IGenericRepository<NailDesign> NailDesignRepository { get; }

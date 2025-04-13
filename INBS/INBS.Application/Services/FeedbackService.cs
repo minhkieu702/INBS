@@ -2,6 +2,8 @@
 using AutoMapper.QueryableExtensions;
 using INBS.Application.Common;
 using INBS.Application.DTOs.Feedback;
+using INBS.Application.DTOs.FeedbackImage;
+using INBS.Application.DTOs.Image;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
 using INBS.Domain.Entities;
@@ -16,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class FeedbackService(IUnitOfWork _unitOfWork, IAuthentication _authentication, IHttpContextAccessor _contextAccessor, IMapper _mapper, IFirebaseCloudMessageService _firebaseCloudMessageService) : IFeedbackService
+    public class FeedbackService(IUnitOfWork _unitOfWork, IAuthentication _authentication, IHttpContextAccessor _contextAccessor, IMapper _mapper, IFirebaseCloudMessageService _firebaseCloudMessageService, INotificationHubService _notificationHubService, IFirebaseStorageService _firebaseService) : IFeedbackService
     {
         private async Task NotifyArtist(Guid artistId)
         {
@@ -36,6 +38,8 @@ namespace INBS.Application.Services
                 await _unitOfWork.NotificationRepository.InsertAsync(notification);
 
                 await _firebaseCloudMessageService.SendToMultipleDevices(deviceTokens.ToList(), notification.Title, notification.Content);
+
+                await _notificationHubService.NotifyFeedback(artistId, notification.Title, notification.Content);
             }
             catch (Exception)
             {
@@ -104,7 +108,90 @@ namespace INBS.Application.Services
             await _unitOfWork.DesignRepository.UpdateAsync(design);
         }
 
-        public async Task Create(FeedbackRequest request)
+        private static void ValidateFeedbackImage(IEnumerable<FeedbackImageRequest> imageReqs)
+        {
+            var seenOrders = new HashSet<int>();
+
+            foreach (var img in imageReqs)
+            {
+                if (!seenOrders.Add(img.NumerialOrder)) // Nếu đã tồn tại, Add() trả về false
+                {
+                    throw new Exception($"Duplicate NumerialOrder found: {img.NumerialOrder}");
+                }
+            }
+        }
+
+        private async Task HandleFeedbackImages(Guid feedbackId, IList<FeedbackImageRequest> newList)
+        {
+            ValidateFeedbackImage(newList);
+
+            var oldList = await _unitOfWork.FeedbackImageRepository.GetAsync(c => c.Where(m => m.FeedbackId == feedbackId));
+
+            var newIdsSet = newList.Select(c => c.NumerialOrder).ToHashSet();
+            var processedItems = new HashSet<FeedbackImageRequest>();
+
+            var updatingList = new List<FeedbackImage>();
+            var insertingList = new List<FeedbackImage>();
+            var deletingList = new List<FeedbackImage>();
+            var uploadTasks = new List<Task>();  // 🔥 Chạy upload ảnh song song để tối ưu tốc độ
+
+            // 1️⃣ Duyệt danh sách cũ để cập nhật hoặc xóa
+            foreach (var oldItem in oldList)
+            {
+                if (newIdsSet.Contains(oldItem.NumerialOrder))
+                {
+                    var newItem = newList.First(c => c.NumerialOrder == oldItem.NumerialOrder);
+
+                    _mapper.Map(newItem, oldItem);
+
+                    if (newItem.NewImage != null)
+                    {
+                        var uploadTask = UploadImageAsync(newItem.NewImage, oldItem);  // 🔥 Tạo Task thay vì `await` ngay
+                        uploadTasks.Add(uploadTask);
+                    }
+
+                    updatingList.Add(oldItem);
+                    processedItems.Add(newItem);  // ✅ Thêm vào danh sách đã xử lý
+                }
+                else
+                {
+                    deletingList.Add(oldItem);
+                }
+            }
+
+            // 2️⃣ Xóa tất cả phần tử đã xử lý khỏi danh sách mới
+            newList = newList.Except(processedItems).ToList();
+
+            // 3️⃣ Duyệt danh sách mới để thêm Media mới
+            foreach (var newItem in newList)
+            {
+                var media = _mapper.Map<FeedbackImage>(newItem);
+                media.FeedbackId = feedbackId;
+
+                if (newItem.NewImage != null)
+                {
+                    var uploadTask = UploadImageAsync(newItem.NewImage, media);
+                    uploadTasks.Add(uploadTask);
+                }
+
+                insertingList.Add(media);
+            }
+
+
+            // 🔥 Chạy upload ảnh song song để tối ưu tốc độ
+            if (uploadTasks.Count != 0) await Task.WhenAll(uploadTasks);
+
+            // 4️⃣ Xử lý batch cập nhật vào DB
+            if (deletingList.Count != 0) _unitOfWork.FeedbackImageRepository.DeleteRange(deletingList);
+            if (updatingList.Count != 0) _unitOfWork.FeedbackImageRepository.UpdateRange(updatingList);
+            if (insertingList.Count != 0) _unitOfWork.FeedbackImageRepository.InsertRange(insertingList);
+        }
+        private async Task UploadImageAsync(IFormFile newImage, FeedbackImage media)
+        {
+            media.ImageUrl = await _firebaseService.UploadFileAsync(newImage);
+        }
+
+        public async Task Create(FeedbackRequest request, IList<FeedbackImageRequest> feedbackImages)
         {
             try
             {
@@ -119,6 +206,8 @@ namespace INBS.Application.Services
                 feedback.CustomerId = userId;
                 feedback.FeedbackType = (int)request.FeedbackType;
 
+                await HandleFeedbackImages(feedback.ID, feedbackImages);
+                
                 switch (request.FeedbackType)
                 {
                     case FeedbackType.Artist:
@@ -204,7 +293,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task Update(Guid id, FeedbackRequest request)
+        public async Task Update(Guid id, FeedbackRequest request, IList<FeedbackImageRequest> feedbackImages)
         {
             try
             {
@@ -232,6 +321,8 @@ namespace INBS.Application.Services
                 }
 
                 _mapper.Map(request, feedback);
+
+                await HandleFeedbackImages(feedback.ID, feedbackImages);
 
                 await _unitOfWork.FeedbackRepository.UpdateAsync(feedback);
 

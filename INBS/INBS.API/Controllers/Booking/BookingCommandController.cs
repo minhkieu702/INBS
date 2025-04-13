@@ -99,13 +99,14 @@ namespace INBS.API.Controllers.Booking
         /// Deletes a booking.
         /// </summary>
         /// <param name="id">The booking ID.</param>
+        /// <param name="reason">The reason of cancelation</param>
         /// <returns>An action result.</returns>
         [HttpPatch]
-        public async Task<IActionResult> CancelBooking([FromQuery] Guid id)
+        public async Task<IActionResult> CancelBooking([FromQuery] Guid id, [FromForm] string reason)
         {
             try
             {
-                await service.CancelBooking(id);
+                await service.CancelBooking(id, reason);
                 return Ok();
             }
             catch (Exception ex)

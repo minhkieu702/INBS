@@ -33,6 +33,8 @@ namespace INBS.Domain.Entities
 
         public TimeOnly EndTime { get; set; }
 
+        public int Status { get; set; }
+
         [InverseProperty(nameof(Booking.ArtistStore))]
         public virtual ICollection<Booking> Bookings { get; set; }
     }

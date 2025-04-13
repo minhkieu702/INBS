@@ -9,6 +9,7 @@ namespace INBS.Domain.Entities
         {
             Rating = 5;
             Content = string.Empty;
+            FeedbackImages = [];
         }
         public int FeedbackType { get; set; }
         
@@ -22,5 +23,8 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(CustomerId))]
         [InverseProperty(nameof(Customer.Feedbacks))]
         public virtual Customer? Customer { get; set; }
+
+        [InverseProperty(nameof(FeedbackImage.Feedback))]
+        public virtual ICollection<FeedbackImage> FeedbackImages { get; set; }
     }
 }

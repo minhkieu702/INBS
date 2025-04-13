@@ -16,7 +16,7 @@ using AutoMapper.QueryableExtensions;
 
 namespace INBS.Application.Services
 {
-    public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseStorageService _firebaseService) : IDesignService
+    public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseStorageService _firebaseService, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor) : IDesignService
     {
         private async Task HandleNailDesign(Guid designId, IList<NailDesignRequest> newList)
         {
@@ -117,7 +117,6 @@ namespace INBS.Application.Services
             if (updateList.Count != 0) _unitOfWork.NailDesignServiceRepository.UpdateRange(updateList);
             if (insertList.Count != 0) _unitOfWork.NailDesignServiceRepository.InsertRange(insertList);
         }
-
 
         private async Task ValidateService(IEnumerable<Guid> serviceIds)
         {
@@ -238,56 +237,18 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.DesignRepository.Query().ProjectTo<DesignResponse>(_mapper.ConfigurationProvider);
+                var role = _authentication.GetUserRoleFromHttpContext(_contextAccesstor.HttpContext);
+                if (role == 2)
+                {
+                    return _unitOfWork.DesignRepository.Query().ProjectTo<DesignResponse>(_mapper.ConfigurationProvider);
+                }
+                return _unitOfWork.DesignRepository.Query().Where(c => !c.IsDeleted).ProjectTo<DesignResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {
 
                 throw;
             }
-            //var (colors, occasions, paintTypes, skintones) = await Utils.GetPreferenceAsync();
-
-            //var designs = await _unitOfWork.DesignRepository.GetAsync( 
-            //    query => query
-            //    .Include(d => d.Medias)
-            //    .Include(d => d.Preferences)
-            //    .Include(d => d.NailDesigns)
-            //        .ThenInclude(nd => nd.NailDesignServices.Where(c => !c.Service!.IsDeleted))
-            //            .ThenInclude(nds => nds.Service)
-            //    .Include(d => d.NailDesigns)
-            //        .ThenInclude(nd => nd.NailDesignServices)
-            //            .ThenInclude(nds => nds.NailDesignServiceSelecteds)
-            //                .ThenInclude(nds => nds.CustomerSelected)
-            //                    .ThenInclude(cs => cs!.Customer)
-            //                        .ThenInclude(c => c!.User)
-            //    .AsNoTracking()
-            //    );
-
-            //var responses = _mapper.Map<IEnumerable<DesignResponse>>(designs);
-
-            //foreach (var response in responses)
-            //{
-            //    var preferenceActions = new Dictionary<PreferenceType, Action<PreferenceResponse>>()
-            //    {
-            //        [PreferenceType.Color] = prefer => prefer.Data = colors.FirstOrDefault(c => c.ID == prefer.PreferenceId),
-
-            //        [PreferenceType.Occasion] = prefer => prefer.Data = occasions.FirstOrDefault(c => c.ID == prefer.PreferenceId),
-
-            //        [PreferenceType.PaintType] = prefer => prefer.Data = paintTypes.FirstOrDefault(c => c.ID == prefer.PreferenceId),
-
-            //        [PreferenceType.SkinTone] = prefer => prefer.Data = skintones.FirstOrDefault(c => c.ID == prefer.PreferenceId)
-            //    };
-
-            //    foreach (var preference in response.Preferences)
-            //    {
-            //        if (Enum.TryParse(preference.PreferenceType, out PreferenceType type) && preferenceActions.TryGetValue(type, out var action))
-            //        {
-            //            action(preference);
-            //        }
-            //    }
-            //}
-
-            //return responses;
         }
 
         public async Task Update(Guid designId, DesignRequest modelRequest, PreferenceRequest preferenceRequest, IList<MediaRequest> images, IList<NailDesignRequest> nailDesigns)

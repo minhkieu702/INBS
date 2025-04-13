@@ -101,5 +101,23 @@ namespace INBS.Infrastructure.Authentication
                 throw new SecurityException("An error occurred while hashing the password.", ex);
             }
         }
+
+        public int GetUserRoleFromHttpContext(HttpContext httpContext)
+        {
+            Claim? roleString = httpContext.User.FindFirst(ClaimTypes.Role);
+
+
+            if (roleString == null || string.IsNullOrWhiteSpace(roleString.Value))
+            {
+                return 0; // Default role if not found
+            }
+
+            if (!int.TryParse(roleString.Value, out var role))
+            {
+                throw new UnauthorizedAccessException("Invalid role format in token.");
+            }
+
+            return role;
+        }
     }
 }

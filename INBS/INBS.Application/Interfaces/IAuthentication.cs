@@ -12,6 +12,7 @@ namespace INBS.Application.Interfaces
 {
     public interface IAuthentication
     {
+        int GetUserRoleFromHttpContext(HttpContext httpContext);
         string HashedPassword(User user, string password);
         Task<string> GenerateDefaultTokenAsync(User user);
         Guid GetUserIdFromHttpContext(HttpContext httpContext);

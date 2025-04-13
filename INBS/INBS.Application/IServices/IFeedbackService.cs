@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Feedback;
+using INBS.Application.DTOs.FeedbackImage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,9 @@ namespace INBS.Application.IServices
     {
         IQueryable<FeedbackResponse> Get();
 
-        Task Create(FeedbackRequest request);
+        Task Create(FeedbackRequest request, IList<FeedbackImageRequest> feedbackImageRequests);
 
-        Task Update(Guid id, FeedbackRequest request);
+        Task Update(Guid id, FeedbackRequest request, IList<FeedbackImageRequest> feedbackImageRequests);
 
         Task Delete(Guid id);
     }

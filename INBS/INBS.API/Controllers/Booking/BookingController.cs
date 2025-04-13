@@ -10,8 +10,6 @@ namespace INBS.API.Controllers.Booking
     /// Get Booking
     /// </summary>
     /// <param name="service"></param>
-    [ApiController]
-    [Route("api/[controller]")]
     public class BookingController(IBookingService service) : ODataController
     {
 

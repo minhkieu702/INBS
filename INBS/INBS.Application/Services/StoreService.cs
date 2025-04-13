@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.Services
 {
-    public class StoreService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseStorageService _firebaseService) : IStoreService
+    public class StoreService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseStorageService _firebaseService, IAuthentication authentication, IHttpContextAccessor contextAccessor) : IStoreService
     {
         public async Task Create(StoreRequest modelRequest)
         {
@@ -79,7 +79,12 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.StoreRepository.Query().ProjectTo<StoreResponse>(_mapper.ConfigurationProvider);
+                var role = authentication.GetUserRoleFromHttpContext(contextAccessor.HttpContext);
+                if (role == 2)
+                {
+                    return _unitOfWork.StoreRepository.Query().ProjectTo<StoreResponse>(_mapper.ConfigurationProvider);
+                }
+                return _unitOfWork.StoreRepository.Query().Where(c => !c.IsDeleted).ProjectTo<StoreResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception ex)
             {

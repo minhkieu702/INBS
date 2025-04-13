@@ -235,7 +235,20 @@ namespace INBS.Persistence.Repository
             }
         }
         #endregion
-        
+
+        #region FeedbackImage
+        private IGenericRepository<FeedbackImage>? _FeedbackImageRepository;
+
+        public IGenericRepository<FeedbackImage> FeedbackImageRepository
+        {
+            get
+            {
+                _FeedbackImageRepository ??= new GenericRepository<FeedbackImage>(_context);
+                return _FeedbackImageRepository;
+            }
+        }
+        #endregion
+
         #region Image
         private IGenericRepository<Media>? _imageRepository;
 

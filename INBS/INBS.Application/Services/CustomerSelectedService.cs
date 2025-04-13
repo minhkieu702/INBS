@@ -138,7 +138,12 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.CustomerSelectedRepository.Query().ProjectTo<CustomerSelectedResponse>(_mapper.ConfigurationProvider);
+                var role = _authentication.GetUserRoleFromHttpContext(_contextAccesstor.HttpContext);
+                if (role == 2)
+                {
+                    return _unitOfWork.CustomerSelectedRepository.Query().ProjectTo<CustomerSelectedResponse>(_mapper.ConfigurationProvider);
+                }
+                return _unitOfWork.CustomerSelectedRepository.Query().Where(c => !c.IsDeleted).ProjectTo<CustomerSelectedResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {

@@ -1,6 +1,7 @@
 ﻿using INBS.Application.DTOs.Booking;
 using INBS.Application.DTOs.Common;
 using INBS.Application.DTOs.Customer;
+using INBS.Application.DTOs.FeedbackImage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,5 +23,7 @@ namespace INBS.Application.DTOs.Feedback
         public Guid CustomerId { get; set; }
 
         public virtual CustomerResponse? Customer { get; set; }
+
+        public virtual ICollection<FeedbackImageResponse> FeedbackImages { get; set; } = [];
     }
 }

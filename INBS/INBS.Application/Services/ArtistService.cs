@@ -10,11 +10,12 @@ using INBS.Application.IServices;
 using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace INBS.Application.Services
 {
-    public class ArtistService(IUnitOfWork _unitOfWork, IFirebaseStorageService _firebaseService, IMapper _mapper, IAuthentication _authentication, IEmailSender _emailSender) : IArtistService
+    public class ArtistService(IUnitOfWork _unitOfWork, IFirebaseStorageService _firebaseService, IMapper _mapper, IAuthentication _authentication, IEmailSender _emailSender, IHttpContextAccessor _contextAccessor, INotificationHubService _notificationHubService, IFirebaseCloudMessageService _firebaseCloudMessageService) : IArtistService
     {
 
         private async Task IsUniquePhoneNumber(string phoneNumber, Guid? userId = null)
@@ -125,8 +126,49 @@ namespace INBS.Application.Services
             _unitOfWork.ArtistStoreRepository.UpdateRange(updateList);
             _unitOfWork.ArtistStoreRepository.DeleteRange(deleteList);
             _unitOfWork.ArtistStoreRepository.InsertRange(insertList);
+
+            var role = _authentication.GetUserRoleFromHttpContext(_contextAccessor.HttpContext);
+            if (role == (int)Role.Admin)
+            {
+                await HandleNotify(artistId, "You got new information", "Admin already assigned shift for you. Please check your shifts");
+            }
+            else
+            {
+                var admin = await _unitOfWork.UserRepository.GetAsync(c => c.Where(c => c.Role == (int)Role.Admin && !c.IsDeleted));
+                if (!admin.Any())
+                    throw new Exception("Admin not found");
+
+                var artist = await _unitOfWork.UserRepository
+                    .Query()
+                    .Include(c => c.Artist)
+                    .FirstOrDefaultAsync(c => c.ID == artistId)
+                    ?? throw new Exception("Artist not found");
+
+                await HandleNotify(admin.FirstOrDefault()!.ID, "You got new information", $"Artist {artist.FullName} - ${artist.Artist!.Username} assigned new shift");
+            }
         }
 
+        private async Task HandleNotify(Guid adminId, string title, string message)
+        {
+            var notification = new Notification
+            {
+                Content = message,
+                Title = title,
+                UserId = adminId,
+                NotificationType = (int)NotificationType.Alert,
+            };
+
+            await _unitOfWork.NotificationRepository.InsertAsync(notification);
+
+            var deviceTokens = await _unitOfWork.DeviceTokenRepository.Query()
+                .Where(c => c.UserId == adminId && c.Platform == (int)DevicePlatformType.Web)
+                .ToListAsync();
+
+            await _firebaseCloudMessageService.SendToMultipleDevices(deviceTokens.Select(c => c.Token).ToList(), title, message);
+
+            await _notificationHubService.NotifyArtistStoreIsCreated(adminId, title, message);
+
+        }
 
         private async Task ValidateStore(IEnumerable<Guid> ids)
         {
@@ -289,7 +331,12 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.ArtistRepository.Query().ProjectTo<ArtistResponse>(_mapper.ConfigurationProvider);
+                var role = _authentication.GetUserRoleFromHttpContext(_contextAccessor.HttpContext);
+                if (role == (int)Role.Admin)
+                {
+                    return _unitOfWork.ArtistRepository.Query().ProjectTo<ArtistResponse>(_mapper.ConfigurationProvider);
+                }
+                return _unitOfWork.ArtistRepository.Query().Include(c => c.User).Where(c => !c.User!.IsDeleted).ProjectTo<ArtistResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {

@@ -18,6 +18,8 @@ namespace INBS.Domain.Entities
 
         public DateTime CancelledAt { get; set; }
 
+        public float Percent { get; set; }
+
         public Guid BookingId { get; set; }
         [ForeignKey(nameof(BookingId))]
         [InverseProperty(nameof(Booking.Cancellations))]
