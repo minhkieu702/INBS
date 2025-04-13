@@ -1,0 +1,46 @@
+sequenceDiagram
+    participant C as Customer
+    participant CS as CustomerSelected
+    participant B as Booking
+    participant AS as ArtistStore
+    participant A as Artist
+    participant S as Store
+    participant P as Payment
+    participant PD as PaymentDetail
+    participant CN as Cancellation
+
+    %% Basic booking process
+    C->>CS: Select service
+    Note over C,CS: Create CustomerSelected
+    CS->>AS: Check working schedule
+    Note over AS: Check available time slots
+    AS->>C: Return available time slots
+    C->>B: Make booking
+    Note over B: Create new Booking
+    B->>P: Create payment
+    Note over P: Create Payment record
+    P->>PD: Save payment details
+    Note over PD: Link Payment with Booking
+    P->>C: Return payment information
+    C->>P: Confirm payment
+    P->>B: Update booking status
+    B->>A: Notify new booking
+    B->>C: Confirm booking success
+
+    %% Cancellation process
+    alt Cancel booking
+        C->>B: Request cancellation
+        B->>CN: Create cancellation record
+        Note over CN: Save cancellation reason
+        CN->>B: Update booking status
+        B->>A: Notify booking cancellation
+        B->>C: Confirm cancellation
+    end
+
+    %% Service completion process
+    alt Complete service
+        A->>B: Update completion status
+        B->>C: Notify service completion
+        C->>B: Rate service
+        Note over B: Update rating
+    end 

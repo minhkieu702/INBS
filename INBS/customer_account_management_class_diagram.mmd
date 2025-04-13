@@ -1,0 +1,151 @@
+classDiagram
+    class User {
+        +Guid ID
+        +string FullName
+        +string Email
+        +string PhoneNumber
+        +string PasswordHash
+        +DateTime DateOfBirth
+        +string ImageUrl
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +UpdateProfile(profileData)
+        +ChangePassword(oldPassword, newPassword)
+        +ResetPassword()
+    }
+
+    class Customer {
+        +Guid ID
+        +string OtpCode
+        +DateTime OtpExpiry
+        +bool IsVerified
+        +string Description
+        +VerifyAccount(otpCode)
+        +RequestOtp()
+        +UpdatePreferences(preferences)
+        +GetBookingHistory()
+        +GetFavorites()
+    }
+
+    class CustomerSelected {
+        +Guid ID
+        +bool IsFavorite
+        +bool IsDeleted
+        +Guid CustomerID
+        +ToggleFavorite()
+        +GetDetails()
+    }
+
+    class Booking {
+        +Guid ID
+        +Date ServiceDate
+        +Time StartTime
+        +Time PredictEndTime
+        +int Status
+        +long TotalAmount
+        +Guid CustomerSelectedId
+        +Guid ArtistStoreId
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +GetStatus()
+        +CancelBooking(reason)
+    }
+
+    class Payment {
+        +string ID
+        +int Method
+        +long TotalAmount
+        +int Status
+        +GetPaymentDetails()
+        +ProcessPayment()
+    }
+
+    class PaymentDetail {
+        +string PaymentId
+        +Guid BookingId
+        +GetPaymentInfo()
+    }
+
+    class Feedback {
+        +Guid ID
+        +int FeedbackType
+        +int Rating
+        +string Content
+        +Guid TypeId
+        +Guid CustomerId
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +SubmitFeedback()
+        +UpdateFeedback()
+    }
+
+    class DeviceToken {
+        +int ID
+        +string Token
+        +DateTime CreatedAt
+        +Guid UserId
+        +int Platform
+        +RegisterDevice()
+        +UnregisterDevice()
+    }
+
+    class Notification {
+        +Guid ID
+        +int Status
+        +int NotificationType
+        +Guid UserId
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +string Content
+        +string Title
+        +MarkAsRead()
+        +DeleteNotification()
+    }
+
+    class Preference {
+        +int ID
+        +Guid DesignId
+        +Guid CustomerId
+        +int PreferenceId
+        +int PreferenceType
+        +UpdatePreference()
+        +GetPreferenceDetails()
+    }
+
+    class Cart {
+        +Guid CustomerId
+        +Guid NailDesignServiceId
+        +AddToCart()
+        +RemoveFromCart()
+        +GetCartItems()
+        +ClearCart()
+    }
+
+    class NailDesignService {
+        +Guid ID
+        +Guid NailDesignId
+        +Guid ServiceId
+        +long ExtraPrice
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +GetServiceDetails()
+    }
+
+    User <|-- Customer
+    Customer "1" -- "many" CustomerSelected
+    Customer "1" -- "many" Booking
+    Customer "1" -- "many" Payment
+    Customer "1" -- "many" Feedback
+    Customer "1" -- "many" DeviceToken
+    Customer "1" -- "many" Notification
+    Customer "1" -- "many" Preference
+    Customer "1" -- "1" Cart
+    CustomerSelected "1" -- "1" Booking
+    Booking "1" -- "1" PaymentDetail
+    Payment "1" -- "many" PaymentDetail
+    Cart "many" -- "many" NailDesignService 

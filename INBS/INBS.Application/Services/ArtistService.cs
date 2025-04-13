@@ -279,6 +279,9 @@ namespace INBS.Application.Services
 
                 artist.Username = await GetUsername(userRequest.FullName);
 
+                var certificates = await HandleArtistCertificates(artist.ID, artistRequest.Certificates);
+                artist.Certificates = certificates;
+
                 if (artistStoreRequest.Count != 0) 
                     await AssignStore(artist.ID, artistStoreRequest);
 
@@ -344,7 +347,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task Update(Guid id, ArtistRequest artistRequest, UserRequest userRequest, IList<ArtistServiceRequest> artistServiceRequest, IList<ArtistStoreRequest> artistStoreRequest)
+        public async Task Update(Guid id, ArtistRequest artistRequest, UserRequest userRequest, IList<ArtistServiceRequest> artistServiceRequest, IList<ArtistStoreRequest> artistStoreRequest, IList<ArtistCertificateRequest> certificateRequests)
         {
             try
             {
@@ -367,7 +370,8 @@ namespace INBS.Application.Services
 
                 //if (artistStoreRequest.Count != 0) 
                     await AssignStore(artist.ID, artistStoreRequest);
-
+                var certificates = await HandleArtistCertificates(artist.ID, artistRequest.Certificates);
+                artist.Certificates = certificates;
                 _mapper.Map(artistRequest, artist);
 
                 await _unitOfWork.ArtistRepository.UpdateAsync(artist);
@@ -397,5 +401,86 @@ namespace INBS.Application.Services
 
             await _unitOfWork.UserRepository.UpdateAsync(user);
         }
+
+        private async Task<List<ArtistCertificate>> HandleArtistCertificates(Guid artistId, IList<ArtistCertificateRequest> newList)
+        {
+            var oldList = await _unitOfWork.ArtistCertificateRepository
+                .GetAsync(c => c.Where(x => x.ArtistId == artistId));
+
+            var newIdsSet = newList.Select(c => c.NumerialOrder).ToHashSet();
+            var processedItems = new HashSet<ArtistCertificateRequest>();
+
+            var updatingList = new List<ArtistCertificate>();
+            var insertingList = new List<ArtistCertificate>();
+            var deletingList = new List<ArtistCertificate>();
+            var uploadTasks = new List<Task>();
+
+            foreach (var oldItem in oldList)
+            {
+                if (newIdsSet.Contains(oldItem.NumerialOrder))
+                {
+                    var newItem = newList.First(c => c.NumerialOrder == oldItem.NumerialOrder);
+                    _mapper.Map(newItem, oldItem);
+
+                    if (newItem.NewImage != null)
+                    {
+                        var uploadTask = UploadCertificateImageAsync(newItem.NewImage)
+                            .ContinueWith(t => oldItem.ImageUrl = t.Result);
+                        uploadTasks.Add(uploadTask);
+                    }
+
+                    updatingList.Add(oldItem);
+                    processedItems.Add(newItem);
+                }
+                else
+                {
+                    deletingList.Add(oldItem);
+                }
+            }
+
+            newList = newList.Except(processedItems).ToList();
+
+            foreach (var newItem in newList)
+            {
+                var entity = _mapper.Map<ArtistCertificate>(newItem);
+                entity.ArtistId = artistId;
+
+                if (newItem.NewImage != null)
+                {
+                    var uploadTask = UploadCertificateImageAsync(newItem.NewImage)
+                        .ContinueWith(t => entity.ImageUrl = t.Result);
+                    uploadTasks.Add(uploadTask);
+                }
+
+                insertingList.Add(entity);
+            }
+
+            if (uploadTasks.Count > 0)
+                await Task.WhenAll(uploadTasks);
+
+            if (deletingList.Count > 0)
+                _unitOfWork.ArtistCertificateRepository.DeleteRange(deletingList);
+
+            if (updatingList.Count > 0)
+                _unitOfWork.ArtistCertificateRepository.UpdateRange(updatingList);
+
+            if (insertingList.Count > 0)
+                _unitOfWork.ArtistCertificateRepository.InsertRange(insertingList);
+
+            if (deletingList.Count > 0 || updatingList.Count > 0 || insertingList.Count > 0)
+            {
+                await _unitOfWork.SaveAsync();
+            }
+
+            return insertingList.Concat(updatingList).ToList();
+        }
+
+
+
+        private async Task<string> UploadCertificateImageAsync(IFormFile file)
+        {
+            return await _firebaseService.UploadFileAsync(file);
+        }
+
     }
 }

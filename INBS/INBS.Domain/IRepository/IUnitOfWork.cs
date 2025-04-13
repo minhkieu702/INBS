@@ -12,7 +12,7 @@ namespace INBS.Domain.IRepository
         public IGenericRepository<Admin> AdminRepository { get; }
 
         public IGenericRepository<Artist> ArtistRepository { get; }
-
+        public IGenericRepository<ArtistCertificate> ArtistCertificateRepository { get; }
         public IGenericRepository<ArtistService> ArtistServiceRepository { get; }
 
         public IGenericRepository<ArtistStore> ArtistStoreRepository { get; }

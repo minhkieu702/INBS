@@ -40,6 +40,20 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
+        #region ArtistCertificate
+        private IGenericRepository<ArtistCertificate>? _artistCertificateRepository;
+
+        public IGenericRepository<ArtistCertificate> ArtistCertificateRepository
+        {
+            get
+            {
+                _artistCertificateRepository ??= new GenericRepository<ArtistCertificate>(_context);
+                return _artistCertificateRepository;
+            }
+        }
+
+        #endregion
+
         #region ArtistStore
         private IGenericRepository<ArtistStore>? _artistStore;
 

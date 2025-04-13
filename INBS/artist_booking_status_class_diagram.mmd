@@ -1,0 +1,91 @@
+classDiagram
+    class Artist {
+        +Guid ID
+        +string Username
+        +int YearsOfExperience
+        +int Level
+        +float AverageRating
+        +UpdateBookingStatus(bookingId, status)
+        +GetBookingsByDate(date)
+        +GetBookingsByStatus(status)
+    }
+
+    class Booking {
+        +Guid ID
+        +Date ServiceDate
+        +Time StartTime
+        +Time PredictEndTime
+        +int Status
+        +long TotalAmount
+        +Guid CustomerSelectedId
+        +Guid ArtistStoreId
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +UpdateStatus(newStatus)
+        +GetStatusHistory()
+    }
+
+    class BookingStatus {
+        +int Id
+        +string Name
+        +string Description
+    }
+
+    class BookingStatusHistory {
+        +Guid Id
+        +Guid BookingId
+        +int OldStatus
+        +int NewStatus
+        +string Reason
+        +Guid UpdatedBy
+        +DateTime UpdatedAt
+    }
+
+    class ArtistStore {
+        +Guid ID
+        +Guid ArtistId
+        +Guid StoreId
+        +long BreakTime
+        +Date WorkingDate
+        +Time StartTime
+        +Time EndTime
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +GetBookingsByDate(date)
+    }
+
+    class Notification {
+        +Guid ID
+        +int Status
+        +int NotificationType
+        +Guid UserId
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +string Content
+        +string Title
+        +SendNotification(userId, title, content)
+    }
+
+    class User {
+        +Guid ID
+        +string FullName
+        +string Email
+        +string PhoneNumber
+        +string PasswordHash
+        +DateTime DateOfBirth
+        +string ImageUrl
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+    }
+
+    Artist --|> User
+    Artist "1" -- "many" ArtistStore
+    Artist "1" -- "many" Booking : "manages"
+    Booking "1" -- "1" BookingStatus : "has"
+    Booking "1" -- "many" BookingStatusHistory : "has"
+    Booking "1" -- "many" Notification : "triggers"
+    ArtistStore "1" -- "many" Booking : "contains" 

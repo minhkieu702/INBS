@@ -1,0 +1,55 @@
+sequenceDiagram
+    participant A as Artist
+    participant B as Booking
+    participant BSH as BookingStatusHistory
+    participant BS as BookingStatus
+    participant N as Notification
+    participant C as Customer
+    participant AS as ArtistStore
+
+    %% Main flow: Artist updates booking status
+    A->>B: UpdateBookingStatus(bookingId, newStatus)
+    Note over A,B: Artist initiates status update
+    
+    B->>BS: ValidateStatus(newStatus)
+    Note over BS: Check if status is valid
+    
+    alt Valid Status
+        B->>BSH: CreateHistoryRecord(oldStatus, newStatus)
+        Note over BSH: Record status change history
+        
+        B->>B: UpdateStatus(newStatus)
+        Note over B: Update booking status
+        
+        B->>N: CreateNotification(CustomerId, "Booking Status Updated", message)
+        Note over N: Create notification for customer
+        
+        N->>C: SendNotification()
+        Note over C: Customer receives notification
+        
+        B->>AS: UpdateAvailability()
+        Note over AS: Update artist's availability
+        
+        B->>A: ReturnSuccess()
+        Note over A: Confirm status update
+    else Invalid Status
+        B->>A: ReturnError("Invalid status")
+        Note over A: Status update failed
+    end
+    
+    %% Alternative flow: Get booking status history
+    A->>B: GetStatusHistory(bookingId)
+    B->>BSH: GetHistoryRecords(bookingId)
+    BSH->>B: ReturnHistoryRecords()
+    B->>A: ReturnStatusHistory()
+    
+    %% Alternative flow: Get bookings by status
+    A->>A: GetBookingsByStatus(status)
+    A->>B: GetBookingsByArtistAndStatus(artistId, status)
+    B->>A: ReturnBookings()
+    
+    %% Alternative flow: Get bookings by date
+    A->>AS: GetBookingsByDate(date)
+    AS->>B: GetBookingsByArtistStoreAndDate(artistStoreId, date)
+    B->>AS: ReturnBookings()
+    AS->>A: ReturnBookings() 

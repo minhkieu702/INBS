@@ -61,11 +61,11 @@ namespace INBS.API.Controllers.Artist
         /// <param name="artistStores"></param>
         /// <returns>An action result.</returns>
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ArtistRequest artist, [FromForm] UserRequest user, [FromForm] IList<ArtistServiceRequest> artistServices, [FromForm] IList<ArtistStoreRequest> artistStores)
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] ArtistRequest artist, [FromForm] UserRequest user, [FromForm] IList<ArtistServiceRequest> artistServices, [FromForm] IList<ArtistStoreRequest> artistStores, [FromForm] IList<ArtistCertificateRequest> artistCertificateRequests)
         {
             try
             {
-                await service.Update(id, artist, user, artistServices, artistStores);
+                await service.Update(id, artist, user, artistServices, artistStores, artistCertificateRequests);
                 return Ok();
             }
             catch (Exception ex)

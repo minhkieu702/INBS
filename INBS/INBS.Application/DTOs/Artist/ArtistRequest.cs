@@ -13,5 +13,7 @@ namespace INBS.Application.DTOs.Artist
         public int Level { get; set; }
 
         public int YearsOfExperience { get; set; }
+
+        public IList<ArtistCertificateRequest> Certificates { get; set; } 
     }
 }

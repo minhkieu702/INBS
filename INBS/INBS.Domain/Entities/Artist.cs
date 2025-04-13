@@ -31,6 +31,8 @@ namespace INBS.Domain.Entities
         public int Level { get; set; }
 
         public float AverageRating { get; set; }
+        public virtual ICollection<ArtistCertificate> Certificates { get; set; } = [];
+
 
         [InverseProperty(nameof(ArtistService.Artist))]
         public virtual ICollection<ArtistService> ArtistServices { get; set; }
