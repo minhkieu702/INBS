@@ -20,6 +20,7 @@ namespace INBS.Persistence.Data
         public virtual DbSet<Admin> Admins { get; set; }
 
         public virtual DbSet<Artist> Artists { get; set; }
+        public virtual DbSet<ArtistCertificate> ArtistCertificates { get; set; }
 
         public virtual DbSet<ArtistService> ArtistServices { get; set; }
 

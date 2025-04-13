@@ -22,7 +22,6 @@ namespace INBS.Application.DTOs.Artist
         public float AverageRating { get; set; }
         public virtual ICollection<ArtistCertificateResponse> Certificates { get; set; } = [];
 
-
         public virtual ICollection<ArtistStoreResponse> ArtistStores { get; set; } = [];
 
         public virtual ICollection<ArtistServiceResponse> ArtistServices { get; set; } = [];

@@ -5,11 +5,16 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using INBS.Domain.Common;
 
 namespace INBS.Domain.Entities
 {
     public class ArtistCertificate
     {
+        public ArtistCertificate() {
+            ImageUrl = Constants.DEFAULT_IMAGE_URL;
+        }
+     
         [Key]
         public Guid Id { get; set; }
 
@@ -21,7 +26,7 @@ namespace INBS.Domain.Entities
 
         public string? Description { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         [ForeignKey(nameof(ArtistId))]
         [InverseProperty(nameof(Artist.Certificates))]
