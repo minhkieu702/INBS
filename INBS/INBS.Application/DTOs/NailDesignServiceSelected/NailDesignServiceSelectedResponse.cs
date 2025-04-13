@@ -15,7 +15,5 @@ namespace INBS.Application.DTOs.NailDesignServiceSelected
         public virtual NailDesignServiceResponse? NailDesignService { get; set; }
 
         public long Duration { get; set; }
-
-        public long PriceAtBooking { get; set; }
     }
 }

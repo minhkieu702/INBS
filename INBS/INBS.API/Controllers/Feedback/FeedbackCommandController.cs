@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Feedback;
+using INBS.Application.DTOs.FeedbackImage;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -27,11 +28,11 @@ namespace INBS.API.Controllers.Feedback
         /// Create the feedback.
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] FeedbackRequest feedback)
+        public async Task<IActionResult> Create([FromForm] FeedbackRequest feedback, [FromForm] IList<FeedbackImageRequest> feedbackImages)
         {
             try
             {
-                await _service.Create(feedback);
+                await _service.Create(feedback, feedbackImages);
                 return Ok();
             }
             catch (Exception ex)
@@ -44,11 +45,11 @@ namespace INBS.API.Controllers.Feedback
         /// Update the feedback.
         /// </summary>
         [HttpPut]
-        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] FeedbackRequest feedback)
+        public async Task<IActionResult> Update([FromQuery] Guid id, [FromForm] FeedbackRequest feedback, [FromForm] IList<FeedbackImageRequest> feedbackImages)
         {
             try
             {
-                await _service.Update(id, feedback);
+                await _service.Update(id, feedback, feedbackImages);
                 return Ok();
             }
             catch (Exception ex)

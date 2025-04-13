@@ -14,6 +14,8 @@ namespace INBS.Domain.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
+        public int NumerialOrder { get; set; }
+        public int MediaType { get; set; }
         public Guid FeedbackId { get; set; }
         [ForeignKey(nameof(FeedbackId))]
         [InverseProperty(nameof(Feedback.FeedbackImages))]

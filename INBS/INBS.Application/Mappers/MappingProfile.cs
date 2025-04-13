@@ -12,6 +12,7 @@ using INBS.Application.DTOs.CustomerSelected;
 using INBS.Application.DTOs.Design;
 using INBS.Application.DTOs.DeviceToken;
 using INBS.Application.DTOs.Feedback;
+using INBS.Application.DTOs.FeedbackImage;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignService;
@@ -120,11 +121,21 @@ namespace INBS.Application.Mappers
             CreateMap<Feedback, FeedbackResponse>();
             #endregion
 
+            #region FeedbackImage
+            CreateMap<FeedbackImageRequest, FeedbackImage>()
+                    .AfterMap((source, dest) =>
+                    {
+                        dest.MediaType = (int)source.MediaType;
+                    });
+            CreateMap<FeedbackImage, FeedbackImageResponse>();
+            #endregion
+
             #region Media
             CreateMap<MediaRequest, Media>()
                 .AfterMap((source, dest) =>
                 {
                     dest.ImageUrl = source.ImageUrl ?? Constants.DEFAULT_IMAGE_URL;
+                    dest.MediaType = (int)source.MediaType;
                 });
             CreateMap<Media, MediaResponse>();
             #endregion

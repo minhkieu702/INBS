@@ -15,5 +15,6 @@ namespace INBS.Application.Interfaces
         Task NotifyArtistStoreRejected(Guid artistId, string title, string message);
         Task NotifyArtistStoreUpdated(Guid artistId, string title, string message);
         Task NotifyArtistStoreIsCreated(Guid adminId, string title, string message);
+        Task NotifyFeedback(Guid artistId, string title, string message);
     }
 }
