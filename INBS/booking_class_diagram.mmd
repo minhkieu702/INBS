@@ -1,0 +1,121 @@
+classDiagram
+    class User {
+        +Guid ID
+        +string FullName
+        +string Email
+        +string PhoneNumber
+        +string PasswordHash
+        +DateTime DateOfBirth
+        +string ImageUrl
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+    }
+
+    class Customer {
+        +Guid ID
+        +string OtpCode
+        +DateTime OtpExpiry
+        +bool IsVerified
+        +string Description
+    }
+
+    class Artist {
+        +Guid ID
+        +string Username
+        +int YearsOfExperience
+        +int Level
+        +float AverageRating
+    }
+
+    class Store {
+        +Guid ID
+        +string Address
+        +string Description
+        +string ImageUrl
+        +float AverageRating
+        +int Status
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +float Latitude
+        +float Longitude
+        +string Province
+    }
+
+    class ArtistStore {
+        +Guid ID
+        +Guid ArtistId
+        +Guid StoreId
+        +long BreakTime
+        +Date WorkingDate
+        +Time StartTime
+        +Time EndTime
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+    }
+
+    class Service {
+        +Guid ID
+        +string Name
+        +string Description
+        +string ImageUrl
+        +long AverageDuration
+        +bool IsAdditional
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+    }
+
+    class CustomerSelected {
+        +Guid ID
+        +bool IsFavorite
+        +bool IsDeleted
+        +Guid CustomerID
+    }
+
+    class Booking {
+        +Guid ID
+        +Date ServiceDate
+        +Time StartTime
+        +Time PredictEndTime
+        +int Status
+        +long TotalAmount
+        +Guid CustomerSelectedId
+        +Guid ArtistStoreId
+        +bool IsDeleted
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+    }
+
+    class Payment {
+        +string ID
+        +int Method
+        +long TotalAmount
+        +int Status
+    }
+
+    class PaymentDetail {
+        +string PaymentId
+        +Guid BookingId
+    }
+
+    class Cancellation {
+        +int ID
+        +string Reason
+        +DateTime CancelledAt
+        +Guid BookingId
+    }
+
+    User <|-- Customer
+    User <|-- Artist
+    Customer "1" -- "many" CustomerSelected
+    CustomerSelected "1" -- "1" Booking
+    Artist "1" -- "many" ArtistStore
+    Store "1" -- "many" ArtistStore
+    ArtistStore "1" -- "many" Booking
+    Booking "1" -- "1" PaymentDetail
+    Payment "1" -- "many" PaymentDetail
+    Booking "1" -- "0..1" Cancellation
+    Service "1" -- "many" CustomerSelected 

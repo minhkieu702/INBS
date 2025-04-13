@@ -1,0 +1,265 @@
+erDiagram
+    Users ||--o{ Admins : "has"
+    Users ||--o{ Artists : "has"
+    Users ||--o{ Customers : "has"
+    Users ||--o{ DeviceTokens : "has"
+    Users ||--o{ Notifications : "has"
+
+    Artists ||--o{ ArtistServices : "provides"
+    Artists ||--o{ ArtistStores : "works_at"
+
+    Services ||--o{ ArtistServices : "offered_by"
+    Services ||--o{ CategoryServices : "belongs_to"
+    Services ||--o{ NailDesignService : "used_in"
+    Services ||--o{ ServicePriceHistory : "has_price_history"
+
+    Stores ||--o{ ArtistStores : "has_artists"
+
+    Designs ||--o{ Medias : "has"
+    Designs ||--o{ NailDesigns : "has"
+    Designs ||--o{ Preferences : "preferred_by"
+    Designs ||--o{ Recommendations : "recommended_to"
+
+    NailDesigns ||--o{ NailDesignService : "used_in"
+    NailDesignService ||--o{ Carts : "added_to"
+    NailDesignService ||--o{ NailDesignServiceSelecteds : "selected_in"
+
+    Customers ||--o{ Carts : "has"
+    Customers ||--o{ CustomerSelected : "has"
+    Customers ||--o{ Feedbacks : "gives"
+    Customers ||--o{ Preferences : "has"
+    Customers ||--o{ Recommendations : "receives"
+
+    CustomerSelected ||--o{ Bookings : "books"
+    CustomerSelected ||--o{ NailDesignServiceSelecteds : "selects"
+
+    Bookings ||--o{ Cancellations : "may_have"
+    Bookings ||--o{ PaymentDetails : "has"
+
+    Payments ||--o{ PaymentDetails : "details"
+
+    Users {
+        uniqueidentifier ID PK
+        string FullName
+        string PasswordHash
+        string PhoneNumber
+        int Role
+        date DateOfBirth
+        string ImageUrl
+        boolean IsDeleted
+        datetime CreatedAt
+        datetime LastModifiedAt
+        string Email
+    }
+
+    Admins {
+        uniqueidentifier ID PK
+        string Username
+    }
+
+    Artists {
+        uniqueidentifier ID PK
+        string Username
+        int YearsOfExperience
+        int Level
+        float AverageRating
+    }
+
+    Customers {
+        uniqueidentifier ID PK
+        string OtpCode
+        datetime OtpExpiry
+        boolean IsVerified
+        string Description
+    }
+
+    Services {
+        uniqueidentifier ID PK
+        string Name
+        string Description
+        string ImageUrl
+        bigint AverageDuration
+        boolean IsAdditional
+        boolean IsDeleted
+        datetime CreatedAt
+        datetime LastModifiedAt
+    }
+
+    Stores {
+        uniqueidentifier ID PK
+        string Address
+        string Description
+        string ImageUrl
+        float AverageRating
+        int Status
+        boolean IsDeleted
+        datetime CreatedAt
+        datetime LastModifiedAt
+        float Latitude
+        float Longitude
+        string Province
+    }
+
+    Designs {
+        uniqueidentifier ID PK
+        string Name
+        float TrendScore
+        string Description
+        float AverageRating
+        boolean IsDeleted
+        datetime CreatedAt
+        datetime LastModifiedAt
+    }
+
+    NailDesigns {
+        uniqueidentifier ID PK
+        uniqueidentifier DesignId FK
+        string ImageUrl
+        int NailPosition
+        boolean IsLeft
+    }
+
+    NailDesignService {
+        uniqueidentifier ID PK
+        uniqueidentifier NailDesignId FK
+        uniqueidentifier ServiceId FK
+        bigint ExtraPrice
+        boolean IsDeleted
+        datetime CreatedAt
+        datetime LastModifiedAt
+    }
+
+    Bookings {
+        uniqueidentifier ID PK
+        date ServiceDate
+        time StartTime
+        time PredictEndTime
+        int Status
+        bigint TotalAmount
+        uniqueidentifier CustomerSelectedId FK
+        uniqueidentifier ArtistStoreId FK
+        boolean IsDeleted
+        datetime CreatedAt
+        datetime LastModifiedAt
+    }
+
+    Payments {
+        string ID PK
+        int Method
+        bigint TotalAmount
+        int Status
+    }
+
+    PaymentDetails {
+        string PaymentId PK,FK
+        uniqueidentifier BookingId PK,FK
+    }
+
+    Cancellations {
+        int ID PK
+        string Reason
+        datetime CancelledAt
+        uniqueidentifier BookingId FK
+    }
+
+    ArtistServices {
+        uniqueidentifier ArtistId PK,FK
+        uniqueidentifier ServiceId PK,FK
+    }
+
+    ArtistStores {
+        uniqueidentifier ID PK
+        uniqueidentifier ArtistId FK
+        uniqueidentifier StoreId FK
+        bigint BreakTime
+        date WorkingDate
+        time StartTime
+        time EndTime
+        boolean IsDeleted
+        datetime CreatedAt
+        datetime LastModifiedAt
+    }
+
+    Carts {
+        uniqueidentifier CustomerId PK,FK
+        uniqueidentifier NailDesignServiceId PK,FK
+    }
+
+    CategoryServices {
+        int CategoryId PK
+        uniqueidentifier ServiceId PK,FK
+    }
+
+    CustomerSelected {
+        uniqueidentifier ID PK
+        boolean IsFavorite
+        boolean IsDeleted
+        uniqueidentifier CustomerID FK
+    }
+
+    DeviceTokens {
+        int ID PK
+        string Token
+        datetime CreatedAt
+        uniqueidentifier UserId FK
+        int Platform
+    }
+
+    Feedbacks {
+        uniqueidentifier ID PK
+        int FeedbackType
+        int Rating
+        string Content
+        uniqueidentifier TypeId
+        uniqueidentifier CustomerId FK
+        boolean IsDeleted
+        datetime CreatedAt
+        datetime LastModifiedAt
+    }
+
+    Medias {
+        int NumerialOrder PK
+        uniqueidentifier DesignId PK,FK
+        string ImageUrl
+        int MediaType
+    }
+
+    NailDesignServiceSelecteds {
+        uniqueidentifier CustomerSelectedId PK,FK
+        uniqueidentifier NailDesignServiceId PK,FK
+        bigint Duration
+    }
+
+    Notifications {
+        uniqueidentifier ID PK
+        int Status
+        int NotificationType
+        uniqueidentifier UserId FK
+        boolean IsDeleted
+        datetime CreatedAt
+        datetime LastModifiedAt
+        string Content
+        string Title
+    }
+
+    Preferences {
+        int ID PK
+        uniqueidentifier DesignId FK
+        uniqueidentifier CustomerId FK
+        int PreferenceId
+        int PreferenceType
+    }
+
+    Recommendations {
+        uniqueidentifier DesignId PK,FK
+        uniqueidentifier CustomerId PK,FK
+        datetime GenerateAt
+    }
+
+    ServicePriceHistory {
+        int ID PK
+        uniqueidentifier ServiceId FK
+        bigint Price
+        datetime EffectiveFrom
+        datetime EffectiveTo
+    } 

@@ -43,6 +43,8 @@ namespace INBS.Application.Mappers
             #region Artist
             CreateMap<ArtistRequest, Artist>();
             CreateMap<Artist, ArtistResponse>();
+            CreateMap<ArtistCertificate, ArtistCertificateResponse>();
+            CreateMap<ArtistCertificateRequest, ArtistCertificate>();
             #endregion
 
             #region ArtistService

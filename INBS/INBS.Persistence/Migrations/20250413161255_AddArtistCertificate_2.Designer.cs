@@ -4,6 +4,7 @@ using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    partial class INBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250413161255_AddArtistCertificate_2")]
+    partial class AddArtistCertificate_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,6 +75,7 @@ namespace INBS.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("NumerialOrder")
@@ -85,7 +89,7 @@ namespace INBS.Persistence.Migrations
 
                     b.HasIndex("ArtistId");
 
-                    b.ToTable("ArtistCertificates");
+                    b.ToTable("ArtistCertificate");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.ArtistService", b =>

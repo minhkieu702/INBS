@@ -7,6 +7,7 @@ using INBS.Application.DTOs.ArtistStore;
 using INBS.Application.DTOs.User;
 using INBS.Application.Interfaces;
 using INBS.Application.IServices;
+using INBS.Domain.Common;
 using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
@@ -265,10 +266,10 @@ namespace INBS.Application.Services
             {
                 _unitOfWork.BeginTransaction();
 
-                if (artistStoreRequest.Count != 0) 
+                if (artistStoreRequest.Count != 0)
                     await ValidateStore(artistStoreRequest.Select(c => c.StoreId));
 
-                if(artistServiceRequest.Count != 0) 
+                if (artistServiceRequest.Count != 0)
                     await ValidateService(artistServiceRequest.Select(c => c.ServiceId));
 
                 var user = await CreateUser(userRequest);
@@ -279,22 +280,58 @@ namespace INBS.Application.Services
 
                 artist.Username = await GetUsername(userRequest.FullName);
 
-                if (artistStoreRequest.Count != 0) 
+                artist.Certificates = null;
+                await _unitOfWork.ArtistRepository.InsertAsync(artist);
+                await _unitOfWork.SaveAsync();
+
+                var certificateEntities = new List<ArtistCertificate>();
+
+                if (artistRequest.Certificates != null && artistRequest.Certificates.Any())
+                {
+                    foreach (var certReq in artistRequest.Certificates)
+                    {
+                        string finalImageUrl = certReq.ImageUrl;
+
+                        if (certReq.NewImage != null)
+                        {
+                            finalImageUrl = await UploadCertificateImageAsync(certReq.NewImage);
+                        }
+                        else if (string.IsNullOrEmpty(finalImageUrl))
+                        {
+                            finalImageUrl = Constants.DEFAULT_IMAGE_URL;
+                        }
+
+                        var certEntity = new ArtistCertificate
+                        {
+                            Id = Guid.NewGuid(),
+                            ArtistId = artist.ID,
+                            NumerialOrder = certReq.NumerialOrder,
+                            Title = certReq.Title,
+                            Description = certReq.Description,
+                            ImageUrl = finalImageUrl
+                        };
+
+                        certificateEntities.Add(certEntity);
+                    }
+
+                    _unitOfWork.ArtistCertificateRepository.InsertRange(certificateEntities);
+                }
+
+                if (artistStoreRequest.Count != 0)
                     await AssignStore(artist.ID, artistStoreRequest);
 
                 if (artistServiceRequest.Count != 0)
                     await AssignService(artist.ID, artistServiceRequest);
 
-                await _unitOfWork.ArtistRepository.InsertAsync(artist);
-
                 if (await _unitOfWork.SaveAsync() <= 0)
                     throw new Exception("This action failed");
 
                 await _emailSender.Send(null, userRequest.Email, "ACCOUNT TO LOG IN TO ARTIST PORTAL", Utils.GetHTMLForNewArtistAccount(artist.Username, "password123!@#"));
-                
+
                 _unitOfWork.CommitTransaction();
 
                 artist.User = user;
+                artist.Certificates = certificateEntities;
 
                 return _mapper.Map<ArtistResponse>(artist);
             }
@@ -304,6 +341,7 @@ namespace INBS.Application.Services
                 throw;
             }
         }
+
 
         public async Task Delete(Guid id)
         {
@@ -360,15 +398,17 @@ namespace INBS.Application.Services
 
                 await UpdateUser(id, userRequest);
 
-                await _unitOfWork.ArtistRepository.UpdateAsync(_mapper.Map(artistRequest, artist));
+                _mapper.Map(artistRequest, artist);
+                artist.Certificates = null;
+                await _unitOfWork.ArtistRepository.UpdateAsync(artist);
 
                 if (artistServiceRequest.Count != 0) 
                     await AssignService(artist.ID, artistServiceRequest);
 
                 //if (artistStoreRequest.Count != 0) 
                     await AssignStore(artist.ID, artistStoreRequest);
-
-                _mapper.Map(artistRequest, artist);
+                var certificates = await HandleArtistCertificates(artist.ID, artistRequest.Certificates);
+                artist.Certificates = certificates;
 
                 await _unitOfWork.ArtistRepository.UpdateAsync(artist);
 
@@ -397,5 +437,76 @@ namespace INBS.Application.Services
 
             await _unitOfWork.UserRepository.UpdateAsync(user);
         }
+
+        private async Task<List<ArtistCertificate>> HandleArtistCertificates(Guid artistId, IList<ArtistCertificateRequest> newList)
+        {
+            var oldList = await _unitOfWork.ArtistCertificateRepository
+                .GetAsync(c => c.Where(x => x.ArtistId == artistId));
+
+            var newIdsSet = newList.Select(c => c.NumerialOrder).ToHashSet();
+            var processedItems = new HashSet<ArtistCertificateRequest>();
+
+            var updatingList = new List<ArtistCertificate>();
+            var insertingList = new List<ArtistCertificate>();
+            var deletingList = new List<ArtistCertificate>();
+
+            foreach (var oldItem in oldList)
+            {
+                if (newIdsSet.Contains(oldItem.NumerialOrder))
+                {
+                    var newItem = newList.First(c => c.NumerialOrder == oldItem.NumerialOrder);
+                    _mapper.Map(newItem, oldItem);
+
+                    if (newItem.NewImage != null)
+                    {
+                        var imageUrl = await UploadCertificateImageAsync(newItem.NewImage);
+                        oldItem.ImageUrl = imageUrl;
+                    }
+                    else if (string.IsNullOrEmpty(oldItem.ImageUrl))
+                    {
+                        oldItem.ImageUrl = Constants.DEFAULT_IMAGE_URL;  // Gán giá trị mặc định nếu không có ảnh mới
+                    }
+                    updatingList.Add(oldItem);
+                    processedItems.Add(newItem);
+                }
+                else
+                {
+                    deletingList.Add(oldItem);
+                }
+            }
+
+            var remainingNewList = newList.Except(processedItems).ToList();
+
+            foreach (var newItem in remainingNewList)
+            {
+                var entity = _mapper.Map<ArtistCertificate>(newItem);
+                entity.ArtistId = artistId;
+
+                if (newItem.NewImage != null)
+                {
+                    var imageUrl = await UploadCertificateImageAsync(newItem.NewImage);
+                    entity.ImageUrl = imageUrl;
+                }
+
+                insertingList.Add(entity);
+            }
+
+            if (deletingList.Count > 0)
+                _unitOfWork.ArtistCertificateRepository.DeleteRange(deletingList);
+
+            if (updatingList.Count > 0)
+                _unitOfWork.ArtistCertificateRepository.UpdateRange(updatingList);
+
+            if (insertingList.Count > 0)
+                _unitOfWork.ArtistCertificateRepository.InsertRange(insertingList);
+
+            return insertingList.Concat(updatingList).ToList();
+        }
+
+        private async Task<string> UploadCertificateImageAsync(IFormFile file)
+        {
+            return await _firebaseService.UploadFileAsync(file);
+        }
+
     }
 }

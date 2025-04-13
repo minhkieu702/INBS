@@ -1,0 +1,138 @@
+sequenceDiagram
+    participant C as Customer
+    participant U as User
+    participant CS as CustomerSelected
+    participant B as Booking
+    participant P as Payment
+    participant PD as PaymentDetail
+    participant F as Feedback
+    participant DT as DeviceToken
+    participant N as Notification
+    participant PR as Preference
+    participant CR as Cart
+    participant NDS as NailDesignService
+
+    %% Account Registration and Verification
+    C->>U: Register(email, password, fullName, phoneNumber)
+    Note over C,U: Create new user account
+    U->>C: Return userId
+    
+    C->>C: RequestOtp()
+    Note over C: Generate OTP code
+    C->>C: SendOtpToEmail(email)
+    Note over C: Send OTP to customer's email
+    
+    C->>C: VerifyAccount(otpCode)
+    Note over C: Validate OTP code
+    C->>C: UpdateIsVerified(true)
+    Note over C: Mark account as verified
+    
+    %% Profile Management
+    C->>U: UpdateProfile(profileData)
+    Note over U: Update user profile information
+    U->>C: ReturnSuccess()
+    
+    C->>U: ChangePassword(oldPassword, newPassword)
+    Note over U: Validate and update password
+    U->>C: ReturnSuccess()
+    
+    %% Device Management
+    C->>DT: RegisterDevice(token, platform)
+    Note over DT: Store device token for notifications
+    DT->>C: ReturnSuccess()
+    
+    %% Booking Management
+    C->>CS: CreateCustomerSelected(serviceId)
+    Note over CS: Create service selection
+    CS->>C: ReturnCustomerSelectedId
+    
+    C->>B: CreateBooking(customerSelectedId, artistStoreId, date, time)
+    Note over B: Create new booking
+    B->>C: ReturnBookingId
+    
+    C->>P: CreatePayment(bookingId, amount, method)
+    Note over P: Create payment record
+    P->>PD: CreatePaymentDetail(paymentId, bookingId)
+    Note over PD: Link payment to booking
+    P->>C: ReturnPaymentId
+    
+    C->>B: GetBookingStatus(bookingId)
+    Note over B: Retrieve booking status
+    B->>C: ReturnStatus()
+    
+    C->>B: CancelBooking(bookingId, reason)
+    Note over B: Update booking status to cancelled
+    B->>N: CreateNotification(userId, "Booking Cancelled", message)
+    Note over N: Notify customer about cancellation
+    B->>C: ReturnSuccess()
+    
+    %% Feedback Management
+    C->>F: SubmitFeedback(type, rating, content, typeId)
+    Note over F: Create feedback record
+    F->>C: ReturnSuccess()
+    
+    C->>F: UpdateFeedback(feedbackId, rating, content)
+    Note over F: Update existing feedback
+    F->>C: ReturnSuccess()
+    
+    %% Preference Management
+    C->>PR: UpdatePreference(designId, preferenceId, preferenceType)
+    Note over PR: Update customer preferences
+    PR->>C: ReturnSuccess()
+    
+    C->>PR: GetPreferenceDetails()
+    Note over PR: Retrieve customer preferences
+    PR->>C: ReturnPreferences()
+    
+    %% Cart Management
+    C->>CR: AddToCart(nailDesignServiceId)
+    Note over CR: Add service to cart
+    CR->>C: ReturnSuccess()
+    
+    C->>CR: GetCartItems()
+    Note over CR: Retrieve cart items
+    CR->>NDS: GetServiceDetails(nailDesignServiceId)
+    Note over NDS: Get service details
+    NDS->>CR: ReturnServiceDetails()
+    CR->>C: ReturnCartItems()
+    
+    C->>CR: RemoveFromCart(nailDesignServiceId)
+    Note over CR: Remove service from cart
+    CR->>C: ReturnSuccess()
+    
+    C->>CR: ClearCart()
+    Note over CR: Remove all items from cart
+    CR->>C: ReturnSuccess()
+    
+    %% Notification Management
+    C->>N: GetNotifications()
+    Note over N: Retrieve customer notifications
+    N->>C: ReturnNotifications()
+    
+    C->>N: MarkAsRead(notificationId)
+    Note over N: Mark notification as read
+    N->>C: ReturnSuccess()
+    
+    C->>N: DeleteNotification(notificationId)
+    Note over N: Delete notification
+    N->>C: ReturnSuccess()
+    
+    %% Booking History
+    C->>C: GetBookingHistory()
+    Note over C: Retrieve all customer bookings
+    C->>B: GetBookingsByCustomer(customerId)
+    Note over B: Get all bookings for customer
+    B->>C: ReturnBookings()
+    C->>C: ReturnBookingHistory()
+    
+    %% Favorites Management
+    C->>C: GetFavorites()
+    Note over C: Retrieve customer favorites
+    C->>CS: GetFavoritesByCustomer(customerId)
+    Note over CS: Get all favorites for customer
+    CS->>C: ReturnFavorites()
+    C->>C: ReturnFavorites()
+    
+    C->>CS: ToggleFavorite(customerSelectedId)
+    Note over CS: Toggle favorite status
+    CS->>C: ReturnSuccess() 
