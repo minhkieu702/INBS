@@ -21,20 +21,19 @@ namespace INBS.API.Controllers.Notification
         /// <summary>
         /// Marks a notification as seen.
         /// </summary>
-        /// <param name="id">The ID of the notification to mark as seen.</param>
         /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
         [HttpPost]
-        public async Task<IActionResult> MarkSeen([FromQuery] Guid id)
+        public async Task<IActionResult> MarkSeen()
         {
             try
             {
-                await service.MarkSeenNotification(id);
+                await service.MarkSeenNotification();
                 return Ok();
             }
             catch (Exception ex)
             {
                 logger.LogError("An error occurred while marking the notification as seen: {Message}", ex.Message);
-                throw;
+                return new BadRequestObjectResult(ex.Message);
             }
         }
     }

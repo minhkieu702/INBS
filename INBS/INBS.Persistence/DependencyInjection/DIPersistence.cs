@@ -19,8 +19,8 @@ namespace INBS.Persistence.DependencyInjection
             services.AddDbContext<INBSDbContext>(options =>
             {
                 options.UseLazyLoadingProxies()
-                //.UseSqlServer(Environment.GetEnvironmentVariable("connectionString"));
-                .UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
+                .UseSqlServer(Environment.GetEnvironmentVariable("connectionString"));
+                //.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
                 //.UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBSTest; TrustServerCertificate=True");
                 //.UseSqlServer("Server=LAPTOP-NLTHM945\\DIVAORAM; uid=sa; pwd=12345; database=INBS; TrustServerCertificate=True");
             });
