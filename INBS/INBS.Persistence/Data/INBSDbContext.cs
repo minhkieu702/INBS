@@ -101,10 +101,10 @@ namespace INBS.Persistence.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer("Server=LAPTOP-NLTHM945\\DIVAORAM; uid=sa; pwd=12345; database=INBS; TrustServerCertificate=True");
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer("Server=LAPTOP-NLTHM945\\DIVAORAM; uid=sa; pwd=12345; database=INBS; TrustServerCertificate=True");
 
-        //}
+        }
     }
 }

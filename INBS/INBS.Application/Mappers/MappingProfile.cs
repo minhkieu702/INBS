@@ -16,6 +16,7 @@ using INBS.Application.DTOs.FeedbackImage;
 using INBS.Application.DTOs.Image;
 using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.NailDesignService;
+using INBS.Application.DTOs.NailDesignServiceGuide;
 using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.DTOs.Notification;
 using INBS.Application.DTOs.Payment;
@@ -157,6 +158,9 @@ namespace INBS.Application.Mappers
             CreateMap<NailDesignServiceRequest, NailDesignService>();
             CreateMap<ServiceNailDesignRequest, NailDesignService>();
             CreateMap<NailDesignService, NailDesignServiceResponse>();
+            CreateMap<NailDesignService, NailDesignServiceResponse>();
+
+            CreateMap<NailDesignServiceGuide, NailDesignServiceGuideResponse>();
             #endregion
 
             #region NailDesignServiceSelected
