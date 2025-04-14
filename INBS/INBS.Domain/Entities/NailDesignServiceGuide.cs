@@ -10,8 +10,6 @@ namespace INBS.Domain.Entities
 {
     public class NailDesignServiceGuide : BaseEntity
     {
-        public Guid NailDesignServiceGuideId { get; set; }
-
         public Guid NailDesignServiceId { get; set; }
 
         [ForeignKey(nameof(NailDesignServiceId))]
