@@ -268,30 +268,5 @@ namespace INBS.Application.Services
                 throw;
             }
         }
-
-        public async Task UpdateTime(ServiceDurationRequest serviceDuration)
-        {
-            try
-            {
-                var count = await _unitOfWork.BookingRepository.Query()
-                    .Select(c => 
-                    c.CustomerSelected!.NailDesignServiceSelecteds.Where(c => c.NailDesignService!.ServiceId == serviceDuration.ServiceId)).CountAsync();
-                var service = await _unitOfWork.ServiceRepository.Query()
-                    .FirstOrDefaultAsync(c => c.ID == serviceDuration.ServiceId) ?? throw new Exception("This service not found");
-
-                    var duration = (serviceDuration.EndAt.CompareTo(serviceDuration.StartAt)*60);
-                service.AverageDuration = (service.AverageDuration * count + duration) / (count + 1);
-
-                await _unitOfWork.ServiceRepository.UpdateAsync(service);
-
-                if (await _unitOfWork.SaveAsync() == 0)
-                    throw new Exception("Update service failed");
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
     }
 }

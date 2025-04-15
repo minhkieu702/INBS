@@ -13,6 +13,5 @@ namespace INBS.Application.IServices
         Task Create(ServiceRequest service, IList<ServiceNailDesignRequest> serviceNailDesignRequests);
         Task Update(Guid id, ServiceRequest service, IList<ServiceNailDesignRequest> serviceNailDesignRequests);
         Task DeleteById(Guid id);
-        Task UpdateTime(ServiceDurationRequest serviceDuration);
     }
 }

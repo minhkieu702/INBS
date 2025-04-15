@@ -13,7 +13,5 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(NailDesignServiceId))]
         [InverseProperty(nameof(NailDesignService.NailDesignServiceSelecteds))]
         public virtual NailDesignService? NailDesignService { get; set; }
-
-        public long Duration { get; set; }
     }
 }
