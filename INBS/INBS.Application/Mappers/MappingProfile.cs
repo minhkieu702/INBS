@@ -157,6 +157,7 @@ namespace INBS.Application.Mappers
             CreateMap<NailDesignServiceRequest, NailDesignService>();
             CreateMap<ServiceNailDesignRequest, NailDesignService>();
             CreateMap<NailDesignService, NailDesignServiceResponse>();
+
             #endregion
 
             #region NailDesignServiceSelected

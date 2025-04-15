@@ -15,6 +15,8 @@ namespace INBS.Application.DTOs.Service
         public string? Description { get; set; }
 
         public long Price { get; set; }
+        public string? ImageDescriptionUrl { get; set; }
+        public IFormFile? NewImageDescription { get; set; }
 
         public string? ImageUrl { get; set; }
 
