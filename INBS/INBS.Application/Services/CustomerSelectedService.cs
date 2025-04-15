@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace INBS.Application.Services
 {
-    public class CustomerSelectedService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor, IFirebaseCloudMessageService _fcmService) : ICustomerSelectedService
+    public class CustomerSelectedService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor) : ICustomerSelectedService
     {
         private async Task HandleCart(IEnumerable<Guid> nailDesignServiceIds)
         {
@@ -149,6 +149,81 @@ namespace INBS.Application.Services
             {
 
                 throw;
+            }
+        }
+
+        public async Task<Guid> BookingWithDesign(Guid designId, Guid serviceId)
+        {
+            try
+            {
+                _unitOfWork.BeginTransaction();
+
+                await ValidationDesign(designId);
+                await ValidationService(serviceId);
+
+                var nailDesignServices = await _unitOfWork.NailDesignServiceRepository
+                    .Query()
+                    .Where(c => c.NailDesign!.DesignId == designId && c.ServiceId == serviceId)
+                    .ToListAsync() ?? throw new Exception("This design with this service is not existed");
+
+                var customerSelected = new CustomerSelected
+                {
+                    CustomerID = _authentication.GetUserIdFromHttpContext(_contextAccesstor.HttpContext),
+                };
+                await _unitOfWork.CustomerSelectedRepository.InsertAsync(customerSelected);
+
+                var nailDesignServiceSelectedList = new List<NailDesignServiceSelected>();
+
+                nailDesignServices.ForEach(c =>
+                {
+                    var nailDesignServiceSelected = new NailDesignServiceSelected
+                    {
+                        NailDesignServiceId = c.ID,
+                        CustomerSelectedId = customerSelected.ID,
+                    };
+                    nailDesignServiceSelectedList.Add(nailDesignServiceSelected);
+                });
+
+                await _unitOfWork.NailDesignServiceSelectedRepository.InsertRangeAsync(nailDesignServiceSelectedList);
+
+                if (await _unitOfWork.SaveAsync() <= 0)
+                {
+                    throw new Exception("Your action failed");
+                }
+                _unitOfWork.CommitTransaction();
+
+                return customerSelected.ID;
+            }
+            catch (Exception)
+            {
+                _unitOfWork.RollBack();
+                throw;
+            }
+        }
+
+        private async Task ValidationDesign(Guid designId)
+        {
+            var design = await _unitOfWork.DesignRepository.GetByIdAsync(designId);
+            if (design == null)
+            {
+                throw new Exception("This design is not existed");
+            }
+            if (design.IsDeleted != false)
+            {
+                throw new Exception("This design is not available");
+            }
+        }
+
+        private async Task ValidationService(Guid serviceId)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetByIdAsync(serviceId);
+            if (service == null)
+            {
+                throw new Exception("This service is not existed");
+            }
+            if (service.IsDeleted != false)
+            {
+                throw new Exception("This service is not available");
             }
         }
 

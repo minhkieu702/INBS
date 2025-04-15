@@ -25,6 +25,19 @@ namespace INBS.API.Controllers.CustomerSelected
         //    return service.Get();
         //}
 
+        [HttpPost("Design")]
+        public async Task<IActionResult> BookingWithDesign([FromQuery] Guid designId, [FromQuery] Guid serviceId)
+        {
+            try
+            {
+                return Ok(await service.BookingWithDesign(designId, serviceId));
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult(ex.Message);
+            }
+        }
+
         /// <summary>
         /// Creates a new customer selected.
         /// </summary>
