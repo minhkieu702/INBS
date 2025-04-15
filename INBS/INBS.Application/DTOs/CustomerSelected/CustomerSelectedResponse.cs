@@ -15,8 +15,6 @@ namespace INBS.Application.DTOs.CustomerSelected
         [Key]
         public Guid ID { get; set; }
 
-        public bool IsFavorite { get; set; }
-
         public Guid CustomerID { get; set; }
 
         public virtual CustomerResponse? Customer { get; set; }
