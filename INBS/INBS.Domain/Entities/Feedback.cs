@@ -19,6 +19,8 @@ namespace INBS.Domain.Entities
 
         public Guid TypeId { get; set; }
 
+        public Guid? BookingId { get; set; }
+
         public Guid CustomerId { get; set; }
         [ForeignKey(nameof(CustomerId))]
         [InverseProperty(nameof(Customer.Feedbacks))]
