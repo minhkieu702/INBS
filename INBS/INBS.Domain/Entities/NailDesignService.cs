@@ -27,10 +27,6 @@ namespace INBS.Domain.Entities
         [InverseProperty(nameof(NailDesignServiceSelected.NailDesignService))]
         public virtual ICollection<NailDesignServiceSelected> NailDesignServiceSelecteds { get; set; }
 
-        [InverseProperty(nameof(NailDesignServiceGuide.NailDesignService))]
-        public virtual ICollection<NailDesignServiceGuide> Guides { get; set; } = new List<NailDesignServiceGuide>();
-
-
         [InverseProperty(nameof(Cart.NailDesignService))]
         public virtual ICollection<Cart> Carts { get; set; }
     }

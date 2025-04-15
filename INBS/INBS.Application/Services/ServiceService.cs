@@ -138,6 +138,11 @@ namespace INBS.Application.Services
                     newService.ImageUrl = await _firebaseService.UploadFileAsync(modelRequest.NewImage);
                 }
 
+                if (modelRequest.NewImageDescription != null)
+                {
+                    newService.ImageDescriptionUrl = await _firebaseService.UploadFileAsync(modelRequest.NewImageDescription);
+                }
+
                 newService.CreatedAt = DateTime.Now;
 
                 await _unitOfWork.ServiceRepository.InsertAsync(newService);
@@ -235,6 +240,11 @@ namespace INBS.Application.Services
                 if (updatingRequest.NewImage != null)
                 {
                     newEntity.ImageUrl = await _firebaseService.UploadFileAsync(updatingRequest.NewImage);
+                }
+
+                if (updatingRequest.NewImageDescription != null)
+                {
+                    newEntity.ImageDescriptionUrl = await _firebaseService.UploadFileAsync(updatingRequest.NewImageDescription);
                 }
 
                 if (updatingRequest.CategoryIds != null && updatingRequest.CategoryIds.Any())

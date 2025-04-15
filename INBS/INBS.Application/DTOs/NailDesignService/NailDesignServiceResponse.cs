@@ -2,8 +2,7 @@
 using INBS.Application.DTOs.Common;
 using INBS.Application.DTOs.Design;
 using INBS.Application.DTOs.NailDesign;
-using INBS.Application.DTOs.NailDesignServiceGuide;
-using INBS.Application.DTOs.NailDesignServiceSelected;
+ using INBS.Application.DTOs.NailDesignServiceSelected;
 using INBS.Application.DTOs.Service;
 using INBS.Domain.Entities;
 using System;
@@ -29,7 +28,5 @@ namespace INBS.Application.DTOs.NailDesignService
         public virtual ICollection<NailDesignServiceSelectedResponse> NailDesignServiceSelecteds { get; set; } = [];
 
         public virtual ICollection<CartResponse> Carts { get; set; } = [];
-        public virtual ICollection<NailDesignServiceGuideResponse>? Guides { get; set; }
-
     }
 }
