@@ -405,7 +405,7 @@ namespace INBS.Application.Services
                 if (artistServiceRequest.Count != 0) 
                     await AssignService(artist.ID, artistServiceRequest);
 
-                //if (artistStoreRequest.Count != 0) 
+                if (artistStoreRequest.Count != 0)
                     await AssignStore(artist.ID, artistStoreRequest);
                 var certificates = await HandleArtistCertificates(artist.ID, artistRequest.Certificates);
                 artist.Certificates = certificates;
