@@ -22,6 +22,7 @@ namespace INBS.Application.DTOs.Service
         public string? Description { get; set; }
 
         public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
+        public string ImageDescriptionUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
 
         public long Price { get; set; }
 
