@@ -25,7 +25,12 @@ namespace INBS.Application.Services
             {
                 return _unitOfWork.ArtistStoreRepository.Query().ProjectTo<ArtistStoreResponse>(_mapper.ConfigurationProvider);
             }
-            return _unitOfWork.ArtistStoreRepository.Query().Where(c => !c.IsDeleted).ProjectTo<ArtistStoreResponse>(_mapper.ConfigurationProvider);
+            if (role == 1)
+            {
+                return _unitOfWork.ArtistStoreRepository.Query().Where(c => !c.IsDeleted).ProjectTo<ArtistStoreResponse>(_mapper.ConfigurationProvider);
+
+            }
+            return _unitOfWork.ArtistStoreRepository.Query().Where(c => !c.IsDeleted && c.Status == (int)ArtistStoreStatus.Approved).ProjectTo<ArtistStoreResponse>(_mapper.ConfigurationProvider);
         }
 
         public async Task Update(Guid id, ArtistStoreStatus artistStoreStatus)

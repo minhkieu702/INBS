@@ -9,5 +9,6 @@ namespace INBS.Application.IServices
         Task<Guid> Create(CustomerSelectedRequest request, IList<NailDesignServiceSelectedRequest> serviceCustomCombos);
         Task Update(Guid id, CustomerSelectedRequest request, IList<NailDesignServiceSelectedRequest> serviceCustomCombos);
         Task Delete(Guid id);
+        Task<Guid> BookingWithDesign(Guid designId, Guid serviceId);
     }
 }

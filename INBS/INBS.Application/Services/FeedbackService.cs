@@ -10,6 +10,7 @@ using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -186,6 +187,7 @@ namespace INBS.Application.Services
             if (updatingList.Count != 0) _unitOfWork.FeedbackImageRepository.UpdateRange(updatingList);
             if (insertingList.Count != 0) _unitOfWork.FeedbackImageRepository.InsertRange(insertingList);
         }
+
         private async Task UploadImageAsync(IFormFile newImage, FeedbackImage media)
         {
             media.ImageUrl = await _firebaseService.UploadFileAsync(newImage);
@@ -225,6 +227,8 @@ namespace INBS.Application.Services
 
                 await _unitOfWork.FeedbackRepository.InsertAsync(feedback);
 
+                await HandleFavoriteBooking(request);
+
                 if (await _unitOfWork.SaveAsync() <= 0)
                 {
                     throw new Exception("This action failed");
@@ -235,6 +239,65 @@ namespace INBS.Application.Services
             {
                 _unitOfWork.RollBack();
                 throw new Exception(ex.Message);
+            }
+        }
+
+        private async Task HandleFavoriteBooking(FeedbackRequest request)
+        {
+            var booking = await _unitOfWork.BookingRepository.Query()
+                .Include(c => c.ArtistStore)
+                    .ThenInclude(c => c!.Artist)
+                .Include(c => c.ArtistStore)
+                    .ThenInclude(c => c!.Store)
+                .Include(c => c.CustomerSelected)
+                    .ThenInclude(c => c!.NailDesignServiceSelecteds)
+                        .ThenInclude(c => c!.NailDesignService)
+                            .ThenInclude(c => c!.NailDesign)
+                                .ThenInclude(c => c!.Design)
+                .FirstOrDefaultAsync(c => c.ID == request.BookingId);
+
+            var customerId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+
+            if (booking == null) return;
+
+            var selectedDesignIds = booking.CustomerSelected!.NailDesignServiceSelecteds
+                .Select(c => c.NailDesignService!.NailDesign!.DesignId).Distinct().ToList();
+
+            var feedbacks = await _unitOfWork.FeedbackRepository.Query()
+                .Where(c
+                => (c.BookingId == request.BookingId && c.CustomerId == customerId && c.FeedbackType == (int)FeedbackType.Artist && c.TypeId == booking.ArtistStore!.ArtistId)
+                || (c.BookingId == request.BookingId && c.CustomerId == customerId && c.FeedbackType == (int)FeedbackType.Store && c.TypeId == booking.ArtistStore!.StoreId)
+                || (c.BookingId == request.BookingId && c.CustomerId == customerId && c.FeedbackType == (int)FeedbackType.Design && selectedDesignIds.Contains(c.TypeId))
+                )
+                .ToListAsync();
+
+            var designFeedbacks = new List<Feedback>();
+            var isFavoriteArtist = false;
+            var isFavoriteStore = false;
+
+            feedbacks.ForEach(c =>
+            {
+                if (c.FeedbackType == (int)FeedbackType.Artist && c.Rating == 5)
+                {
+                    isFavoriteArtist = true;
+                }
+                else if (c.FeedbackType == (int)FeedbackType.Store && c.Rating == 5)
+                {
+                    isFavoriteStore = true;
+                }
+                else if (c.FeedbackType == (int)FeedbackType.Design)
+                {
+                    designFeedbacks.Add(c);
+                }
+            });
+
+            var isFavoriteDesign = selectedDesignIds.All(designId =>
+                designFeedbacks.Any(f => f.TypeId == designId && f.Rating == 5));
+
+            if (isFavoriteStore && isFavoriteDesign && isFavoriteArtist)
+            {
+                booking.IsFavorite = true;
+                _unitOfWork.BookingRepository.Update(booking);
             }
         }
 

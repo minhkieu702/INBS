@@ -9,7 +9,6 @@ namespace INBS.Domain.Entities
         public CustomerSelected()
         {
             ID = Guid.NewGuid();
-            IsFavorite = false;
             Bookings = [];
             NailDesignServiceSelecteds = [];
             IsDeleted = false;
@@ -17,8 +16,6 @@ namespace INBS.Domain.Entities
 
         [Key]
         public Guid ID { get; set; }
-
-        public bool IsFavorite { get; set; }
 
         public bool IsDeleted { get; set; }
 

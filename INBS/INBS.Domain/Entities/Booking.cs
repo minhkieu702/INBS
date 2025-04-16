@@ -7,6 +7,7 @@ namespace INBS.Domain.Entities
     {
         public Booking() : base()
         {
+            IsFavorite = false;
             Cancellations = [];
             PaymentDetails = [];
         }
@@ -19,6 +20,8 @@ namespace INBS.Domain.Entities
         public int Status { get; set; } 
 
         public long TotalAmount { get; set; }
+
+        public bool IsFavorite { get; set; }
 
         public Guid CustomerSelectedId { get; set; }
         [ForeignKey(nameof(CustomerSelectedId))]

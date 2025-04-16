@@ -9,8 +9,6 @@ namespace INBS.API.Controllers.ArtistStore
     /// <summary>
     /// Controller for managing artists.
     /// </summary>
-    [ApiController]
-    [Route("api/[controller]")]
     public class ArtistStoreController(IArtistStoreService service) : ODataController
     {
         /// <summary>

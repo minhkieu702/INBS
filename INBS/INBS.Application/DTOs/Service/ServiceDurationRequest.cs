@@ -9,7 +9,6 @@ namespace INBS.Application.DTOs.Service
     public class ServiceDurationRequest
     {
         public Guid ServiceId { get; set; }
-        public TimeOnly StartAt { get; set; }
-        public TimeOnly EndAt { get; set; }
+        public long Duration { get; set; }
     }
 }

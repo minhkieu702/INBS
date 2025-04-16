@@ -8,6 +8,7 @@ using INBS.Domain.Entities;
 using INBS.Domain.Enums;
 using INBS.Domain.IRepository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -19,12 +20,16 @@ namespace INBS.Application.Services
 {
     public class NotificationService : INotificationService
     {
+        private readonly IAuthentication _authentication;
+        private readonly IHttpContextAccessor _contextAccessor;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<NotificationService> _logger;
 
-        public NotificationService(ILogger<NotificationService> logger, IUnitOfWork unitOfWork, IMapper mapper)
+        public NotificationService(ILogger<NotificationService> logger, IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication, IHttpContextAccessor contextAccessor)
         {
+            _authentication = authentication;
+            _contextAccessor = contextAccessor;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
@@ -50,17 +55,18 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task MarkSeenNotification(Guid notificationId)
+        public async Task MarkSeenNotification()
         {
             try
             {
-                var notification = await _unitOfWork.NotificationRepository.GetByIdAsync(notificationId) ?? throw new Exception("Notification not found");
+                var userId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var notifications = await _unitOfWork.NotificationRepository.Query().Where(c => c.Status == (int)NotificationStatus.Send && c.UserId == userId).ToListAsync() ?? throw new Exception("Notification not found");
 
-                notification.Status = (int)NotificationStatus.Read;
+                notifications.ForEach(c => c.Status = (int)NotificationStatus.Read);
 
-                await _unitOfWork.NotificationRepository.UpdateAsync(notification);
+                _unitOfWork.NotificationRepository.UpdateRange(notifications);
 
-                if (await _unitOfWork.SaveAsync() == 0)
+                if (_unitOfWork.Save() == 0)
                 {
                     throw new Exception("This action failed");
                 }

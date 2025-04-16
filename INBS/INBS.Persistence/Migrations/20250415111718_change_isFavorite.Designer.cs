@@ -4,6 +4,7 @@ using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    partial class INBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415111718_change_isFavorite")]
+    partial class change_isFavorite
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -364,9 +367,6 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("BookingId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -479,9 +479,6 @@ namespace INBS.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<long>("AverageDuration")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -516,6 +513,9 @@ namespace INBS.Persistence.Migrations
 
                     b.Property<Guid>("CustomerSelectedId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("Duration")
+                        .HasColumnType("bigint");
 
                     b.HasKey("NailDesignServiceId", "CustomerSelectedId");
 

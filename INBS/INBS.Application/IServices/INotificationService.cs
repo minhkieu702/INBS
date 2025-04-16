@@ -10,7 +10,7 @@ namespace INBS.Application.IServices
     public interface INotificationService
     {
         IQueryable<NotificationResponse> Get();
-        Task MarkSeenNotification(Guid notificationId);
+        Task MarkSeenNotification();
         Task SendNotificationAsync(string phoneNumber, string message);
     }
 }

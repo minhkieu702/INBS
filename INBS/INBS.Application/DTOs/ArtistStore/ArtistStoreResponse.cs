@@ -1,4 +1,5 @@
 ﻿using INBS.Application.DTOs.Artist;
+using INBS.Application.DTOs.Booking;
 using INBS.Application.DTOs.Common;
 using INBS.Application.DTOs.Store;
 using System;
@@ -19,6 +20,8 @@ namespace INBS.Application.DTOs.ArtistStore
 
         public Guid StoreId { get; set; }
 
+        public int Status { get; set; }
+
         public virtual StoreResponse? Store { get; set; }
 
         public DateOnly WorkingDate { get; set; }
@@ -29,6 +32,6 @@ namespace INBS.Application.DTOs.ArtistStore
 
         public TimeOnly EndTime { get; set; }
 
-#warning response booking
+        public virtual ICollection<BookingResponse> Bookings { get; set; } = [];
     }
 }

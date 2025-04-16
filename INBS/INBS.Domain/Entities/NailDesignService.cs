@@ -11,6 +11,7 @@ namespace INBS.Domain.Entities
             NailDesignServiceSelecteds = [];
             Carts = [];
         }
+        public long AverageDuration { get; set; }
 
         public Guid NailDesignId { get; set; }
         [ForeignKey(nameof(NailDesignId))]
