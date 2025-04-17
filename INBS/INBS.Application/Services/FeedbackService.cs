@@ -91,7 +91,7 @@ namespace INBS.Application.Services
 
         private async Task HandleDesign(Guid designId, int newRating, int count, int? oldRating = null, bool isDelete = false)
         {
-            var design = await _unitOfWork.DesignRepository.GetByIdAsync(designId) ?? throw new Exception("Store not found");
+            var design = await _unitOfWork.DesignRepository.GetByIdAsync(designId) ?? throw new Exception("Design not found");
 
             var averageRating = design.AverageRating;
 
@@ -328,7 +328,7 @@ namespace INBS.Application.Services
                         break;
                 }
 
-                await _unitOfWork.FeedbackRepository.DeleteAsync(feedback);
+                await _unitOfWork.FeedbackRepository.DeleteAsync(feedback.ID);
 
                 if (await _unitOfWork.SaveAsync() <= 0)
                 {
