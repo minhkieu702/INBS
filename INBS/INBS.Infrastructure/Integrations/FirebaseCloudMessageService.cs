@@ -61,7 +61,10 @@ namespace INBS.Infrastructure.Integrations
                         Body = body
                     }
                 };
-
+                if (deviceTokens.Count() <= 0)
+                {
+                    return null;
+                }
                 var response = await _firebaseMessaging.SendEachForMulticastAsync(messages);
 
                 Console.WriteLine($"📤 Sent {response.SuccessCount} messages successfully.");
