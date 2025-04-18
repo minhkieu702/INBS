@@ -49,7 +49,7 @@ namespace INBS.API.Controllers.Customer
             return Ok(skinTone);
         }
 
-        [HttpPost("RecommendDesign")]
+        [HttpGet("RecommendDesign")]
         public async Task<IActionResult> RecommendDesign([FromForm] Guid customerId, [FromForm] IFormFile image)
         {
             try

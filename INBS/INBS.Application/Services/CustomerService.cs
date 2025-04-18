@@ -200,8 +200,6 @@ namespace INBS.Application.Services
             return "Không thể tạo gợi ý thiết kế.";
         }
 
-        private readonly string _skinTonePath = "File/Skintone.json";
-
         public async Task<Skintone> DetectSkinToneFromImage(Stream imageStream)
         {
             using var bitmap = new Bitmap(imageStream);
@@ -223,7 +221,7 @@ namespace INBS.Application.Services
 
             var avgColor = ((int)(totalR / count), (int)(totalG / count), (int)(totalB / count));
 
-            var json = await File.ReadAllTextAsync(_skinTonePath);
+            var json = await File.ReadAllTextAsync("File/Skintone.json");
             var skinTones = JsonConvert.DeserializeObject<List<Skintone>>(json);
 
             var bestMatch = skinTones
