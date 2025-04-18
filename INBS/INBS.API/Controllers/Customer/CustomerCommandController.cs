@@ -1,6 +1,7 @@
 ﻿using INBS.Application.DTOs.Customer;
 using INBS.Application.DTOs.Preference;
 using INBS.Application.IServices;
+using INBS.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Newtonsoft.Json;
@@ -47,5 +48,26 @@ namespace INBS.API.Controllers.Customer
 
             return Ok(skinTone);
         }
+
+        [HttpPost("RecommendDesign")]
+        public async Task<IActionResult> RecommendDesign([FromForm] Guid customerId, [FromForm] IFormFile image)
+        {
+            try
+            {
+                if (image == null || image.Length == 0)
+                    return BadRequest(new { Message = "Image is required." });
+
+                using var imageStream = image.OpenReadStream();
+
+                var recommendation = await service.GetDesignRecommendation(customerId, imageStream);
+
+                return Ok(new { Recommendation = recommendation });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
     }
 }

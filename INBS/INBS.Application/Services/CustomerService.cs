@@ -17,8 +17,10 @@ using System.Text;
 
 namespace INBS.Application.Services
 {
-    public class CustomerService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccessor) : ICustomerService
+    public class CustomerService(IUnitOfWork _unitOfWork, IMapper _mapper, IAuthentication _authentication, IHttpContextAccessor _contextAccessor, HttpClient _httpClient) : ICustomerService
     {
+        private const string ApiKey = "469acea901a9fff8210792874151eaa2582149dbf8fa1a28db48ebb4c5901382";
+        private const string TogetherAIUrl = "https://api.together.xyz/v1/chat/completions";
         public async Task UpdatePreferencesAsync(PreferenceRequest request)
         {
             try
@@ -128,12 +130,14 @@ namespace INBS.Application.Services
                 var skinTone = await DetectSkinToneFromImage(imageStream);
                 var skinToneName = skinTone.Name;
 
-                var season = GetCurrentSeason();
-                var occasion = customer.Occasion;
+                var occasions = await GetUpcomingOccasions();
 
+                var availableDesigns = _unitOfWork.DesignRepository.Query()
+                    .Select(d => d.Name)
+                    .ToList();
                 _unitOfWork.CommitTransaction();
 
-                return await GetAIRecommendation(pastSelections, currentTrends, skinTone, season, occasion);
+                return await GetAIRecommendation(pastSelections, currentTrends, skinTone.Name, occasions, availableDesigns);
             }
             catch (Exception)
             {
@@ -142,60 +146,63 @@ namespace INBS.Application.Services
             }
         }
 
-        //public async Task<string> GetAIRecommendation(List<string> pastSelections, List<string> currentTrends, string skinTone, string season, string occasion)
-        //{
-        //    var requestBody = new
-        //    {
-        //        model = "meta-llama/Llama-Vision-Free",
-        //        messages = new[]
-        //        {
-        //    new {
-        //        role = "system",
-        //        content = "Bạn là chuyên gia về Nail, đưa ra đề xuất phù hợp cho khách hàng dựa trên sở thích, màu da, xu hướng và dịp."
-        //    },
-        //    new {
-        //        role = "user",
-        //        content = $"Thông tin khách hàng:\n" +
-        //                  $"- Màu da: {skinTone}\n" +
-        //                  $"- Lựa chọn trước đây: {string.Join(", ", pastSelections)}\n" +
-        //                  $"- Xu hướng hiện tại: {string.Join(", ", currentTrends)}\n" +
-        //                  $"- Mùa/Dịp: {season} - {occasion}\n\n" +
-        //                  $"Gợi ý thiết kế phù hợp (chỉ đưa ra mô tả ngắn gọn, tối đa 3 dòng):"
-        //    }
-        //},
-        //        temperature = 0.8
-        //    };
+        public async Task<string> GetAIRecommendation(List<string> pastSelections, List<string> currentTrends, string skinTone, string occasion, List<string> availableDesigns)
+        {
+            var requestBody = new
+            {
+                model = "meta-llama/Llama-Vision-Free",
+                messages = new[]
+                {
+            new {
+                role = "system",
+                content = "Bạn là chuyên gia về Nail, đưa ra đề xuất phù hợp cho khách hàng dựa trên sở thích, màu da, xu hướng và dịp."
+            },
+            new {
+                role = "user",
+                content = $"Thông tin khách hàng:\n" +
+                          $"- Màu da: {skinTone}\n" +
+                          $"- Lựa chọn trước đây: {string.Join(", ", pastSelections)}\n" +
+                          $"- Xu hướng hiện tại: {string.Join(", ", currentTrends)}\n" +
+                          $"- Dịp sắp đến: {occasion}\n" +
+                          $"- Các thiết kế có sẵn: {string.Join(", ", availableDesigns)}\n\n" +
+                          $"Hãy chọn **tối đa 3 tên mẫu thiết kế cụ thể** từ danh sách có sẵn.\n" +
+                          $"Chỉ trả về các tên mẫu, phân tách bằng dấu phẩy, không mô tả, không thêm bất kỳ chú thích nào.\n" +
+                          $"Ví dụ: Neon Glow, Elegant Night, Sunset Glow"
+            }
+        },
+                temperature = 0.8
+            };
 
-        //    var jsonRequest = JsonConvert.SerializeObject(requestBody);
-        //    var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+            var jsonRequest = JsonConvert.SerializeObject(requestBody);
+            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-        //    if (!_httpClient.DefaultRequestHeaders.Contains("Authorization"))
-        //    {
-        //        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
-        //    }
+            if (!_httpClient.DefaultRequestHeaders.Contains("Authorization"))
+            {
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
+            }
 
-        //    try
-        //    {
-        //        var response = await _httpClient.PostAsync(TogetherAIUrl, content);
-        //        var responseBody = await response.Content.ReadAsStringAsync();
+            try
+            {
+                var response = await _httpClient.PostAsync(TogetherAIUrl, content);
+                var responseBody = await response.Content.ReadAsStringAsync();
 
-        //        var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
-        //        if (responseData?.choices?.Count > 0)
-        //        {
-        //            return responseData.choices[0].message.content.ToString();
-        //        }
-        //    }
-        //    catch (HttpRequestException ex)
-        //    {
-        //        Console.WriteLine($"API error: {ex.Message}");
-        //    }
+                var responseData = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                if (responseData?.choices?.Count > 0)
+                {
+                    return responseData.choices[0].message.content.ToString();
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API error: {ex.Message}");
+            }
 
-        //    return "Không thể tạo gợi ý thiết kế.";
-        //}
+            return "Không thể tạo gợi ý thiết kế.";
+        }
 
         private readonly string _skinTonePath = "File/Skintone.json";
 
-        public async Task<SkinTone> DetectSkinToneFromImage(Stream imageStream)
+        public async Task<Skintone> DetectSkinToneFromImage(Stream imageStream)
         {
             using var bitmap = new Bitmap(imageStream);
 
@@ -217,7 +224,7 @@ namespace INBS.Application.Services
             var avgColor = ((int)(totalR / count), (int)(totalG / count), (int)(totalB / count));
 
             var json = await File.ReadAllTextAsync(_skinTonePath);
-            var skinTones = JsonConvert.DeserializeObject<List<SkinTone>>(json);
+            var skinTones = JsonConvert.DeserializeObject<List<Skintone>>(json);
 
             var bestMatch = skinTones
                 .Select(st => new
@@ -246,14 +253,7 @@ namespace INBS.Application.Services
             return Math.Sqrt(Math.Pow(c1.R - c2.R, 2) + Math.Pow(c1.G - c2.G, 2) + Math.Pow(c1.B - c2.B, 2));
         }
 
-        public class SkinTone
-        {
-            public int ID { get; set; }
-            public string Name { get; set; }
-            public string HexCode { get; set; }
-        }
-
-        public async Task<List<Occasion>> GetUpcomingOccasions()
+        public async Task<string> GetUpcomingOccasions()
         {
             var json = await File.ReadAllTextAsync("File/Occasion.json");
             var occasions = JsonConvert.DeserializeObject<List<Occasion>>(json);
@@ -285,7 +285,9 @@ namespace INBS.Application.Services
                     }
                 }
             }
-            return upcomingOccasions.OrderBy(o => o.Date).ToList();
+            var occasionNames = string.Join(", ", upcomingOccasions.Select(o => o.Name));
+
+            return occasionNames;
         }
 
         public DateTime? GetCalculatedDate(string occasionName, int year)
@@ -314,13 +316,6 @@ namespace INBS.Application.Services
             int day = ((h + l - 7 * m + 114) % 31) + 1;
 
             return new DateTime(year, month, day);
-        }
-        public class Occasion
-        {
-            public int ID { get; set; }
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public string Date { get; set; }
         }
     }
 }
