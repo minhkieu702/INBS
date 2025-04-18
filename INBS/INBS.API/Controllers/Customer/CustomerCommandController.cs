@@ -3,6 +3,9 @@ using INBS.Application.DTOs.Preference;
 using INBS.Application.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace INBS.API.Controllers.Customer
 {
@@ -11,8 +14,8 @@ namespace INBS.API.Controllers.Customer
     /// </summary>
     [ApiController]
     [Route("api/Customer")]
-    public class CustomerCommandController(ICustomerService service) : ControllerBase
-    {
+    public class CustomerCommandController(ICustomerService service, IHttpClientFactory httpClientFactory) : ControllerBase
+    {   
         /// <summary>
         /// Updates/Create customer preferences.
         /// </summary>
@@ -31,6 +34,18 @@ namespace INBS.API.Controllers.Customer
             {
                 return new BadRequestObjectResult(ex.Message);
             }
+        }
+
+        [HttpPost("detect")]
+        public async Task<IActionResult> DetectSkinTone(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+                return BadRequest("No image uploaded.");
+
+            using var stream = image.OpenReadStream();
+            var skinTone = await service.DetectSkinToneFromImage(stream);
+
+            return Ok(skinTone);
         }
     }
 }
