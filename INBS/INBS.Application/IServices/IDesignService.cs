@@ -20,5 +20,6 @@ namespace INBS.Application.IService
         Task Delete(Guid designId);
 
         Task Update(Guid id, DesignRequest designReq, PreferenceRequest preferenceRequest, IList<MediaRequest> images, IList<NailDesignRequest> nailDesigns);
+        Task<List<DesignResponse>> RecommendDesign();
     }
 }

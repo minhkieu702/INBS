@@ -208,6 +208,11 @@ namespace INBS.Application.Common
             return JsonSerializer.Deserialize<List<Occasion>>(occasionJson) ?? [];
         }
 
+        public static string GetOccasionsRaw()
+        {
+            return File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Occasion.json"));
+        }
+
         public static List<Color> GetColors()
         {
             var colorJson = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "File", "Color.json"));
