@@ -18,5 +18,7 @@ namespace INBS.Domain.Entities
         public string Name { get; set; } = string.Empty;
 
         public string? Description { get; set; }
+        public string Date { get; set; }
+
     }
 }

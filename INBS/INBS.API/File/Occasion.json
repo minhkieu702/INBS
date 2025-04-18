@@ -2,76 +2,91 @@
   {
     "ID": 1,
     "Name": "Wedding",
-    "Description": "A celebration of marriage."
+    "Description": "A celebration of marriage.",
+    "Date": null
   },
   {
     "ID": 2,
     "Name": "Birthday",
-    "Description": "A celebration of someone's birth."
+    "Description": "A celebration of someone's birth.",
+    "Date": null
   },
   {
     "ID": 3,
     "Name": "Christmas",
-    "Description": "A holiday celebrated on December 25th."
+    "Description": "A holiday celebrated on December 25th.",
+    "Date": "12-25"
   },
   {
     "ID": 4,
     "Name": "New Year",
-    "Description": "Celebration of the beginning of a new year."
+    "Description": "Celebration of the beginning of a new year.",
+    "Date": "01-01"
   },
   {
     "ID": 5,
     "Name": "Valentine's Day",
-    "Description": "A day to celebrate love and romance."
+    "Description": "A day to celebrate love and romance.",
+    "Date": "02-14"
   },
   {
     "ID": 6,
     "Name": "Halloween",
-    "Description": "A spooky celebration on October 31st."
+    "Description": "A spooky celebration on October 31st.",
+    "Date": "10-31"
   },
   {
     "ID": 7,
     "Name": "Easter",
-    "Description": "A Christian holiday celebrating resurrection."
+    "Description": "A Christian holiday celebrating resurrection.",
+    "Date": "variable"
   },
   {
     "ID": 8,
     "Name": "Graduation",
-    "Description": "A ceremony for completing a course of study."
+    "Description": "A ceremony for completing a course of study.",
+    "Date": null
   },
   {
     "ID": 9,
     "Name": "Anniversary",
-    "Description": "A celebration of a special date."
+    "Description": "A celebration of a special date.",
+    "Date": null
   },
   {
     "ID": 10,
     "Name": "Mother's Day",
-    "Description": "Celebrating mothers and motherhood."
+    "Description": "Celebrating mothers and motherhood.",
+    "Date": null
   },
   {
     "ID": 11,
     "Name": "Father's Day",
-    "Description": "Honoring fathers and fatherhood."
+    "Description": "Honoring fathers and fatherhood.",
+    "Date": null
   },
   {
     "ID": 12,
     "Name": "Baby Shower",
-    "Description": "Celebrating an upcoming birth."
+    "Description": "Celebrating an upcoming birth.",
+    "Date": null
   },
   {
     "ID": 13,
     "Name": "Corporate Event",
-    "Description": "Professional gatherings or meetings."
+    "Description": "Professional gatherings or meetings.",
+    "Date": null
   },
   {
     "ID": 14,
     "Name": "Prom Night",
-    "Description": "A high school formal dance."
+    "Description": "A high school formal dance.",
+    "Date": null
   },
   {
     "ID": 15,
     "Name": "Festival",
-    "Description": "A community celebration or event."
+    "Description": "A community celebration or event.",
+    "Date": null
   }
 ]
