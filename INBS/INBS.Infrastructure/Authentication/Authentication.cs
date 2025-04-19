@@ -45,7 +45,7 @@ namespace INBS.Infrastructure.Authentication
 
         public async Task<string> GenerateDefaultTokenAsync(User user)
         {
-            return await Task.FromResult(GenerateJwtToken(user, expirationInMinutes: 30)); // Access token với thời gian sống 30 phút
+            return await Task.FromResult(GenerateJwtToken(user, expirationInMinutes: 20160)); // Access token với thời gian sống 30 phút
         }
 
         public async Task<string> GenerateRefreshTokenAsync(User user)
