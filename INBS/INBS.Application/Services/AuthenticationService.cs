@@ -184,7 +184,7 @@ namespace INBS.Application.Services
                 var customer = new Customer 
                 {
                     ID = newUser.ID,
-                    IsVerified = true,
+                    IsVerified = false,
                     OtpCode = otpCode,
                     OtpExpiry = DateTime.UtcNow.AddMinutes(5)
                 };
