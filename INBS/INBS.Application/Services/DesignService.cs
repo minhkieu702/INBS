@@ -457,7 +457,7 @@ namespace INBS.Application.Services
 
                 var results = new List<DesignResponse>();
 
-                foreach (var d in scoredDesigns.OrderByDescending(c => c.TrendScore).Take(5))
+                foreach (var d in scoredDesigns.Take(5))
                 {
                     var result = _mapper.Map<DesignResponse>(d);
                     result.Preferences = [];
