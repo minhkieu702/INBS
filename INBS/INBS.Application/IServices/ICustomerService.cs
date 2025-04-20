@@ -7,9 +7,7 @@ namespace INBS.Application.IServices
 {
     public interface ICustomerService
     {
-        Task UpdatePreferencesAsync(PreferenceRequest request);
+        Task UpdatePreferencesAsync(CustomerPreferenceRequest request);
         IQueryable<CustomerResponse> Get();
-        Task<Skintone> DetectSkinToneFromImage(Stream imageStream);
-        Task<string> GetDesignRecommendation(Guid customerId, Stream imageStream);
     }
 }

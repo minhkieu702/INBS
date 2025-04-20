@@ -18,27 +18,27 @@ namespace INBS.API.Controllers.Design
     /// <param name="service">The design service.</param>
     [ApiController]
     [Route("api/Design")]
-    public class DesignCommandController(IDesignService service) : ControllerBase
+    public class DesignCommandController(IDesignService service, ILogger<DesignCommandController> logger) : ControllerBase
     {
 
-        ///// <summary>
-        ///// Gets the list of designs.
-        ///// </summary>
-        ///// <returns>A list of designs.</returns>
-        //[HttpGet]
-        //[EnableQuery(MaxExpansionDepth = 100)]
-        //public IQueryable<DesignResponse> Get()
-        //{
-        //    try
-        //    {
-        //        return service.Get();
-        //    }
-        //    catch (Exception)
-        //    {
-
-        //        throw;
-        //    }
-        //}
+        /// <summary>
+        /// Gets the list of designs.
+        /// </summary>
+        /// <returns>A list of designs.</returns>
+        [HttpGet("Recommendation")]
+        [EnableQuery(MaxExpansionDepth = 100)]
+        public async Task<IActionResult> GetRecommendation()
+        {
+            try
+            {
+                return Ok(await service.RecommendDesign());
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting design recommendations.");
+                return Ok(new List<DesignResponse>());
+            }
+        }
 
         /// <summary>
         /// Creates a new design.

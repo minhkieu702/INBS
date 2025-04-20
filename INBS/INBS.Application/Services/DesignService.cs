@@ -13,10 +13,13 @@ using INBS.Application.DTOs.NailDesign;
 using INBS.Application.DTOs.Design;
 using Microsoft.AspNetCore.Http;
 using AutoMapper.QueryableExtensions;
+using Newtonsoft.Json;
+using System.Text;
+using System.Text.Json.Nodes;
 
 namespace INBS.Application.Services
 {
-    public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseStorageService _firebaseService, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor) : IDesignService
+    public class DesignService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseStorageService _firebaseService, IAuthentication _authentication, IHttpContextAccessor _contextAccesstor, HttpClient _httpClient) : IDesignService
     {
         private async Task HandleNailDesign(Guid designId, IList<NailDesignRequest> newList)
         {
@@ -377,6 +380,210 @@ namespace INBS.Application.Services
         private async Task UploadImageAsync(IFormFile newImage, Media media)
         {
             media.ImageUrl = await _firebaseService.UploadFileAsync(newImage);
+        }
+
+        public async Task<List<DesignResponse>> RecommendDesign()
+        {
+            try
+            {
+                var customerId = _authentication.GetUserIdFromHttpContext(_contextAccesstor.HttpContext);
+                
+                // Lấy thông tin preferences của customer
+                var preferences = await _unitOfWork.PreferenceRepository.Query()
+                    .Where(c => c.CustomerId == customerId)
+                    .ToListAsync();
+
+                // Lấy skin tones của customer
+                var skintonesOfCustomer = preferences
+                    .Where(p => p.PreferenceType == (int)PreferenceType.SkinTone)
+                    .Select(p => p.PreferenceId)
+                    .ToList();
+
+                // Lấy occasions của customer
+                var occasionsOfCustomer = preferences
+                    .Where(p => p.PreferenceType == (int)PreferenceType.Occasion)
+                    .Select(p => p.PreferenceId)
+                    .ToList();
+
+                // Lấy current occasion từ AI
+                var currentOccasionIds = await GetCurrentOccasionIdWithTogetherAI();
+
+                // Lấy lịch sử thiết kế đã chọn
+                var customerSelecteds = await _unitOfWork.CustomerSelectedRepository
+                    .Query()
+                    .Where(c => c.CustomerID == customerId)
+                    .Include(c => c.NailDesignServiceSelecteds)
+                    .ThenInclude(c => c.NailDesignService)
+                    .ThenInclude(c => c!.NailDesign)
+                    .ThenInclude(c => c!.Design)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var pastDesignSelected = new List<Design>();
+                foreach (var customerSelected in customerSelecteds)
+                {
+                    foreach (var nailDesignServiceSelected in customerSelected.NailDesignServiceSelecteds)
+                    {
+                        if(nailDesignServiceSelected?.NailDesignService?.NailDesign?.Design != null)
+                        {
+                            var design = nailDesignServiceSelected.NailDesignService.NailDesign.Design;
+                            pastDesignSelected.Add(design);
+                        }
+                    }
+                }
+
+                // Lấy tất cả designs có thể recommend
+                var allDesigns = await _unitOfWork.DesignRepository.GetAsync(query => query.Include(d => d.Medias)
+                    .Include(d => d.Preferences)
+                    .Where(d => !d.IsDeleted));
+
+                // Tính điểm cho từng design
+                var scoredDesigns = allDesigns.Select(design => new
+                {
+                    Design = design,
+                    Score = CalculateDesignScore(
+                        design,
+                        pastDesignSelected,
+                        skintonesOfCustomer,
+                        occasionsOfCustomer,
+                        currentOccasionIds
+                    )
+                })
+                .Where(x => x.Score > 0) // Chỉ lấy designs có điểm > 0
+                .OrderByDescending(x => x.Score)
+                .Take(10) // Lấy top 10 designs
+                .Select(x => x.Design)
+                .ToList();
+
+                var results = new List<DesignResponse>();
+
+                foreach (var d in scoredDesigns.Take(5))
+                {
+                    var result = _mapper.Map<DesignResponse>(d);
+                    result.Preferences = [];
+                    result.NailDesigns = [];
+                    results.Add(result);
+                }
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error recommending designs: {ex.Message}");
+            }
+        }
+
+        private double CalculateDesignScore(
+            Design design,
+            List<Design> pastDesignSelected,
+            List<int> skintonesOfCustomer,
+            List<int> occasionsOfCustomer,
+            List<int> currentOccasionIds)
+        {
+            double score = 0;
+
+            // 1. Điểm cho skin tone phù hợp (40%)
+            var matchingSkinTones = design.Preferences
+                .Count(dst => skintonesOfCustomer.Contains(dst.PreferenceId));
+            score += (matchingSkinTones / (double)skintonesOfCustomer.Count) * 0.4;
+
+            // 2. Điểm cho occasion phù hợp (30%)
+            var matchingOccasions = design.Preferences
+                .Count(p => occasionsOfCustomer.Contains(p.PreferenceId));
+            score += (matchingOccasions / (double)occasionsOfCustomer.Count) * 0.3;
+
+            // 3. Điểm cho current occasion (20%)
+            var matchingCurrentOccasions = design.Preferences
+                .Count(p => currentOccasionIds.Contains(p.PreferenceId));
+            score += (matchingCurrentOccasions / (double)currentOccasionIds.Count) * 0.2;
+
+            // 4. Điểm cho sự đa dạng (10%)
+            // Trừ điểm nếu design quá giống với những design đã chọn trước đó
+            var similarityScore = CalculateSimilarityScore(design, pastDesignSelected);
+            score += similarityScore * 0.1;
+
+            return score;
+        }
+
+        private double CalculateSimilarityScore(Design design, List<Design> pastDesigns)
+        {
+            if (!pastDesigns.Any()) return 0;
+
+            // Tính điểm tương đồng dựa trên các yếu tố:
+            // - PainType
+            // - Color
+
+            var paintType = pastDesigns.Count(pd => 
+                pd.Preferences.Any(ps => 
+                    design.Preferences.Any(ds => ds.PreferenceId == ps.PreferenceId && ps.PreferenceType == (int)PreferenceType.PaintType)));
+
+            var color = pastDesigns.Count(pd =>
+                pd.Preferences.Any(ps =>
+                    design.Preferences.Any(ds => ds.PreferenceId == ps.PreferenceId && ps.PreferenceType == (int)PreferenceType.Color)));
+
+            // Tính tổng điểm tương đồng
+            var totalMatches = paintType + color;
+            var maxPossibleMatches = pastDesigns.Count * 2; // 4 yếu tố so sánh
+
+            return totalMatches / (double)maxPossibleMatches;
+        }
+
+        private async Task<List<int>> GetCurrentOccasionIdWithTogetherAI()
+        {
+            var key = "469acea901a9fff8210792874151eaa2582149dbf8fa1a28db48ebb4c5901382";
+            var url = "https://api.together.xyz/v1/chat/completions";
+
+            var requestBody = new
+            {
+                model = "meta-llama/Llama-Vision-Free",
+                messages = new[]
+                {
+                    new {
+                        role = "system",
+                        content = "Bạn là chuyên gia về dự đoán lịch."
+                    },
+                    new {
+                        role = "user",
+                        content = $"Based on today's date ({DateTime.Today}) and that the user is in Vietnam, suggest relevant seasons or beauty-related occasions coming soon, and nail design trends that would suit them.\r\nReturns only the list of id of object in this json, separated by commas, no description, no added comments\r\n {Utils.GetOccasionsRaw()}"
+                    }
+                },
+                temperature = 0.8
+            };
+            var jsonRequest = JsonConvert.SerializeObject(requestBody);
+            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+            if (!_httpClient.DefaultRequestHeaders.Contains("Authorization"))
+            {
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {key}");
+            }
+
+            try
+            {
+                var response = await _httpClient.PostAsync(url, content);
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                JsonNode? root = JsonNode.Parse(responseBody);
+
+                string? res = root?["choices"]?[0]?["message"]?["content"]?.ToString();
+                List<int> intResult = res?
+    .Split(',')
+    .Select(s => int.Parse(s.Trim()))
+    .ToList() ?? new List<int>();
+                return intResult;
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"API error: {ex.Message}");
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"JSON error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unexpected error: {ex.Message}");
+            }
+            return [1, 2];
         }
     }
 }

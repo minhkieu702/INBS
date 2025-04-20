@@ -18,7 +18,7 @@ namespace INBS.Application.DTOs.Store
 
         public string ImageUrl { get; set; } = Constants.DEFAULT_IMAGE_URL;
 
-        public string Status { get; set; } = "active";// 0: inactive, 1: active
+        public int Status { get; set; }
 
         public float Latitude { get; set; }
 

@@ -317,10 +317,10 @@ namespace INBS.Application.Services
                     _unitOfWork.ArtistCertificateRepository.InsertRange(certificateEntities);
                 }
 
-                if (artistStoreRequest.Count != 0)
+                //if (artistStoreRequest.Count != 0)
                     await AssignStore(artist.ID, artistStoreRequest);
 
-                if (artistServiceRequest.Count != 0)
+                //if (artistServiceRequest.Count != 0)
                     await AssignService(artist.ID, artistServiceRequest);
 
                 if (await _unitOfWork.SaveAsync() <= 0)
@@ -402,10 +402,8 @@ namespace INBS.Application.Services
                 artist.Certificates = null;
                 await _unitOfWork.ArtistRepository.UpdateAsync(artist);
 
-                if (artistServiceRequest.Count != 0) 
                     await AssignService(artist.ID, artistServiceRequest);
 
-                if (artistStoreRequest.Count != 0)
                     await AssignStore(artist.ID, artistStoreRequest);
                 var certificates = await HandleArtistCertificates(artist.ID, artistRequest.Certificates);
                 artist.Certificates = certificates;

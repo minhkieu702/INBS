@@ -178,13 +178,14 @@ namespace INBS.API.Controllers.Authentication
         /// <param name="phoneNumber">The phone number of the customer.</param>
         /// <param name="newPassword">The new password for the customer.</param>
         /// <param name="confirmPassword">The confirmation of the new password.</param>
+        /// <param name="otp"> The OTP for verification.</param>
         /// <returns>The result of the password reset operation.</returns>
         [HttpPost("customer/reset-password")]
-        public async Task<IActionResult> ResetPasswordCustomer([FromForm] string phoneNumber, [FromForm] string newPassword, [FromForm] string confirmPassword)
+        public async Task<IActionResult> ResetPasswordCustomer([FromForm] string phoneNumber, [FromForm] string otp, [FromForm] string newPassword, [FromForm] string confirmPassword)
         {
             try
             {
-                var response = await service.ResetPasswordCustomer(phoneNumber, newPassword, confirmPassword);
+                var response = await service.ResetPasswordCustomer(phoneNumber, otp, newPassword, confirmPassword);
                 return Ok(response);
             }
             catch (Exception ex)

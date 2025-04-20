@@ -205,7 +205,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public async Task<string> ResetPasswordCustomer(string phone, string newPassword, string confirmPassword)
+        public async Task<LoginResponse> ResetPasswordCustomer(string phone, string otp, string newPassword, string confirmPassword)
         {
             try
             {
@@ -218,17 +218,19 @@ namespace INBS.Application.Services
                 if (user == null)
                     throw new Exception("Phone number is not registered");
 
+                if (user.Customer?.OtpCode != otp)
+                {
+                    throw new Exception("OTP is not matching");
+                }
+
                 user.PasswordHash = _authentication.HashedPassword(user, newPassword);
-
-                var otp = await SendOtp(user);
-
-                var customer = user.Customer ?? throw new Exception("Customer not found");
-                customer.OtpCode = otp;
-                customer.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
-
+                user.Customer.OtpCode = null;
                 await _unitOfWork.UserRepository.UpdateAsync(user);
 
-                return user.PhoneNumber!;
+                var accessToken = await _authentication.GenerateDefaultTokenAsync(user);
+                var refreshToken = await _authentication.GenerateRefreshTokenAsync(user);
+
+                return new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken };
             }
             catch (Exception)
             {

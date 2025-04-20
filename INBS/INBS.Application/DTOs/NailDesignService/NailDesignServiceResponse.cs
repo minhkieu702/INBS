@@ -25,6 +25,8 @@ namespace INBS.Application.DTOs.NailDesignService
 
         public long ExtraPrice { get; set; }
 
+        public long AverageDuration { get; set; }
+
         public virtual ICollection<NailDesignServiceSelectedResponse> NailDesignServiceSelecteds { get; set; } = [];
 
         public virtual ICollection<CartResponse> Carts { get; set; } = [];
