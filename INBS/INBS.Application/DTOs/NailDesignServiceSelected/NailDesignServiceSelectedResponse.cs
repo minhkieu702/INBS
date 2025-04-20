@@ -13,7 +13,5 @@ namespace INBS.Application.DTOs.NailDesignServiceSelected
         [Key]
         public Guid NailDesignServiceId { get; set; }
         public virtual NailDesignServiceResponse? NailDesignService { get; set; }
-
-        public long Duration { get; set; }
     }
 }
