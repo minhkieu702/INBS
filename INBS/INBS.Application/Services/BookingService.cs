@@ -135,7 +135,7 @@ namespace INBS.Application.Services
                 oldBooking.Status = (int)BookingStatus.isWaiting;
             }
 
-            await SendNotificationBookingToArtist(bookingRequest.ArtistId, "YOU ARE CHOSEN ONE", oldBooking.Status == (int)BookingStatus.isWaiting ? $"You got a overlapping booking that start at {bookingRequest.StartTime} on {bookingRequest.ServiceDate}" : $"You have new booking that start at {bookingRequest.StartTime} on {bookingRequest.ServiceDate}");
+            await SendNotificationBookingToArtist(bookingRequest.ArtistId, "YOU ARE CHOSEN ONE", oldBooking.Status == (int)BookingStatus.isWaiting ? $"You got a overlapping booking that start at {bookingRequest.StartTime} on {bookingRequest.ServiceDate}" : $"You have new booking that start at {bookingRequest.StartTime} on {bookingRequest.ServiceDate}", $"/booking/:{oldBooking.ID}");
 
             oldBooking.ArtistStoreId = artistStore.ID;
 
@@ -182,7 +182,7 @@ namespace INBS.Application.Services
                     "New Booking",
                     $"You have a new booking at {booking.StartTime} on {booking.ServiceDate}",
                     new { booking.ID, booking.StartTime, booking.ServiceDate }
-                );
+                    );
 
                 // Send notification to customer
                 if (booking.CustomerSelected?.CustomerID != null)
@@ -289,12 +289,13 @@ namespace INBS.Application.Services
             }
         }
 
-        private async Task SendNotificationBookingToArtist(Guid artistId, string title, string body)
+        private async Task SendNotificationBookingToArtist(Guid artistId, string title, string body, string webHref)
         {
             var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId && c.Platform == (int)DevicePlatformType.Web));
 
             var notification = new Notification
             {
+                WebHref = webHref,
                 CreatedAt = DateTime.Now,
                 NotificationType = (int)NotificationType.Notification,
                 Content = body,
@@ -370,7 +371,8 @@ namespace INBS.Application.Services
                     await SendNotificationBookingToArtist(
                         booking.ArtistStore!.ArtistId,
                         "BOOKING TIME CHANGED",
-                        $"Your booking has been rescheduled from {oldStartTime} {oldServiceDate} to {booking.StartTime} {booking.ServiceDate}"
+                        $"Your booking has been rescheduled from {oldStartTime} {oldServiceDate} to {booking.StartTime} {booking.ServiceDate}",
+                        $"/booking/:{booking.ID}"
                     );
                 }
 
