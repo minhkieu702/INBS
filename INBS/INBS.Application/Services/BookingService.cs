@@ -123,7 +123,7 @@ namespace INBS.Application.Services
             {
                 var servicePrice = item.NailDesignService!.Service!.ServicePriceHistories.FirstOrDefault(c => c.EffectiveTo == null) ?? throw new Exception("Some service do not have price");
                 //totalDuration += item.NailDesignService!.Service!.AverageDuration;
-                totalAmount += servicePrice.Price + item.NailDesignService!.ExtraPrice;
+                totalAmount += servicePrice.Price;
             }
             oldBooking.Status = (int)BookingStatus.isConfirmed;
             oldBooking.TotalAmount = totalAmount;

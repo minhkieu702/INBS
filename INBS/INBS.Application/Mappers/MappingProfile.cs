@@ -154,7 +154,11 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region NailDesignService
-            CreateMap<NailDesignServiceRequest, NailDesignService>();
+            CreateMap<NailDesignServiceRequest, NailDesignService>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.AverageDuration = 60;
+                });
             CreateMap<ServiceNailDesignRequest, NailDesignService>();
             CreateMap<NailDesignService, NailDesignServiceResponse>();
 
