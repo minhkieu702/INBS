@@ -17,6 +17,6 @@ namespace INBS.Application.DTOs.Feedback
 
         public Guid TypeId { get; set; }
 
-        public Guid? BookingId { get; set; }
+        public Guid BookingId { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace INBS.Application.Services
 {
     public class FeedbackService(IUnitOfWork _unitOfWork, IAuthentication _authentication, IHttpContextAccessor _contextAccessor, IMapper _mapper, IFirebaseCloudMessageService _firebaseCloudMessageService, INotificationHubService _notificationHubService, IFirebaseStorageService _firebaseService) : IFeedbackService
     {
-        private async Task NotifyArtist(Guid artistId)
+        private async Task NotifyArtist(Guid artistId, Guid bookingId)
         {
             try
             {
@@ -34,6 +34,7 @@ namespace INBS.Application.Services
                     Title = "YOU ARE RATED",
                     CreatedAt = DateTime.Now,
                     NotificationType = (int)NotificationType.Alert,
+                    WebHref = $"/booking/:{bookingId}",
                 };
 
                 await _unitOfWork.NotificationRepository.InsertAsync(notification);
@@ -47,7 +48,7 @@ namespace INBS.Application.Services
                 return;
             }
         }
-        private async Task HandleAritst(Guid artistId, int newRating, int count, int? oldRating = null, bool isDelete = false)
+        private async Task HandleAritst(Guid artistId, Guid bookingId, int newRating, int count, int? oldRating = null, bool isDelete = false)
         {
             var artist = await _unitOfWork.ArtistRepository.GetByIdAsync(artistId) ?? throw new Exception("Artist not found");
 
@@ -61,7 +62,7 @@ namespace INBS.Application.Services
             {
                 Utils.UpdateRating(newRating, ref count, ref averageRating, oldRating);
 
-                await NotifyArtist(artistId);
+                await NotifyArtist(artistId, bookingId);
             }
 
             artist.AverageRating = averageRating;
@@ -69,7 +70,7 @@ namespace INBS.Application.Services
             await _unitOfWork.ArtistRepository.UpdateAsync(artist);
         }
         
-        private async Task HandleStore(Guid storeId, int newRating, int count, int? oldRating = null, bool isDelete = false)
+        private async Task HandleStore(Guid storeId, Guid bookingId, int newRating, int count, int? oldRating = null, bool isDelete = false)
         {
             var store = await _unitOfWork.StoreRepository.GetByIdAsync(storeId) ?? throw new Exception("Store not found");
 
@@ -89,7 +90,7 @@ namespace INBS.Application.Services
             await _unitOfWork.StoreRepository.UpdateAsync(store);
         }
 
-        private async Task HandleDesign(Guid designId, int newRating, int count, int? oldRating = null, bool isDelete = false)
+        private async Task HandleDesign(Guid designId, Guid bookingId, int newRating, int count, int? oldRating = null, bool isDelete = false)
         {
             var design = await _unitOfWork.DesignRepository.GetByIdAsync(designId) ?? throw new Exception("Design not found");
 
@@ -213,13 +214,13 @@ namespace INBS.Application.Services
                 switch (request.FeedbackType)
                 {
                     case FeedbackType.Artist:
-                        await HandleAritst(request.TypeId, request.Rating, count);
+                        await HandleAritst(request.TypeId, request.BookingId, request.Rating, count);
                         break;
                     case FeedbackType.Design:
-                        await HandleDesign(request.TypeId, request.Rating, count); 
+                        await HandleDesign(request.TypeId, request.BookingId, request.Rating, count); 
                         break;
                     case FeedbackType.Store:
-                        await HandleStore(request.TypeId, request.Rating, count);
+                        await HandleStore(request.TypeId, request.BookingId, request.Rating, count);
                         break;
                     default:
                         break;
@@ -316,13 +317,13 @@ namespace INBS.Application.Services
                 switch (feedback.FeedbackType)
                 {
                     case (int)FeedbackType.Artist:
-                        await HandleAritst(feedback.TypeId, feedback.Rating, count, feedback.Rating, true);
+                        await HandleAritst(feedback.TypeId, feedback.BookingId, feedback.Rating, count, feedback.Rating, true);
                         break;
                     case (int)FeedbackType.Design:
-                        await HandleDesign(feedback.TypeId, feedback.Rating, count, feedback.Rating, true);
+                        await HandleDesign(feedback.TypeId, feedback.BookingId, feedback.Rating, count, feedback.Rating, true);
                         break;
                     case (int)FeedbackType.Store:
-                        await HandleStore(feedback.TypeId, feedback.Rating, count, feedback.Rating, true);
+                        await HandleStore(feedback.TypeId, feedback.BookingId, feedback.Rating, count, feedback.Rating, true);
                         break;
                     default:
                         break;
@@ -371,13 +372,13 @@ namespace INBS.Application.Services
                 switch (request.FeedbackType)
                 {
                     case FeedbackType.Artist:
-                        await HandleAritst(request.TypeId, request.Rating, count, feedback.Rating);
+                        await HandleAritst(request.TypeId, request.BookingId, request.Rating, count, feedback.Rating);
                         break;
                     case FeedbackType.Design:
-                        await HandleDesign(request.TypeId, request.Rating, count, feedback.Rating);
+                        await HandleDesign(request.TypeId, request.BookingId, request.Rating, count, feedback.Rating);
                         break;
                     case FeedbackType.Store:
-                        await HandleStore(request.TypeId, request.Rating, count, feedback.Rating);
+                        await HandleStore(request.TypeId, request.BookingId, request.Rating, count, feedback.Rating);
                         break;
                     default:
                         break;
