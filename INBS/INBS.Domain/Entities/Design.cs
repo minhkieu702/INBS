@@ -11,7 +11,6 @@ namespace INBS.Domain.Entities
             Medias = [];
             NailDesigns = [];
             Preferences = [];
-            Recommendations = [];
         }
 
         public string Name { get; set; }
@@ -30,8 +29,5 @@ namespace INBS.Domain.Entities
 
         [InverseProperty(nameof(Preference.Design))]
         public virtual ICollection<Preference> Preferences { get; set; }
-
-        [InverseProperty(nameof(Recommendation.Design))]
-        public virtual ICollection<Recommendation> Recommendations { get; set; }
     }
 }

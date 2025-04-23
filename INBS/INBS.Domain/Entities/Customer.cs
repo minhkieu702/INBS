@@ -14,7 +14,6 @@ namespace INBS.Domain.Entities
     {
         public Customer()
         {
-            Recommendations = [];
             Preferences = [];
             Description = string.Empty;
             CustomerSelecteds = [];
@@ -34,9 +33,6 @@ namespace INBS.Domain.Entities
         public bool IsVerified { get; set; }
 
         public string? Description { get; set; }
-
-        [InverseProperty(nameof(Recommendation.Customer))]
-        public virtual ICollection<Recommendation> Recommendations { get; set; }
 
         [InverseProperty(nameof(CustomerSelected.Customer))]
         public virtual ICollection<CustomerSelected> CustomerSelecteds { get; set; }

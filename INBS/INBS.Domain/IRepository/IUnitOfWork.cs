@@ -53,8 +53,6 @@ namespace INBS.Domain.IRepository
 
         public IGenericRepository<Preference> PreferenceRepository { get; }
 
-        public IGenericRepository<Recommendation> RecommendationRepository { get; }
-
         public IGenericRepository<Service> ServiceRepository { get; }
 
         public IGenericRepository<ServicePriceHistory> ServicePriceHistoryRepository { get; }

@@ -378,19 +378,6 @@ namespace INBS.Persistence.Repository
         }
         #endregion
 
-        #region Recommendation
-        private IGenericRepository<Recommendation>? _recommendationRepository;
-
-        public IGenericRepository<Recommendation> RecommendationRepository
-        {
-            get
-            {
-                _recommendationRepository ??= new GenericRepository<Recommendation>(_context);
-                return _recommendationRepository;
-            }
-        }
-        #endregion
-
         #region Service
         private IGenericRepository<Service>? _serviceRepository;
 
