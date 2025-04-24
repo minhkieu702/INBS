@@ -42,7 +42,9 @@ namespace INBS.Application.Mappers
 
             #region Artist
             CreateMap<ArtistRequest, Artist>();
-            CreateMap<Artist, ArtistResponse>();
+            CreateMap<Artist, ArtistResponse>()
+                .ForMember(dest => dest.TotalBookingCount, opt => opt.MapFrom(src =>
+        src.ArtistStores.SelectMany(s => s.Bookings).Count()));
             CreateMap<ArtistCertificate, ArtistCertificateResponse>();
             CreateMap<ArtistCertificateRequest, ArtistCertificate>();
             #endregion
