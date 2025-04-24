@@ -112,7 +112,10 @@ namespace INBS.Application.Mappers
                 {
                     dest.LastModifiedAt = DateTime.Now;
                 });
-            CreateMap<Design, DesignResponse>();
+            CreateMap<Design, DesignResponse>()
+                .ForMember(dest => dest.TotalBookingCount, opt => opt.MapFrom(src =>
+                    src.NailDesigns.SelectMany(nd => nd.NailDesignServices.SelectMany(nds => nds.NailDesignServiceSelecteds.SelectMany(s => s.CustomerSelected!.Bookings.Where(c => c.Status == (int)BookingStatus.isCompleted)))).Count())
+                    );
             #endregion
 
             #region DeviceToken
@@ -162,10 +165,7 @@ namespace INBS.Application.Mappers
                     dest.AverageDuration = 60;
                 });
             CreateMap<ServiceNailDesignRequest, NailDesignService>();
-            CreateMap<NailDesignService, NailDesignServiceResponse>()
-                .ForMember(dest => dest.TotalBookingCount, opt => opt.MapFrom(src =>
-                    src.NailDesignServiceSelecteds.SelectMany(s => s.CustomerSelected!.Bookings.Where(c => c.Status == (int)BookingStatus.isCompleted)).Count())
-                    );
+            CreateMap<NailDesignService, NailDesignServiceResponse>();
 
             #endregion
 
