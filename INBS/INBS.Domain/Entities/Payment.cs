@@ -11,12 +11,15 @@ namespace INBS.Domain.Entities
             ID = string.Empty;
             PaymentDetails = [];
             Status = (int)PaymentStatus.Pending;
+            CreatedAt = DateTime.UtcNow;
         }
 
         [Key]
         public string ID { get; set; }
 
         public int Method { get; set; }
+
+        public DateTime CreatedAt { get; set; }
 
         public long TotalAmount { get; set; }
 

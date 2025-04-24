@@ -71,7 +71,9 @@ namespace INBS.Application.Services
 
                     Method = (int)PaymentMethod.QRCode,
 
-                    Status = (int)PaymentStatus.Pending
+                    Status = (int)PaymentStatus.Pending,
+
+                    CreatedAt = DateTime.UtcNow,
                 };
 
                 var bookings = await ValidatePaymentRequest(paymentDetailRequests.Select(c => c.BookingId));
