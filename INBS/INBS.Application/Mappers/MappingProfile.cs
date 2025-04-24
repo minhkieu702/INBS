@@ -44,7 +44,7 @@ namespace INBS.Application.Mappers
             CreateMap<ArtistRequest, Artist>();
             CreateMap<Artist, ArtistResponse>()
                 .ForMember(dest => dest.TotalBookingCount, opt => opt.MapFrom(src =>
-        src.ArtistStores.SelectMany(s => s.Bookings).Count()));
+        src.ArtistStores.SelectMany(s => s.Bookings.Where(c => c.Status == (int)BookingStatus.isCompleted)).Count()));
             CreateMap<ArtistCertificate, ArtistCertificateResponse>();
             CreateMap<ArtistCertificateRequest, ArtistCertificate>();
             #endregion
@@ -162,11 +162,14 @@ namespace INBS.Application.Mappers
                     dest.AverageDuration = 60;
                 });
             CreateMap<ServiceNailDesignRequest, NailDesignService>();
-            CreateMap<NailDesignService, NailDesignServiceResponse>();
+            CreateMap<NailDesignService, NailDesignServiceResponse>()
+                .ForMember(dest => dest.TotalBookingCount, opt => opt.MapFrom(src =>
+                    src.NailDesignServiceSelecteds.SelectMany(s => s.CustomerSelected!.Bookings.Where(c => c.Status == (int)BookingStatus.isCompleted)).Count())
+                    );
 
             #endregion
 
-            #region NailDesignServiceSelected
+                #region NailDesignServiceSelected
             CreateMap<NailDesignServiceSelectedRequest, NailDesignServiceSelected>();
             CreateMap<NailDesignServiceSelected, NailDesignServiceSelectedResponse>();
             #endregion
