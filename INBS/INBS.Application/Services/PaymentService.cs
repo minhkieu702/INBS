@@ -258,6 +258,8 @@ namespace INBS.Application.Services
 
             payment.Status = (int)PaymentStatus.Success;
 
+            payment.CreatedAt = DateTime.UtcNow;
+
             var bookings = payment.PaymentDetails.Select(c => c.Booking).ToList();
 
             if (bookings.Count == 0)
@@ -385,7 +387,7 @@ namespace INBS.Application.Services
         {
             try
             {
-                return _unitOfWork.PaymentRepository.Query().ProjectTo<PaymentResponse>(_mapper.ConfigurationProvider);
+                return _unitOfWork.PaymentRepository.Query().Where(c => c.Status == (int)PaymentStatus.Success).ProjectTo<PaymentResponse>(_mapper.ConfigurationProvider);
             }
             catch (Exception)
             {

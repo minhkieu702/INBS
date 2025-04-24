@@ -20,6 +20,8 @@ namespace INBS.Application.DTOs.Payment
 
         public string Status { get; set; } = string.Empty;
 
+        public DateTime CreatedAt { get; set; }
+
         public virtual ICollection<PaymentDetailResponse> PaymentDetails { get; set; } = [];
     }
 }
