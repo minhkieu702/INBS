@@ -44,7 +44,7 @@ namespace INBS.Application.Services
                     throw new Exception("Artist store not found");
                 }
                 artistStore.Status = (int)artistStoreStatus;
-                _unitOfWork.ArtistStoreRepository.Update(artistStore);
+                await _unitOfWork.ArtistStoreRepository.UpdateAsync(artistStore);
 
                 switch (artistStoreStatus)
                 {
@@ -84,7 +84,7 @@ namespace INBS.Application.Services
                 UserId = artistStore.ArtistId
             };
 
-            _unitOfWork.NotificationRepository.Insert(notification);
+            await _unitOfWork.NotificationRepository.InsertAsync(notification);
 
             if (deviceTokens.Count == 0) return /*throw new Exception("Can't send notification to artist, because artist does not have device")*/;
 
