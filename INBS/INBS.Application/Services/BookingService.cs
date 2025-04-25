@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Google.Apis.Http;
 using INBS.Application.Common.MyJsonConverters;
+using INBS.Application.DTOs.Artist;
 using INBS.Application.DTOs.Booking;
 using INBS.Application.Interfaces;
 using INBS.Application.IService;
@@ -909,6 +910,95 @@ namespace INBS.Application.Services
             }
 
             return timeRanges;
+        }
+
+        public async Task<List<ArtistResponse>> SuggestArtist(Guid storeId, DateOnly date, TimeOnly time, Guid customerSelectedId)
+        {
+            try
+            {
+                var nailDesignServiceSelected = await _unitOfWork.NailDesignServiceSelectedRepository.Query()
+                    .Where(c => c.CustomerSelectedId == customerSelectedId)
+                    .Include(c => c.NailDesignService)
+                    .Include(c => c.CustomerSelected)
+                    .ToListAsync() ?? throw new Exception("Something was wrong. Please begin from start");
+
+                var averageDuration = nailDesignServiceSelected.Sum(c => c.NailDesignService!.AverageDuration);
+
+                var predictEndTime = time.AddMinutes(averageDuration);
+
+                var serviceIds = nailDesignServiceSelected.Select(c => c.NailDesignService!.ServiceId).ToList();
+
+                // lấy những artist của store vào ngày đó và có khả năng làm các dịch vụ trong customerSelected và rảnh vào thời gian đó
+                var artistStores = await _unitOfWork.ArtistStoreRepository.Query()
+                    .Where(c
+                    => c.Artist != null
+                    && c.StoreId == storeId
+                    && date == c.WorkingDate
+                    && c.StartTime <= predictEndTime
+                    && time < c.EndTime
+                    && !serviceIds.Except(c.Artist.ArtistServices.Select(x => x.ServiceId)).Any()
+                    )
+                    .Include(c => c.Artist)
+                    .ThenInclude(c => c!.User)
+                    .Include(c => c.Artist!.Certificates)
+                    .ToListAsync();
+
+                var artists = artistStores.Select(c => c.Artist).OrderByDescending(c => c.AverageRating).ToList();
+
+                // tính điểm cho các artist trong danh sách artsit theo khối lượng thời gian các artist làm vào ngày đó và thời gian trống của artist (*1,5)
+                // dựa vào lịch sử đánh giá của khách hàng (*2)
+
+                var scoredBookings = artistStores.Select(c => new
+                {
+                    c.Artist,
+                    Score = CalculateScoreArtist(c.Artist!, c.Bookings, c)
+                })
+                .OrderByDescending(c => c.Score)
+                .Select(c => c.Artist)
+                .ToList();
+
+                scoredBookings.ForEach(c =>
+                {
+                    if (c == null || c.User == null) return;
+                    c.User.Artist = null;
+                    c.ArtistServices = [];
+                    c.ArtistStores = [];
+                });
+
+                // trả về danh sách artist
+                return _mapper.Map<List<ArtistResponse>>(scoredBookings);            
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public double CalculateScoreArtist(Artist artist, IEnumerable<Booking> bookings, ArtistStore artistStore)
+        {
+            var customerId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+            var feedback = _unitOfWork.FeedbackRepository.Query()
+                .OrderByDescending(c => c.CreatedAt)
+                .FirstOrDefault(c 
+                => c.FeedbackType == (int)FeedbackType.Artist 
+                && customerId == c.CustomerId 
+                && c.TypeId == artist.ID);
+
+            var feedbackScore = feedback != null ? feedback.Rating : 0;
+
+            var totalBookedMinutes = bookings
+                                .Sum(c => (c.PredictEndTime.ToTimeSpan() - c.StartTime.ToTimeSpan()).TotalMinutes);
+
+            var averageRatingScore = artist.AverageRating/ 5.0;
+
+            var feedbackScoreNormalized = feedbackScore / 5.0;
+
+            var timeInThisStore = (artistStore.EndTime.ToTimeSpan() - artistStore.StartTime.ToTimeSpan()).TotalMinutes;
+
+            var bookingTimeScore = 1 - Math.Min(totalBookedMinutes / timeInThisStore, 1);
+
+            return (averageRatingScore * 0.3) + (feedbackScoreNormalized * 0.5) + (bookingTimeScore * 0.2);
         }
     }
 }
