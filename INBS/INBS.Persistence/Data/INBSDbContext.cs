@@ -64,8 +64,6 @@ namespace INBS.Persistence.Data
 
         public virtual DbSet<Preference> Preferences { get; set; }
 
-        public virtual DbSet<Recommendation> Recommendations { get; set; }
-
         public virtual DbSet<Service> Services { get; set; }
 
         public virtual DbSet<Store> Stores { get; set; }
@@ -79,7 +77,6 @@ namespace INBS.Persistence.Data
             modelBuilder.Entity<NailDesignServiceSelected>().HasKey(c => new { c.NailDesignServiceId, c.CustomerSelectedId });
             modelBuilder.Entity<CategoryService>().HasKey(c => new { c.CategoryId, c.ServiceId });
             modelBuilder.Entity<Media>().HasKey(c => new { c.DesignId, c.NumerialOrder });
-            modelBuilder.Entity<Recommendation>().HasKey(c => new { c.CustomerId, c.DesignId });
             modelBuilder.Entity<PaymentDetail>().HasKey(c => new { c.PaymentId, c.BookingId });
             modelBuilder.Entity<Cart>().HasKey(c => new { c.NailDesignServiceId, c.CustomerId });
 
@@ -101,10 +98,11 @@ namespace INBS.Persistence.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
-
-        }
+            optionsBuilder
+             .UseSqlServer("workstation id=INBSDatabase.mssql.somee.com;packet size=4096;user id=quangminh_SQLLogin_1;pwd=at22vmjqnq;data source=INBSDatabase.mssql.somee.com;persist security info=False;initial catalog=INBSDatabase;TrustServerCertificate=True");
+             // .UseSqlServer("Server=DESKTOP-54Q7719\\SQLEXPRESS; uid=sa; pwd=1234567890; database=INBSTest; TrustServerCertificate=True");
+         }
     }
 }

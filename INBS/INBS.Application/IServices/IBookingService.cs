@@ -1,4 +1,5 @@
-﻿using INBS.Application.DTOs.Booking;
+﻿using INBS.Application.DTOs.Artist;
+using INBS.Application.DTOs.Booking;
 using INBS.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -27,5 +28,7 @@ namespace INBS.Application.IService
         Task<string?> SuggestOffPeakTimeAsync(Guid bookingId);
 
         Task<List<SuggestSlot>> SuggestTimeSlots(DateOnly date, Guid storeId);
+
+        Task<List<ArtistResponse>> SuggestArtist(Guid storeId, DateOnly date, TimeOnly time, Guid customerSelectedId);
     }
 }

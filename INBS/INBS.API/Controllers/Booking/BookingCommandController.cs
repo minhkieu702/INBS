@@ -166,6 +166,20 @@ namespace INBS.API.Controllers.Booking
             }
         }
 
+        [HttpPost("SuggestArtist")]
+        public async Task<IActionResult> SuggestArtist([FromForm] Guid storeId, [FromForm] DateOnly date, [FromForm] TimeOnly time, [FromForm] Guid customerSelectedId)
+        {
+            try
+            {
+                var suggestedArtists = await service.SuggestArtist(storeId, date, time, customerSelectedId);
+                return Ok(suggestedArtists);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
         [HttpPost("SuggestTimeSlots")]
         public async Task<IActionResult> SuggestTimeSlots([FromForm] DateOnly date, [FromForm] Guid storeId)
         {

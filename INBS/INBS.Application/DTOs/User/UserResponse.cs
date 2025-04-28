@@ -18,8 +18,6 @@ namespace INBS.Application.DTOs.User
         public string? FullName { get; set; }
         public string? Email {  get; set; }
 
-        public string PasswordHash { get; set; } = string.Empty;
-
         public string? PhoneNumber { get; set; }
 
         public int Role { get; set; } //Customer, Artist, Admin

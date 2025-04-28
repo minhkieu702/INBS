@@ -10,6 +10,7 @@ namespace INBS.Domain.Entities
         {
             NailDesignServiceSelecteds = [];
             Carts = [];
+            AverageDuration = 60;
         }
         public long AverageDuration { get; set; }
 
@@ -22,8 +23,6 @@ namespace INBS.Domain.Entities
         [ForeignKey(nameof(ServiceId))]
         [InverseProperty(nameof(Service.NailDesignServices))]
         public virtual Service? Service { get; set; }
-
-        public long ExtraPrice { get; set; }
 
         [InverseProperty(nameof(NailDesignServiceSelected.NailDesignService))]
         public virtual ICollection<NailDesignServiceSelected> NailDesignServiceSelecteds { get; set; }

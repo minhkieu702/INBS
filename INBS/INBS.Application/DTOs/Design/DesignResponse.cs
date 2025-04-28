@@ -16,6 +16,8 @@ namespace INBS.Application.DTOs.Design
 
         public float AverageRating { get; set; }
 
+        public int TotalBookingCount { get; set; }
+
         public virtual ICollection<MediaResponse> Medias { get; set; } = [];
 
         public virtual ICollection<PreferenceResponse> Preferences { get; set; } = [];

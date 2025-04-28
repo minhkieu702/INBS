@@ -42,7 +42,9 @@ namespace INBS.Application.Mappers
 
             #region Artist
             CreateMap<ArtistRequest, Artist>();
-            CreateMap<Artist, ArtistResponse>();
+            CreateMap<Artist, ArtistResponse>()
+                .ForMember(dest => dest.TotalBookingCount, opt => opt.MapFrom(src =>
+        src.ArtistStores.SelectMany(s => s.Bookings.Where(c => c.Status == (int)BookingStatus.isCompleted)).Count()));
             CreateMap<ArtistCertificate, ArtistCertificateResponse>();
             CreateMap<ArtistCertificateRequest, ArtistCertificate>();
             #endregion
@@ -110,7 +112,10 @@ namespace INBS.Application.Mappers
                 {
                     dest.LastModifiedAt = DateTime.Now;
                 });
-            CreateMap<Design, DesignResponse>();
+            CreateMap<Design, DesignResponse>()
+                .ForMember(dest => dest.TotalBookingCount, opt => opt.MapFrom(src =>
+                    src.NailDesigns.SelectMany(nd => nd.NailDesignServices.SelectMany(nds => nds.NailDesignServiceSelecteds.SelectMany(s => s.CustomerSelected!.Bookings.Where(c => c.Status == (int)BookingStatus.isCompleted)))).Count())
+                    );
             #endregion
 
             #region DeviceToken
@@ -154,13 +159,17 @@ namespace INBS.Application.Mappers
             #endregion
 
             #region NailDesignService
-            CreateMap<NailDesignServiceRequest, NailDesignService>();
+            CreateMap<NailDesignServiceRequest, NailDesignService>()
+                .AfterMap((source, dest) =>
+                {
+                    dest.AverageDuration = 60;
+                });
             CreateMap<ServiceNailDesignRequest, NailDesignService>();
             CreateMap<NailDesignService, NailDesignServiceResponse>();
 
             #endregion
 
-            #region NailDesignServiceSelected
+                #region NailDesignServiceSelected
             CreateMap<NailDesignServiceSelectedRequest, NailDesignServiceSelected>();
             CreateMap<NailDesignServiceSelected, NailDesignServiceSelectedResponse>();
             #endregion

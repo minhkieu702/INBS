@@ -18,6 +18,8 @@ namespace INBS.Domain.Entities
             Status = (int)NotificationStatus.Send;
             Content = string.Empty;
             NotificationType = (int)Enums.NotificationType.Notification;
+            WebHref = string.Empty;
+            AppHref = string.Empty;
         }
         public int Status { get; set; } 
 
@@ -26,6 +28,10 @@ namespace INBS.Domain.Entities
         public string Title { get; set; }
 
         public string Content { get; set; }
+
+        public string WebHref { get; set; }
+
+        public string AppHref { get; set; }
 
         public Guid UserId { get; set; }
         [ForeignKey(nameof(UserId))]

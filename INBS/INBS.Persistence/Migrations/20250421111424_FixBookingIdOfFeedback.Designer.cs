@@ -4,6 +4,7 @@ using INBS.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace INBS.Persistence.Migrations
 {
     [DbContext(typeof(INBSDbContext))]
-    partial class INBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250421111424_FixBookingIdOfFeedback")]
+    partial class FixBookingIdOfFeedback
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -570,9 +573,6 @@ namespace INBS.Persistence.Migrations
                     b.Property<string>("ID")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("Method")
                         .HasColumnType("int");
 
@@ -629,6 +629,24 @@ namespace INBS.Persistence.Migrations
                     b.HasIndex("DesignId");
 
                     b.ToTable("Preferences");
+                });
+
+            modelBuilder.Entity("INBS.Domain.Entities.Recommendation", b =>
+                {
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DesignId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("GenerateAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CustomerId", "DesignId");
+
+                    b.HasIndex("DesignId");
+
+                    b.ToTable("Recommendations");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Service", b =>
@@ -1078,6 +1096,25 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Design");
                 });
 
+            modelBuilder.Entity("INBS.Domain.Entities.Recommendation", b =>
+                {
+                    b.HasOne("INBS.Domain.Entities.Customer", "Customer")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("INBS.Domain.Entities.Design", "Design")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("DesignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Design");
+                });
+
             modelBuilder.Entity("INBS.Domain.Entities.ServicePriceHistory", b =>
                 {
                     b.HasOne("INBS.Domain.Entities.Service", "Service")
@@ -1119,6 +1156,8 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("Preferences");
+
+                    b.Navigation("Recommendations");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.CustomerSelected", b =>
@@ -1135,6 +1174,8 @@ namespace INBS.Persistence.Migrations
                     b.Navigation("NailDesigns");
 
                     b.Navigation("Preferences");
+
+                    b.Navigation("Recommendations");
                 });
 
             modelBuilder.Entity("INBS.Domain.Entities.Feedback", b =>

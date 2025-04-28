@@ -34,8 +34,6 @@ namespace INBS.Domain.Entities
 
         public long AverageDuration { get; set; }
 
-        public bool IsAdditional { get; set; }
-
         [InverseProperty(nameof(ServicePriceHistory.Service))]
         public virtual ICollection<ServicePriceHistory> ServicePriceHistories { get; set; }
 
