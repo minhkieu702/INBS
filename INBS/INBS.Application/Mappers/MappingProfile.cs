@@ -45,6 +45,9 @@ namespace INBS.Application.Mappers
             CreateMap<Artist, ArtistResponse>()
                 .ForMember(dest => dest.TotalBookingCount, opt => opt.MapFrom(src =>
         src.ArtistStores.SelectMany(s => s.Bookings.Where(c => c.Status == (int)BookingStatus.isCompleted)).Count()));
+            #endregion
+
+            #region ArtistCertificate
             CreateMap<ArtistCertificate, ArtistCertificateResponse>();
             CreateMap<ArtistCertificateRequest, ArtistCertificate>();
             #endregion
