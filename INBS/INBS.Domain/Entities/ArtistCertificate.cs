@@ -13,6 +13,8 @@ namespace INBS.Domain.Entities
     {
         public ArtistCertificate() {
             ImageUrl = Constants.DEFAULT_IMAGE_URL;
+            Title = string.Empty;
+            Description = string.Empty;
         }
      
         [Key]

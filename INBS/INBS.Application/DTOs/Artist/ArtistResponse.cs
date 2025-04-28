@@ -22,7 +22,7 @@ namespace INBS.Application.DTOs.Artist
         public int TotalBookingCount { get; set; }
 
         public float AverageRating { get; set; }
-        public virtual ICollection<ArtistCertificateResponse> Certificates { get; set; } = [];
+        public virtual ICollection<ArtistCertificateResponse> ArtistCertificates { get; set; } = [];
 
         public virtual ICollection<ArtistStoreResponse> ArtistStores { get; set; } = [];
 
