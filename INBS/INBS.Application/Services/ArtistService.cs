@@ -342,7 +342,6 @@ namespace INBS.Application.Services
             }
         }
 
-
         public async Task Delete(Guid id)
         {
             try

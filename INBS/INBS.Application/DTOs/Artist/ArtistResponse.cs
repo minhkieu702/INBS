@@ -21,6 +21,8 @@ namespace INBS.Application.DTOs.Artist
 
         public int TotalBookingCount { get; set; }
 
+        public bool IsBusy { get; set; }
+
         public float AverageRating { get; set; }
         public virtual ICollection<ArtistCertificateResponse> Certificates { get; set; } = [];
 

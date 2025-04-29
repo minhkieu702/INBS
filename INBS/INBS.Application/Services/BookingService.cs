@@ -912,7 +912,7 @@ namespace INBS.Application.Services
             return timeRanges;
         }
 
-        public async Task<List<ArtistResponse>> SuggestArtist(Guid storeId, DateOnly date, TimeOnly time, Guid customerSelectedId)
+        public async Task<List<ArtistResponse>> SuggestArtist(Guid storeId, DateOnly date, TimeOnly startTime, Guid customerSelectedId)
         {
             try
             {
@@ -924,7 +924,7 @@ namespace INBS.Application.Services
 
                 var averageDuration = nailDesignServiceSelected.Sum(c => c.NailDesignService!.AverageDuration);
 
-                var predictEndTime = time.AddMinutes(averageDuration);
+                var predictEndTime = startTime.AddMinutes(averageDuration);
 
                 var serviceIds = nailDesignServiceSelected.Select(c => c.NailDesignService!.ServiceId).ToList();
 
@@ -935,38 +935,45 @@ namespace INBS.Application.Services
                     && c.StoreId == storeId
                     && date == c.WorkingDate
                     && c.StartTime <= predictEndTime
-                    && time < c.EndTime
+                    && startTime < c.EndTime
                     && !serviceIds.Except(c.Artist.ArtistServices.Select(x => x.ServiceId)).Any()
                     )
                     .Include(c => c.Artist)
                     .ThenInclude(c => c!.User)
                     .Include(c => c.Artist!.Certificates)
+                    .Include(c => c.Bookings)
                     .ToListAsync();
-
-                var artists = artistStores.Select(c => c.Artist).OrderByDescending(c => c.AverageRating).ToList();
 
                 // tính điểm cho các artist trong danh sách artsit theo khối lượng thời gian các artist làm vào ngày đó và thời gian trống của artist (*1,5)
                 // dựa vào lịch sử đánh giá của khách hàng (*2)
-
+                    
                 var scoredBookings = artistStores.Select(c => new
                 {
                     c.Artist,
-                    Score = CalculateScoreArtist(c.Artist!, c.Bookings, c)
+                    Score = CalculateScoreArtist(c.Artist!, c.Bookings, c, out bool status),
+                    Status = status
                 })
                 .OrderByDescending(c => c.Score)
-                .Select(c => c.Artist)
+                .Select(c => new { c.Artist, c.Status })
                 .ToList();
 
                 scoredBookings.ForEach(c =>
                 {
-                    if (c == null || c.User == null) return;
-                    c.User.Artist = null;
-                    c.ArtistServices = [];
-                    c.ArtistStores = [];
+                    if (c.Artist == null || c.Artist.User == null) return;
+                    c.Artist.User.Artist = null;
+                    c.Artist.ArtistServices = [];
+                    c.Artist.ArtistStores = [];
+                });
+
+                var artists = _mapper.Map<List<ArtistResponse>>(scoredBookings.Select(c => c.Artist));
+
+                artists.ForEach(c =>
+                {
+                    c.IsBusy = scoredBookings.FirstOrDefault(s => s.Artist?.ID == c.ID)?.Status ?? false;
                 });
 
                 // trả về danh sách artist
-                return _mapper.Map<List<ArtistResponse>>(scoredBookings);            
+                return artists;            
             }
             catch (Exception)
             {
@@ -975,7 +982,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public double CalculateScoreArtist(Artist artist, IEnumerable<Booking> bookings, ArtistStore artistStore)
+        public double CalculateScoreArtist(Artist artist, IEnumerable<Booking> bookings, ArtistStore artistStore, out bool status)
         {
             var customerId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
             var feedback = _unitOfWork.FeedbackRepository.Query()
@@ -986,6 +993,8 @@ namespace INBS.Application.Services
                 && c.TypeId == artist.ID);
 
             var feedbackScore = feedback != null ? feedback.Rating : 0;
+
+            status = bookings.Any(c => c.Status == (int)BookingStatus.isConfirmed || c.Status == (int)BookingStatus.isWaiting);
 
             var totalBookedMinutes = bookings
                                 .Sum(c => (c.PredictEndTime.ToTimeSpan() - c.StartTime.ToTimeSpan()).TotalMinutes);
@@ -1000,5 +1009,6 @@ namespace INBS.Application.Services
 
             return (averageRatingScore * 0.3) + (feedbackScoreNormalized * 0.5) + (bookingTimeScore * 0.2);
         }
+    
     }
 }
