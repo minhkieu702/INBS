@@ -950,7 +950,7 @@ namespace INBS.Application.Services
                 var scoredBookings = artistStores.Select(c => new
                 {
                     c.Artist,
-                    Score = CalculateScoreArtist(c.Artist!, c.Bookings, c, out bool status),
+                    Score = CalculateScoreArtist(c.Artist!, c.Bookings, c, startTime, predictEndTime, out bool status),
                     Status = status
                 })
                 .OrderByDescending(c => c.Score)
@@ -982,7 +982,7 @@ namespace INBS.Application.Services
             }
         }
 
-        public double CalculateScoreArtist(Artist artist, IEnumerable<Booking> bookings, ArtistStore artistStore, out bool status)
+        public double CalculateScoreArtist(Artist artist, IEnumerable<Booking> bookings, ArtistStore artistStore, TimeOnly startTime, TimeOnly endTime, out bool IsArtistBusy)
         {
             var customerId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
             var feedback = _unitOfWork.FeedbackRepository.Query()
@@ -994,7 +994,10 @@ namespace INBS.Application.Services
 
             var feedbackScore = feedback != null ? feedback.Rating : 0;
 
-            status = bookings.Any(c => c.Status == (int)BookingStatus.isConfirmed || c.Status == (int)BookingStatus.isWaiting);
+            IsArtistBusy = bookings.Any(c 
+                => c.StartTime <= endTime.AddMinutes(artistStore.BreakTime) 
+                && startTime <= c.PredictEndTime.AddMinutes(artistStore.BreakTime)
+                && (c.Status == (int)BookingStatus.isConfirmed || c.Status == (int)BookingStatus.isWaiting));
 
             var totalBookedMinutes = bookings
                                 .Sum(c => (c.PredictEndTime.ToTimeSpan() - c.StartTime.ToTimeSpan()).TotalMinutes);
