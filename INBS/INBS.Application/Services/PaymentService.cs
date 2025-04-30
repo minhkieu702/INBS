@@ -145,9 +145,10 @@ namespace INBS.Application.Services
                 
                 payment.Method = (int)PaymentMethod.Cash;
                 payment.Status = (int)PaymentStatus.Success;
+                payment.ID = Utils.GetID().ToString();
 
                 var totalAmount = await ValidatePaymentRequest(paymentDetailRequests.Select(c => c.BookingId));
-                
+
                 await UpdateBookingStatus(paymentDetailRequests.Select(c => c.BookingId), (int)BookingStatus.isCompleted);
 
                 await _unitOfWork.PaymentRepository.InsertAsync(payment);
