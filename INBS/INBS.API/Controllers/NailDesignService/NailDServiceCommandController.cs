@@ -15,7 +15,7 @@ namespace INBS.API.Controllers.NailDesignService
         /// <param name="serviceDuration">The service duration request.</param>
         /// <returns>An action result.</returns>
         [HttpPost("Time")]
-        public async Task<IActionResult> UpdateTime([FromForm] ServiceDurationRequest serviceDuration)
+        public async Task<IActionResult> UpdateTime([FromForm] NailDesignServiceDurationRequest serviceDuration)
         {
             try
             {

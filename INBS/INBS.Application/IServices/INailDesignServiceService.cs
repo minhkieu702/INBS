@@ -12,6 +12,6 @@ namespace INBS.Application.IServices
     public interface INailDesignServiceService
     {
         IQueryable<NailDesignServiceResponse> Get();
-        Task UpdateTime(ServiceDurationRequest serviceDuration);
+        Task UpdateTime(NailDesignServiceDurationRequest serviceDuration);
     }
 }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace INBS.Application.DTOs.Service
 {
-    public class ServiceDurationRequest
+    public class NailDesignServiceDurationRequest
     {
-        public Guid ServiceId { get; set; }
+        public Guid ID { get; set; }
         public long Duration { get; set; }
     }
 }

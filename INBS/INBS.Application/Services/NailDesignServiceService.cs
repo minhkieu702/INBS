@@ -38,15 +38,15 @@ namespace INBS.Application.Services
 
 
 
-        public async Task UpdateTime(ServiceDurationRequest serviceDuration)
+        public async Task UpdateTime(NailDesignServiceDurationRequest serviceDuration)
         {
             try
             {
                 var count = await _unitOfWork.BookingRepository.Query()
-                    .Select(c => c.CustomerSelected!.NailDesignServiceSelecteds.Where(c => c.NailDesignService!.ServiceId == serviceDuration.ServiceId)).CountAsync();
+                    .Select(c => c.CustomerSelected!.NailDesignServiceSelecteds.Where(c => c.NailDesignService!.ID == serviceDuration.ID)).CountAsync();
 
                 var nailDesignService = await _unitOfWork.NailDesignServiceRepository.Query()
-                    .FirstOrDefaultAsync(c => c.ServiceId == serviceDuration.ServiceId) ?? throw new Exception("This nail design service not found");
+                    .FirstOrDefaultAsync(c => c.ID == serviceDuration.ID) ?? throw new Exception("This nail design service not found");
 
                 nailDesignService.AverageDuration = (nailDesignService.AverageDuration * count + serviceDuration.Duration) / (count + 1);
 
