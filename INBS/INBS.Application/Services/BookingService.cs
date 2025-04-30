@@ -417,7 +417,7 @@ namespace INBS.Application.Services
                 BookingId = bookingId,
                 CancelledAt = DateTime.UtcNow,
                 Reason = cancelReason,
-                Percent = 1
+                Percent = 100
             };
             await _unitOfWork.CancellationRepository.InsertAsync(cancelation);
         }
