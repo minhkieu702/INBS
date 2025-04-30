@@ -83,6 +83,10 @@ namespace INBS.Application.Mappers
                 ;
             #endregion
 
+            #region Cancellation
+            CreateMap<Cancellation, CancellationResponse>();
+            #endregion
+
             #region Cart
             CreateMap<CartRequest, Cart>();
             CreateMap<Cart, CartResponse>();
@@ -172,7 +176,7 @@ namespace INBS.Application.Mappers
 
             #endregion
 
-                #region NailDesignServiceSelected
+            #region NailDesignServiceSelected
             CreateMap<NailDesignServiceSelectedRequest, NailDesignServiceSelected>();
             CreateMap<NailDesignServiceSelected, NailDesignServiceSelectedResponse>();
             #endregion

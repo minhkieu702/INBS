@@ -74,6 +74,7 @@ namespace INBS.API.AppStart
                     odataBuilder.EntitySet<ArtistServiceResponse>(nameof(ArtistService));
                     odataBuilder.EntitySet<ArtistStoreResponse>(nameof(ArtistStore));
                     odataBuilder.EntitySet<BookingResponse>(nameof(Booking));
+                    odataBuilder.EntitySet<CancellationResponse>(nameof(Cancellation));
                     odataBuilder.EntitySet<Category>(nameof(Category));
                     odataBuilder.EntitySet<CategoryServiceResponse>(nameof(CategoryService));
                     odataBuilder.EntitySet<CartResponse>(nameof(Cart));

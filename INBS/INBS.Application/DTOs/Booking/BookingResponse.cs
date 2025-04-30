@@ -35,6 +35,6 @@ namespace INBS.Application.DTOs.Booking
         
         public virtual ArtistStoreResponse? ArtistStore { get; set; }
 
-        //public virtual ICollection<Cancellation> Cancellations { get; set; } = [];
+        public virtual ICollection<CancellationResponse> Cancellations { get; set; } = [];
     }
 }
