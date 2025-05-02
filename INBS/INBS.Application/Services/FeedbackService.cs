@@ -310,8 +310,6 @@ namespace INBS.Application.Services
 
                 var feedback = await _unitOfWork.FeedbackRepository.GetByIdAsync(id) ?? throw new Exception("Feedback not found");
 
-                var userId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-
                 var count = _unitOfWork.FeedbackRepository.Query().Where(c => c.TypeId == feedback.TypeId && c.FeedbackType == feedback.FeedbackType).Count();
 
                 switch (feedback.FeedbackType)
