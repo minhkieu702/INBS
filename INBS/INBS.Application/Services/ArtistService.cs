@@ -167,7 +167,7 @@ namespace INBS.Application.Services
 
             await _firebaseCloudMessageService.SendToMultipleDevices(deviceTokens.Select(c => c.Token).ToList(), title, message);
 
-            await _notificationHubService.NotifyArtistStoreIsCreated(adminId, title, message);
+            await _notificationHubService.NotifyBookingCreated(adminId, title, message, new object());
 
         }
 
