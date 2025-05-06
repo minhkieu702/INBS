@@ -59,7 +59,7 @@ namespace INBS.Application.Services
             var breaktime = artistStore.BreakTime;
 
             var bookings = await _unitOfWork.BookingRepository.GetAsync(c => c.Where(otherBooking
-                => otherBooking.ArtistStoreId == booking.ArtistStoreId
+                => otherBooking.ArtistStoreId == artistStore.ID
 
                 && otherBooking.ServiceDate == booking.ServiceDate
 
