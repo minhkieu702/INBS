@@ -25,7 +25,6 @@ namespace INBS.Application.Services
         private const string ApiKey = "469acea901a9fff8210792874151eaa2582149dbf8fa1a28db48ebb4c5901382";
         private const string TogetherAIUrl = "https://api.together.xyz/v1/chat/completions";
 
-
         private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly? predictEndTime)
         {
             var artistStores = await _unitOfWork.ArtistStoreRepository.GetAsync(c => c.Where(c
@@ -186,14 +185,14 @@ namespace INBS.Application.Services
                     );
 
                 // Send notification to customer
-                if (booking.CustomerSelected?.CustomerID != null)
-                {
-                    await NotificationToCustomer(
-                        booking.CustomerSelected.CustomerID,
-                        "Booking Confirmation",
-                        $"Your booking has been created successfully for {booking.StartTime} on {booking.ServiceDate}"
-                    );
-                }
+                //if (booking.CustomerSelected?.CustomerID != null)
+                //{
+                //    await NotificationToCustomer(
+                //        booking.CustomerSelected.CustomerID,
+                //        "Booking Confirmation",
+                //        $"Your booking has been created successfully for {booking.StartTime} on {booking.ServiceDate}"
+                //    );
+                //}
 
                 _unitOfWork.CommitTransaction();
                 return booking.ID;
@@ -292,7 +291,7 @@ namespace INBS.Application.Services
 
         private async Task SendNotificationBookingToArtist(Guid artistId, string title, string body, string webHref)
         {
-            var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId && c.Platform == (int)DevicePlatformType.Web));
+            var deviceTokenOfArtist = await _unitOfWork.DeviceTokenRepository.GetAsync(query => query.Where(c => c.UserId == artistId));
 
             var notification = new Notification
             {
