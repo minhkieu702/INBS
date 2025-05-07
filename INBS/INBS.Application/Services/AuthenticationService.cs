@@ -226,7 +226,7 @@ namespace INBS.Application.Services
                 user.PasswordHash = _authentication.HashedPassword(user, newPassword);
                 user.Customer.OtpCode = null;
                 await _unitOfWork.UserRepository.UpdateAsync(user);
-
+                await _unitOfWork.SaveAsync();
                 var accessToken = await _authentication.GenerateDefaultTokenAsync(user);
                 var refreshToken = await _authentication.GenerateRefreshTokenAsync(user);
 
