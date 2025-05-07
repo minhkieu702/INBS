@@ -22,7 +22,7 @@ namespace INBS.Application.Services
     public class BookingService(IUnitOfWork _unitOfWork, IMapper _mapper, IFirebaseCloudMessageService _fcmService, IExpoNotification _expoNotification, HttpClient _httpClient, IAuthentication _authentication, IHttpContextAccessor _contextAccessor, INotificationHubService _notificationHubService) : IBookingService
     {
 
-        private const string ApiKey = "469acea901a9fff8210792874151eaa2582149dbf8fa1a28db48ebb4c5901382";
+        private const string ApiKey = Environment.GetEnvironmentVariable("togetherAIKey");
         private const string TogetherAIUrl = "https://api.together.xyz/v1/chat/completions";
 
         private async Task<ArtistStore> ValidateArtistStore(BookingRequest request, TimeOnly? predictEndTime)

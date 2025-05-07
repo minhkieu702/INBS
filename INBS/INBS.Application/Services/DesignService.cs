@@ -530,7 +530,7 @@ namespace INBS.Application.Services
 
         private async Task<List<int>> GetCurrentOccasionIdWithTogetherAI()
         {
-            var key = "469acea901a9fff8210792874151eaa2582149dbf8fa1a28db48ebb4c5901382";
+            var key = "9510715f8646568d5896f1dd2de087316d8724b9425973b4ffedd23c1102a35a";
             var url = "https://api.together.xyz/v1/chat/completions";
 
             var requestBody = new
